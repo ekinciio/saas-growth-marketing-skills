@@ -63,6 +63,10 @@ For each opportunity:
 - Leading indicators to monitor weekly
 - Lagging indicators to review monthly
 
+## Report Output
+
+Save the complete growth strategy as `GROWTH-STRATEGY-REPORT.md` in the current working directory. The report should consolidate findings from all skill audits into a single deliverable. Always inform the user where the report was saved.
+
 ## Guidelines
 
 - Always lead with data, not opinions

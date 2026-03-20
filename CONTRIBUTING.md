@@ -70,6 +70,7 @@ skills/your-skill-name/
 - Must include YAML frontmatter with `name` and `description`
 - Description must explain what the skill does and when to trigger it
 - Must define at least one command
+- Must include a **Report Output** section defining the `.md` report file each command generates
 - Maximum 500 lines (use reference files for additional content)
 
 ```yaml

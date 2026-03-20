@@ -15,7 +15,7 @@
 
 15 specialized skills that turn your AI coding agent into a growth marketing expert. Built for Claude Code, compatible with any tool supporting the [Agent Skills](https://github.com/anthropics/agent-skills) standard.
 
-Every skill produces **actionable output** - scores, reports, and data-driven recommendations. Not just knowledge dumps. Give it a URL, your metrics, or your app name and get back a scored audit with prioritized fixes.
+Every skill produces **actionable output** saved as a `.md` report file - scores, audits, and data-driven recommendations. Not just knowledge dumps. Give it a URL, your metrics, or your app name and get back a scored audit with prioritized fixes, saved to a file you can share.
 
 **No API keys required** - everything works with public endpoints and your own data.
 
@@ -33,23 +33,23 @@ Every skill produces **actionable output** - scores, reports, and data-driven re
 
 ## What You Get
 
-| Skill | Input | Output |
-|-------|-------|--------|
-| **geo-seo-auditor** | URL | AI search visibility score (0-100), crawler status, llms.txt |
-| **aso-optimizer** | App name | Optimized metadata, ASO health score, keyword strategy |
-| **landing-page-cro** | URL | CRO score (0-100), 10-point audit, A/B test ideas |
-| **subscription-metrics** | Your numbers | MRR, ARR, CAC, LTV, Rule of 40 + health assessment |
-| **local-seo-optimizer** | Business info | Local SEO score, GBP completeness, citation gaps |
-| **review-sentiment** | Reviews text | Sentiment breakdown, theme extraction, insights |
-| **plg-funnel-analyzer** | Your metrics | Funnel leak detection, benchmark comparison, fix priorities |
-| **onboarding-optimizer** | Flow details | Onboarding score, pattern recommendation, activation lift |
-| **retention-playbook** | Customer data | Churn risk score, early warning signals, interventions |
-| **pricing-analyzer** | Pricing data | Van Westendorp analysis, tier recommendations, positioning |
-| **competitor-intel** | Competitor URL | Auto-extracted profile, positioning analysis, battle card |
-| **web-app-growth-engine** | Signup URL | Friction score, field analysis, SSO/trust audit |
-| **saas-landing-builder** | Landing URL | Section completeness (X/12), missing elements, structure score |
-| **reddit-opportunity-finder** | Keywords | Scored Reddit threads, opportunity ranking, best subreddits |
-| **brand-mention-scanner** | Brand name | Cross-platform mentions (Reddit/HN/GitHub), sentiment, opportunities |
+| Skill | Input | Output | Report File |
+|-------|-------|--------|-------------|
+| **geo-seo-auditor** | URL | AI search visibility score (0-100), crawler status, llms.txt | `GEO-AUDIT-REPORT.md` |
+| **aso-optimizer** | App name | Optimized metadata, ASO health score, keyword strategy | `ASO-REPORT.md` |
+| **landing-page-cro** | URL | CRO score (0-100), 10-point audit, A/B test ideas | `CRO-AUDIT-REPORT.md` |
+| **subscription-metrics** | Your numbers | MRR, ARR, CAC, LTV, Rule of 40 + health assessment | `SAAS-METRICS-REPORT.md` |
+| **local-seo-optimizer** | Business info | Local SEO score, GBP completeness, citation gaps | `LOCAL-SEO-AUDIT-REPORT.md` |
+| **review-sentiment** | Reviews text | Sentiment breakdown, theme extraction, insights | `REVIEW-SENTIMENT-REPORT.md` |
+| **plg-funnel-analyzer** | Your metrics | Funnel leak detection, benchmark comparison, fix priorities | `PLG-FUNNEL-AUDIT-REPORT.md` |
+| **onboarding-optimizer** | Flow details | Onboarding score, pattern recommendation, activation lift | `ONBOARDING-AUDIT-REPORT.md` |
+| **retention-playbook** | Customer data | Churn risk score, early warning signals, interventions | `RETENTION-DIAGNOSIS-REPORT.md` |
+| **pricing-analyzer** | Pricing data | Van Westendorp analysis, tier recommendations, positioning | `PRICING-AUDIT-REPORT.md` |
+| **competitor-intel** | Competitor URL | Auto-extracted profile, positioning analysis, battle card | `COMPETITOR-ANALYSIS-REPORT.md` |
+| **web-app-growth-engine** | Signup URL | Friction score, field analysis, SSO/trust audit | `WEB-GROWTH-AUDIT-REPORT.md` |
+| **saas-landing-builder** | Landing URL | Section completeness (X/12), missing elements, structure score | `LANDING-PAGE-BLUEPRINT-REPORT.md` |
+| **reddit-opportunity-finder** | Keywords | Scored Reddit threads, opportunity ranking, best subreddits | `REDDIT-OPPORTUNITIES-REPORT.md` |
+| **brand-mention-scanner** | Brand name | Cross-platform mentions (Reddit/HN/GitHub), sentiment, opportunities | `BRAND-MENTIONS-REPORT.md` |
 
 ---
 
@@ -125,6 +125,8 @@ Each skill contains:
 - `SKILL.md` - Skill definition with commands and instructions
 - `references/` - Domain knowledge and best practices
 - `scripts/` - Python scripts for data processing and scoring
+
+Every skill saves its output as a `.md` report file in the current working directory. Report files include the date of analysis, full results, and prioritized recommendations.
 
 ---
 

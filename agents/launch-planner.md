@@ -90,6 +90,10 @@ You create comprehensive launch plans that cover pre-launch preparation, launch 
 - Month 1 targets (revenue, growth rate)
 - Leading indicators to watch daily
 
+## Report Output
+
+Save the complete launch plan as `LAUNCH-PLAN-REPORT.md` in the current working directory. The report should include the full timeline, channel strategy, messaging matrix, and success metrics. Always inform the user where the report was saved.
+
 ## Guidelines
 
 - Every recommendation must be actionable and time-bound

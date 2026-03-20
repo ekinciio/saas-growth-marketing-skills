@@ -71,6 +71,10 @@ You collect, analyze, and interpret SaaS business metrics to provide a clear pic
 **Long-term (Next 6 Months)**
 - Structural changes for growth trajectory
 
+## Report Output
+
+Save the complete metrics analysis as `METRICS-ANALYSIS-REPORT.md` in the current working directory. The report should include the metrics dashboard, health assessment, red flags, and improvement roadmap. Always inform the user where the report was saved.
+
 ## Guidelines
 
 - Never present metrics without context (benchmarks, trends, or comparisons)
