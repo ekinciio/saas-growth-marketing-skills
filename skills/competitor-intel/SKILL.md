@@ -121,6 +121,25 @@ Develop a competitive positioning strategy.
 - Messaging pillars (3-5 key messages that reinforce the positioning)
 - Proof points for each pillar
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `analyze` | `COMPETITOR-ANALYSIS-REPORT.md` |
+| `battlecard` | `COMPETITOR-BATTLECARD-REPORT.md` |
+| `landscape` | `COMPETITOR-LANDSCAPE-REPORT.md` |
+| `positioning` | `COMPETITOR-POSITIONING-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Competitor name(s) and URL(s)
+- Full analysis with strengths, weaknesses, and opportunities
+- Actionable recommendations
+
+Always inform the user where the report was saved after completion.
+
 ## Key Reference Files
 
 - `references/analysis-framework.md` - Structured competitive analysis framework covering product, pricing, marketing, brand, and traction dimensions

@@ -168,6 +168,26 @@ Benchmarks represent aggregated data across PLG SaaS companies. Your specific ve
 ### Privacy
 No metrics or data entered during the audit are stored, cached, or transmitted beyond the current session.
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `audit` | `PLG-FUNNEL-AUDIT-REPORT.md` |
+| `benchmark` | `PLG-BENCHMARK-REPORT.md` |
+| `loops` | `PLG-GROWTH-LOOPS-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Company/product name
+- Full metric assessment with traffic-light indicators
+- Funnel health grade
+- Biggest leak identified with recommendations
+- Growth loop opportunities
+
+Always inform the user where the report was saved after completion.
+
 ## References
 
 - `references/plg-metrics.md` - AARRR framework definitions and metric guidance

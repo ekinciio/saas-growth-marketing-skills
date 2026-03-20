@@ -110,6 +110,24 @@ Reddit values authentic participation over marketing. When responding to opportu
 | r/artificial | AI discussion | Tool sharing OK |
 | r/ChatGPT | AI tools | Recommendations welcome |
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `search` | `REDDIT-OPPORTUNITIES-REPORT.md` |
+| `monitor` | `REDDIT-MONITOR-SETUP-REPORT.md` |
+| `analyze` | `REDDIT-SUBREDDIT-REPORT.md` |
+
+The report file should include:
+- Date of scan
+- Keywords or subreddit analyzed
+- Opportunity scores and thread details with URLs
+- Engagement recommendations
+
+Always inform the user where the report was saved after completion.
+
 ## Integration with Other Skills
 
 - Use with `brand-mention-scanner` for comprehensive mention monitoring

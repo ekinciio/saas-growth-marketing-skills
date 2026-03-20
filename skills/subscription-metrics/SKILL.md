@@ -91,6 +91,26 @@ Simple MRR/ARR forecast based on current trajectory and assumptions.
 - Revenue growth chart description (text-based)
 - Cash runway estimate if burn data is provided
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `calculate` | `SAAS-METRICS-REPORT.md` |
+| `health` | `SAAS-HEALTH-REPORT.md` |
+| `benchmark` | `SAAS-BENCHMARK-REPORT.md` |
+| `forecast` | `SAAS-FORECAST-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Company name and stage
+- Full metric calculations with traffic-light indicators
+- Benchmark comparisons
+- Health grade and recommendations
+
+Always inform the user where the report was saved after completion.
+
 ## Key Reference Files
 
 - `references/saas-metrics-guide.md` - Detailed definitions, formulas, benchmarks, and improvement tactics for every SaaS metric

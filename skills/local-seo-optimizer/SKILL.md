@@ -138,6 +138,25 @@ Then produce:
 - Local Content: 40/100 (no Google Posts, no local blog content)
 ```
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `audit` | `LOCAL-SEO-AUDIT-REPORT.md` |
+| `gbp-check` | `LOCAL-SEO-GBP-REPORT.md` |
+| `citations` | `LOCAL-SEO-CITATIONS-REPORT.md` |
+| `local-content` | `LOCAL-SEO-CONTENT-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Business name and location
+- Full scores with dimension breakdowns
+- Prioritized recommendations with quick wins and long-term items
+
+Always inform the user where the report was saved after completion.
+
 ## References
 
 - `references/gbp-audit-checklist.md` - Full 30+ item GBP completeness checklist

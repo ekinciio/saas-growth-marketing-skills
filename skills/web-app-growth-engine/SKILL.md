@@ -181,6 +181,26 @@ The audit follows a structured approach based on the pirate metrics framework (A
 | Free Trial | 15-25% | 25-40% | 40-55% |
 | PLG Products | 25-35% | 35-50% | 50-65% |
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `audit` | `WEB-GROWTH-AUDIT-REPORT.md` |
+| `signup-flow` | `WEB-GROWTH-SIGNUP-REPORT.md` |
+| `activation` | `WEB-GROWTH-ACTIVATION-REPORT.md` |
+| `loops` | `WEB-GROWTH-LOOPS-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- URL analyzed
+- Full scores with dimension breakdowns
+- Benchmark comparisons
+- Prioritized recommendations
+
+Always inform the user where the report was saved after completion.
+
 ## Integration with Other Skills
 
 - Use with `saas-landing-builder` for landing page optimization

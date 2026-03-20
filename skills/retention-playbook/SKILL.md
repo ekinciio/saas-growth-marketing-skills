@@ -125,6 +125,26 @@ Build an engagement scoring model to proactively identify healthy and at-risk cu
 - Action playbook per tier
 - Suggested review cadence (weekly for At-Risk and below, monthly for Healthy and above)
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `diagnose` | `RETENTION-DIAGNOSIS-REPORT.md` |
+| `signals` | `RETENTION-SIGNALS-REPORT.md` |
+| `winback` | `RETENTION-WINBACK-REPORT.md` |
+| `engagement` | `RETENTION-ENGAGEMENT-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Product/company context
+- Full analysis results with metrics and breakdowns
+- Churn risk assessment
+- Prioritized action plan with timeline
+
+Always inform the user where the report was saved after completion.
+
 ## Key Reference Files
 
 - `references/churn-signals.md` - Early warning churn signals organized by category with detection methods

@@ -182,6 +182,26 @@ Analyzes the page and generates a prioritized list of A/B test ideas.
 - **1-3**: Feature-heavy copy with little connection to customer outcomes
 - **0**: Technical jargon, no identifiable benefits, or copy that focuses entirely on the company
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `audit` | `CRO-AUDIT-REPORT.md` |
+| `score` | `CRO-SCORE-REPORT.md` |
+| `copy-review` | `CRO-COPY-REPORT.md` |
+| `ab-ideas` | `CRO-AB-IDEAS-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- URL analyzed
+- Overall CRO score with per-dimension breakdown
+- Prioritized recommendations with A/B test hypotheses
+- Quick wins vs long-term improvements
+
+Always inform the user where the report was saved after completion.
+
 ## Important Notes
 
 ### SPA Limitation

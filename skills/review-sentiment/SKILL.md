@@ -133,6 +133,25 @@ Top Themes: Support, Pricing, UX/UI, Bugs, Onboarding
 - Theme detection relies on curated keyword lists; highly domain-specific terminology may not be captured without customization.
 - For best results, provide at least 10-20 reviews to get meaningful aggregate statistics.
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `analyze` | `REVIEW-SENTIMENT-REPORT.md` |
+| `themes` | `REVIEW-THEMES-REPORT.md` |
+| `summary` | `REVIEW-SUMMARY-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Product/app name
+- Sentiment distribution with per-review breakdown
+- Theme analysis with frequencies
+- Executive summary and action items
+
+Always inform the user where the report was saved after completion.
+
 ## References
 
 - `references/sentiment-categories.md` - Sentiment scoring definitions, theme categories, and example classifications

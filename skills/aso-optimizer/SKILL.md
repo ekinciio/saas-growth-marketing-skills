@@ -79,6 +79,29 @@ When running the `analyze` command, the skill follows this sequence:
 4. **Calculate ASO health score** - Generate a weighted score from 0 to 100
 5. **Generate recommendations** - Produce prioritized, actionable suggestions
    for improving the listing
+6. **Generate report** - Save the complete analysis to `ASO-REPORT.md` in the
+   current working directory
+
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `analyze` | `ASO-REPORT.md` |
+| `validate` | `ASO-VALIDATION-REPORT.md` |
+| `compare` | `ASO-COMPARE-REPORT.md` |
+| `score` | `ASO-SCORE-REPORT.md` |
+| `optimize` | `ASO-OPTIMIZE-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- App name and store URL
+- Full analysis results with scores and breakdowns
+- Prioritized recommendations
+- Competitor comparison data (when available)
+
+Always inform the user where the report was saved after completion.
 
 ## ASO Health Score Breakdown
 

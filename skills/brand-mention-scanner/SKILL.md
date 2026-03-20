@@ -149,6 +149,27 @@ Discover what users are saying about your product category. Use common questions
 ### GEO Impact
 Brand mentions on Reddit and HN influence how AI search tools describe your product. Monitoring and shaping these discussions has a direct impact on generative engine optimization.
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `scan` | `BRAND-MENTIONS-REPORT.md` |
+| `reddit` | `BRAND-MENTIONS-REDDIT-REPORT.md` |
+| `hn` | `BRAND-MENTIONS-HN-REPORT.md` |
+| `github` | `BRAND-MENTIONS-GITHUB-REPORT.md` |
+| `report` | `BRAND-MENTIONS-FULL-REPORT.md` |
+
+The report file should include:
+- Date of scan
+- Brand name searched
+- Platform-by-platform results with sentiment breakdown
+- Top mentions by engagement
+- Action items and recommendations
+
+Always inform the user where the report was saved after completion.
+
 ## Integration with Other Skills
 
 - Use with `reddit-opportunity-finder` for deeper Reddit engagement strategy

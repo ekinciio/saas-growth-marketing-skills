@@ -153,6 +153,26 @@ Every high-converting SaaS landing page follows a predictable structure. Not eve
 5. Review platform ratings (G2, Capterra)
 6. Media mentions and awards
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `create` | `LANDING-PAGE-BLUEPRINT-REPORT.md` |
+| `review` | `LANDING-PAGE-REVIEW-REPORT.md` |
+| `copy` | `LANDING-PAGE-COPY-REPORT.md` |
+| `wireframe` | `LANDING-PAGE-WIREFRAME-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Product name and target audience
+- Full page structure or review results
+- Copy suggestions and CTA recommendations
+- Visual hierarchy guidelines
+
+Always inform the user where the report was saved after completion.
+
 ## Integration with Other Skills
 
 - Use with `web-app-growth-engine` for post-landing signup optimization

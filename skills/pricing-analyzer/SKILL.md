@@ -126,6 +126,26 @@ Guide the user through a Van Westendorp Price Sensitivity analysis.
 - Acceptable price range
 - Optimal price recommendation with rationale
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `audit` | `PRICING-AUDIT-REPORT.md` |
+| `compare` | `PRICING-COMPARE-REPORT.md` |
+| `tiers` | `PRICING-TIERS-REPORT.md` |
+| `sensitivity` | `PRICING-SENSITIVITY-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Product/company name
+- Full analysis results with scores and breakdowns
+- Prioritized recommendations
+- Competitive comparison data (when available)
+
+Always inform the user where the report was saved after completion.
+
 ## Key Reference Files
 
 - `references/pricing-models.md` - Six SaaS pricing models with pros, cons, examples, and implementation guidance

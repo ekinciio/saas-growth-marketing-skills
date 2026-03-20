@@ -107,6 +107,25 @@ Generate a customized onboarding improvement checklist based on the current flow
 - Remove credit card requirement from trial signup
 - Create personalized onboarding paths based on user role or use case
 
+## Report Output
+
+Every command MUST save its output as a markdown report file:
+
+| Command | Output File |
+|---------|-------------|
+| `audit` | `ONBOARDING-AUDIT-REPORT.md` |
+| `patterns` | `ONBOARDING-PATTERNS-REPORT.md` |
+| `checklist` | `ONBOARDING-CHECKLIST-REPORT.md` |
+
+The report file should include:
+- Date of analysis
+- Product name and type
+- Onboarding score with full breakdown
+- Recommended pattern and rationale
+- Prioritized improvements with estimated activation lift
+
+Always inform the user where the report was saved after completion.
+
 ## Key Reference Files
 
 - `references/onboarding-patterns.md` - Five onboarding patterns with guidance on when to use each
