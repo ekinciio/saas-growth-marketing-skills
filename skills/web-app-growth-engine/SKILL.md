@@ -133,6 +133,31 @@ Designs growth loops specific to your SaaS product.
 
 **Report:** Save output to `WEB-GROWTH-LOOPS-REPORT.md`
 
+## API Integrations (Optional)
+
+This skill works out of the box by fetching public web pages. However, real page performance data and analytics cannot be measured from a simple HTML fetch alone.
+
+If the user provides their own API keys, use them to enrich the growth audit with real data.
+
+| Environment Variable | Service | What It Unlocks |
+|---------------------|---------|-----------------|
+| `GOOGLE_API_KEY` | Google PageSpeed Insights API | Real Core Web Vitals scores, mobile performance data, Lighthouse audit |
+| `GOOGLE_ANALYTICS_JSON` | Google Analytics Data API | Actual signup conversion rates, traffic sources, bounce rates, session data |
+
+**How to set up:**
+```bash
+# Google PageSpeed (optional)
+export GOOGLE_API_KEY="your_google_api_key"
+
+# Google Analytics (optional) - path to service account JSON
+export GOOGLE_ANALYTICS_JSON="/path/to/service-account.json"
+```
+
+**Behavior:**
+- If API keys are set → Enrich the audit with real performance and analytics data
+- If not set → Use HTML-only analysis (current default behavior, no change)
+- Each integration is independent - you can set one without the others
+
 ## SPA Limitation Note
 
 This skill performs static HTML analysis using HTTP requests. Single-page applications (SPAs) built with frameworks like React, Angular, or Vue.js may render signup forms dynamically via JavaScript. In these cases, the static analysis may not capture all form elements, and results should be verified manually. For SPA-heavy sites, consider using browser automation tools like Playwright or Puppeteer for a more complete analysis.

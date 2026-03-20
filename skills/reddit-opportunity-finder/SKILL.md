@@ -134,6 +134,29 @@ The report file should include:
 
 Always inform the user where the report was saved after completion.
 
+## API Integrations (Optional)
+
+This skill works out of the box with Reddit's free public JSON API. However, the free API has strict rate limits (1 request per 2 seconds) which can cause timeouts or incomplete results for broad searches.
+
+If the user provides their own API credentials, use them for higher rate limits and richer data.
+
+| Environment Variable | Service | What It Unlocks |
+|---------------------|---------|-----------------|
+| `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` | Reddit OAuth API | 60 requests/minute (vs 1 per 2 seconds), access to more results per query, comment-level search |
+
+**How to set up:**
+1. Create a Reddit app at `https://www.reddit.com/prefs/apps`
+2. Select "script" as the app type
+3. Set the environment variables:
+   ```bash
+   export REDDIT_CLIENT_ID="your_client_id"
+   export REDDIT_CLIENT_SECRET="your_client_secret"
+   ```
+
+**Behavior:**
+- If `REDDIT_CLIENT_ID` is set → Use OAuth API with higher rate limits
+- If not set → Use free public JSON API (current default behavior, no change)
+
 ## Integration with Other Skills
 
 - Use with `brand-mention-scanner` for comprehensive mention monitoring

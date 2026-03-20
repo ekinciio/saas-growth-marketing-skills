@@ -210,6 +210,25 @@ The report file should include:
 
 Always inform the user where the report was saved after completion.
 
+## API Integrations (Optional)
+
+This skill works out of the box by fetching public web pages. However, the "Page Speed and Mobile Responsiveness" dimension (Dimension 6) is estimated from HTML analysis alone, which is less accurate than real performance data.
+
+If the user provides their own API key, use it for actual Core Web Vitals scores.
+
+| Environment Variable | Service | What It Unlocks |
+|---------------------|---------|-----------------|
+| `GOOGLE_API_KEY` | Google PageSpeed Insights API | Real Core Web Vitals (LCP, FID, CLS), Lighthouse performance score, mobile vs desktop breakdown |
+
+**How to set up:**
+```bash
+export GOOGLE_API_KEY="your_google_api_key"
+```
+
+**Behavior:**
+- If `GOOGLE_API_KEY` is set → Fetch real PageSpeed data and use it for Dimension 6 scoring
+- If not set → Estimate page speed from HTML signals (current default behavior, no change)
+
 ## Important Notes
 
 ### SPA Limitation

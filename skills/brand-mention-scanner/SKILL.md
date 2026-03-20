@@ -159,6 +159,32 @@ Discover what users are saying about your product category. Use common questions
 ### GEO Impact
 Brand mentions on Reddit and HN influence how AI search tools describe your product. Monitoring and shaping these discussions has a direct impact on generative engine optimization.
 
+## API Integrations (Optional)
+
+This skill works out of the box with free public APIs. However, Reddit and GitHub have rate limits that may restrict results for high-volume scans.
+
+If the user provides their own API credentials, use them for higher rate limits and broader coverage.
+
+| Environment Variable | Service | What It Unlocks |
+|---------------------|---------|-----------------|
+| `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` | Reddit OAuth API | 60 requests/minute (vs 1 per 2 seconds), deeper thread search |
+| `GITHUB_TOKEN` | GitHub Personal Access Token | 30 requests/minute (vs 10 unauthenticated), access to private repos |
+
+**How to set up:**
+```bash
+# Reddit (optional)
+export REDDIT_CLIENT_ID="your_client_id"
+export REDDIT_CLIENT_SECRET="your_client_secret"
+
+# GitHub (optional)
+export GITHUB_TOKEN="your_personal_access_token"
+```
+
+**Behavior:**
+- If credentials are set → Use authenticated APIs with higher rate limits
+- If not set → Use free public APIs (current default behavior, no change)
+- Each platform is independent - you can set one without the others
+
 ## Report Output
 
 Every command MUST save its output as a markdown report file:

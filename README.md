@@ -140,15 +140,31 @@ Every skill saves its output as a `.md` report file in the current working direc
 
 ---
 
-## No API Keys Required
+## No API Keys Required (But Supported)
 
-Zero configuration. No API keys, no accounts, no subscriptions.
+Zero configuration out of the box. No API keys, no accounts, no subscriptions.
 
 - **URL-based skills** fetch public web pages (requests + BeautifulSoup)
 - **Community skills** use public APIs (Reddit JSON, HN Algolia, GitHub Search, iTunes Search)
 - **Metric skills** use your own data - you input numbers, the skill calculates and benchmarks
 
 Install and start auditing in under 60 seconds.
+
+### Optional API Integrations
+
+7 skills support optional API keys for higher rate limits and richer data. If no keys are set, the free flow works exactly as before.
+
+| Skill | Environment Variable | Service | What It Adds |
+|-------|---------------------|---------|-------------|
+| reddit-opportunity-finder | `REDDIT_CLIENT_ID` | Reddit OAuth | 60 req/min vs 1/2s |
+| brand-mention-scanner | `REDDIT_CLIENT_ID`, `GITHUB_TOKEN` | Reddit OAuth, GitHub | Higher rate limits |
+| geo-seo-auditor | `GOOGLE_API_KEY`, `AHREFS_API_KEY` | PageSpeed, Ahrefs | Real Core Web Vitals, backlink data |
+| landing-page-cro | `GOOGLE_API_KEY` | PageSpeed Insights | Real performance scores |
+| web-app-growth-engine | `GOOGLE_API_KEY`, `GOOGLE_ANALYTICS_JSON` | PageSpeed, GA4 | Performance + analytics data |
+| aso-optimizer | `SENSOR_TOWER_API_KEY`, `APPSTORE_CONNECT_KEY_ID` | Sensor Tower, ASC | Keyword volume, downloads |
+| competitor-intel | `SEMRUSH_API_KEY`, `SIMILARWEB_API_KEY` | SEMrush, SimilarWeb | Traffic, keywords, tech stack |
+
+See each skill's `SKILL.md` for full setup instructions.
 
 ---
 
@@ -175,9 +191,9 @@ Install and start auditing in under 60 seconds.
 
 - **URL-based skills work best with server-rendered pages.** Client-side-only SPAs (pure React/Vue without SSR) may return incomplete results because content is loaded via JavaScript, not present in initial HTML.
 
-- **ASO skill uses the free iTunes Search API.** It provides metadata quality analysis and competitor comparison, but does NOT provide keyword search volume, difficulty scores, or download estimates. For those, use paid tools like Sensor Tower or data.ai.
+- **ASO skill uses the free iTunes Search API by default.** It provides metadata quality analysis and competitor comparison, but does NOT provide keyword search volume, difficulty scores, or download estimates. Set `SENSOR_TOWER_API_KEY` or `APPSTORE_CONNECT_KEY_ID` to unlock these features.
 
-- **Reddit and GitHub APIs have rate limits.** Reddit: 2-second delays between requests. GitHub: 10 requests per minute without auth. These are sufficient for individual audits but not for bulk scanning.
+- **Reddit and GitHub APIs have rate limits by default.** Reddit: 2-second delays between requests. GitHub: 10 requests per minute without auth. Set `REDDIT_CLIENT_ID` for 60 req/min or `GITHUB_TOKEN` for 30 req/min to remove these bottlenecks.
 
 - **Sentiment analysis is keyword-based, not ML-based.** The review-sentiment and brand-mention-scanner use keyword matching for sentiment (not machine learning models). Results are directional, not precise.
 

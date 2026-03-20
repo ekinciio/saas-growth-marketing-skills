@@ -189,13 +189,44 @@ Fetches app data from the iTunes Search API and calculates an ASO health score.
 Accepts an app name string or a pre-built metadata dictionary. Returns a score
 breakdown, competitor comparison, and prioritized recommendations.
 
+## API Integrations (Optional)
+
+This skill works out of the box with the free iTunes Search API. However, the free API does not provide keyword search volume, keyword difficulty scores, or download estimates.
+
+If the user provides their own API keys, use them for deeper ASO intelligence.
+
+| Environment Variable | Service | What It Unlocks |
+|---------------------|---------|-----------------|
+| `APPSTORE_CONNECT_KEY_ID` + `APPSTORE_CONNECT_ISSUER_ID` + `APPSTORE_CONNECT_KEY_PATH` | App Store Connect API | Real download counts, conversion rates, keyword rankings, A/B test results |
+| `SENSOR_TOWER_API_KEY` | Sensor Tower API | Keyword search volume, keyword difficulty scores, download estimates, category rankings |
+| `DATA_AI_API_KEY` | data.ai (App Annie) API | Market data, competitive downloads, revenue estimates, usage metrics |
+
+**How to set up:**
+```bash
+# App Store Connect (optional)
+export APPSTORE_CONNECT_KEY_ID="your_key_id"
+export APPSTORE_CONNECT_ISSUER_ID="your_issuer_id"
+export APPSTORE_CONNECT_KEY_PATH="/path/to/AuthKey.p8"
+
+# Sensor Tower (optional)
+export SENSOR_TOWER_API_KEY="your_api_key"
+
+# data.ai (optional)
+export DATA_AI_API_KEY="your_api_key"
+```
+
+**Behavior:**
+- If API keys are set → Enrich the analysis with keyword volume, downloads, and market data
+- If not set → Use free iTunes Search API (current default behavior, no change)
+- Each integration is independent - you can set one without the others
+
 ## Limitation
 
-This skill uses the free iTunes Search API for live app data. It does NOT
-provide keyword search volume, keyword difficulty scores, or download estimates
-- these require paid tools like Sensor Tower, data.ai, or Apple Search Ads.
-This skill focuses on what is freely measurable: metadata quality, best
-practice compliance, and competitor metadata comparison.
+This skill uses the free iTunes Search API for live app data by default. Without
+optional API integrations above, it does not provide keyword search volume,
+keyword difficulty scores, or download estimates. It focuses on what is freely
+measurable: metadata quality, best practice compliance, and competitor metadata
+comparison.
 
 ## References
 

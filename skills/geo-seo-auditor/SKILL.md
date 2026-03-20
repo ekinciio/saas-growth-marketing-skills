@@ -230,6 +230,35 @@ Generates platform-specific optimization recommendations for each major AI searc
 
 **Report:** Save output to `GEO-PLATFORMS-REPORT.md`
 
+## API Integrations (Optional)
+
+This skill works out of the box by fetching public web pages. However, some analysis dimensions (page speed, backlinks, search performance) cannot be measured from a simple HTML fetch alone.
+
+If the user provides their own API keys, use them to enrich the audit with real performance and search data.
+
+| Environment Variable | Service | What It Unlocks |
+|---------------------|---------|-----------------|
+| `GOOGLE_API_KEY` | Google PageSpeed Insights API | Real Core Web Vitals scores (LCP, FID, CLS), mobile/desktop performance data |
+| `GOOGLE_SEARCH_CONSOLE_JSON` | Google Search Console API | Actual search impressions, clicks, CTR, average position for the audited URL |
+| `AHREFS_API_KEY` | Ahrefs API | Backlink count, referring domains, Domain Rating, organic keyword data |
+
+**How to set up:**
+```bash
+# Google PageSpeed (optional)
+export GOOGLE_API_KEY="your_google_api_key"
+
+# Google Search Console (optional) - path to service account JSON
+export GOOGLE_SEARCH_CONSOLE_JSON="/path/to/service-account.json"
+
+# Ahrefs (optional)
+export AHREFS_API_KEY="your_ahrefs_api_key"
+```
+
+**Behavior:**
+- If API keys are set → Enrich the audit with real performance and search data
+- If not set → Use HTML-only analysis (current default behavior, no change)
+- Each integration is independent - you can set one without the others
+
 ## Important Notes
 
 ### SPA Limitation

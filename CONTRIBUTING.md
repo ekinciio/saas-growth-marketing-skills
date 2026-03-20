@@ -183,9 +183,18 @@ All contributions must be relevant to **SaaS growth, marketing, or business opti
 ### Not in Scope
 
 - Skills unrelated to SaaS or growth marketing
-- Features requiring paid API keys or proprietary services
+- Skills that **require** paid API keys to function at all (API keys must always be optional - the skill must work without them using free alternatives)
 - Machine learning models or heavy dependencies
 - Monitoring or alerting services (these are on-demand audit tools)
+
+### Adding Optional API Integrations
+
+If your skill can benefit from an external API but also works without it, add an **API Integrations (Optional)** section to the SKILL.md:
+
+- List each integration as an environment variable with what it unlocks
+- Always document the free fallback behavior
+- Include setup instructions with `export` examples
+- Make each integration independent - users can set one without the others
 
 ---
 

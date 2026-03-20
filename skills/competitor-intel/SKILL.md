@@ -148,6 +148,35 @@ The report file should include:
 
 Always inform the user where the report was saved after completion.
 
+## API Integrations (Optional)
+
+This skill works out of the box by fetching a single public web page. However, deeper competitive data (traffic estimates, keyword rankings, tech stack) cannot be extracted from a single page fetch alone.
+
+If the user provides their own API keys, use them for richer competitive intelligence.
+
+| Environment Variable | Service | What It Unlocks |
+|---------------------|---------|-----------------|
+| `SEMRUSH_API_KEY` | SEMrush API | Organic traffic estimates, top keywords, backlink data, ad spend estimates |
+| `SIMILARWEB_API_KEY` | SimilarWeb API | Monthly visit estimates, traffic sources, geographic distribution, engagement metrics |
+| `BUILTWITH_API_KEY` | BuiltWith API | Full technology stack detection (frameworks, analytics, CDN, hosting) |
+
+**How to set up:**
+```bash
+# SEMrush (optional)
+export SEMRUSH_API_KEY="your_api_key"
+
+# SimilarWeb (optional)
+export SIMILARWEB_API_KEY="your_api_key"
+
+# BuiltWith (optional)
+export BUILTWITH_API_KEY="your_api_key"
+```
+
+**Behavior:**
+- If API keys are set → Enrich the competitor profile with traffic, keyword, and tech stack data
+- If not set → Use single-page HTML analysis (current default behavior, no change)
+- Each integration is independent - you can set one without the others
+
 ## Key Reference Files
 
 - `references/analysis-framework.md` - Structured competitive analysis framework covering product, pricing, marketing, brand, and traction dimensions
