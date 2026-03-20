@@ -8,6 +8,31 @@ description: >
   web apps, or growth engine optimization.
 ---
 
+## First Run
+
+When a user runs `/web-app-growth-engine audit <url>` for the first time,
+display this intro before starting:
+
+"""
+📡 Web App Growth Engine
+
+What I'll do:
+  Fetch your signup/landing URL and analyze friction in the growth funnel.
+
+What you'll get:
+  → Signup friction score (lower = less friction)
+  → Field-by-field form analysis
+  → SSO and social login availability check
+  → Trust signal evaluation
+
+Output: Saved to WEB-GROWTH-AUDIT-REPORT.md
+Time: ~60 seconds.
+
+Starting...
+"""
+
+Then proceed immediately.
+
 # Web App Growth Engine
 
 A comprehensive skill for analyzing and optimizing SaaS web application growth funnels. This skill helps you evaluate signup flows, measure activation metrics, identify conversion bottlenecks, and design sustainable growth loops.
@@ -217,25 +242,32 @@ The audit follows a structured approach based on the pirate metrics framework (A
 | Free Trial | 15-25% | 25-40% | 40-55% |
 | PLG Products | 25-35% | 35-50% | 50-65% |
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `audit` | `WEB-GROWTH-AUDIT-REPORT.md` |
-| `signup-flow` | `WEB-GROWTH-SIGNUP-REPORT.md` |
-| `activation` | `WEB-GROWTH-ACTIVATION-REPORT.md` |
-| `loops` | `WEB-GROWTH-LOOPS-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- URL analyzed
-- Full scores with dimension breakdowns
-- Benchmark comparisons
-- Prioritized recommendations
+"""
+✅ Growth audit complete — saved to WEB-GROWTH-AUDIT-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Signup Friction Score: [X] ([interpretation])
+
+Top findings:
+  1. [Biggest friction point]
+  2. [Second issue]
+  3. [Third issue]
+
+Full report with field analysis and growth loops → open WEB-GROWTH-AUDIT-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## Integration with Other Skills
 

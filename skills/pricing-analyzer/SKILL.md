@@ -7,6 +7,73 @@ description: >
   willingness to pay, freemium vs paid, feature gating, or pricing optimization.
 ---
 
+## First Run
+
+When a user runs `/pricing-analyzer audit`, ALWAYS display this input
+summary before asking for any data:
+
+"""
+📊 Pricing Analyzer
+
+What I'll ask you:
+
+  Your pricing:
+    1. Number of tiers              → e.g. 3
+    2. Price per tier ($/mo)        → e.g. 0, 29, 99
+    3. Key features per tier        → brief list each
+
+  Business context:
+    4. Average deal size ($/mo)     → e.g. 45
+    5. Most popular tier            → e.g. "Pro"
+    6. Free-to-paid conversion (%)  → e.g. 4
+
+  Competitor pricing (optional):
+    7. Competitor names + prices    → entered manually
+
+  Type "skip" for any you don't have.
+  Type "demo" to see a sample report first.
+
+What you'll get:
+  → Pricing model identification and assessment
+  → Feature gating analysis
+  → Competitive positioning map
+  → Tier optimization recommendations
+  → Saved to PRICING-AUDIT-REPORT.md
+
+Ready? How many pricing tiers do you have?
+"""
+
+### Demo Mode
+
+If the user types "demo", use this data to generate a full sample report:
+
+```json
+{
+  "tiers": [
+    {"name": "Free", "price": 0, "features": ["3 projects", "1 user", "basic reports"]},
+    {"name": "Pro", "price": 29, "features": ["unlimited projects", "5 users", "advanced reports", "integrations"]},
+    {"name": "Business", "price": 99, "features": ["everything in Pro", "unlimited users", "SSO", "priority support"]}
+  ],
+  "avg_deal_size": 45,
+  "most_popular_tier": "Pro",
+  "free_to_paid_pct": 4,
+  "competitors": [
+    {"name": "Competitor A", "prices": [0, 19, 79]},
+    {"name": "Competitor B", "prices": [15, 49, 149]}
+  ]
+}
+```
+
+Save the demo report as `PRICING-AUDIT-REPORT-DEMO.md`.
+After showing the summary, ask: "Want to run this with your own pricing data now?"
+
+### Skip Handling
+
+If the user types "skip" for any input:
+- Proceed with available data
+- Note which analyses were limited by missing data
+- Never block the report because competitor data is missing
+
 # Pricing Analyzer
 
 Evaluate and optimize SaaS pricing strategy through tier analysis, competitive positioning, willingness-to-pay research, and feature gating recommendations.
@@ -134,25 +201,33 @@ Guide the user through a Van Westendorp Price Sensitivity analysis.
 
 **Report:** Save output to `PRICING-SENSITIVITY-REPORT.md`
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `audit` | `PRICING-AUDIT-REPORT.md` |
-| `compare` | `PRICING-COMPARE-REPORT.md` |
-| `tiers` | `PRICING-TIERS-REPORT.md` |
-| `sensitivity` | `PRICING-SENSITIVITY-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Product/company name
-- Full analysis results with scores and breakdowns
-- Prioritized recommendations
-- Competitive comparison data (when available)
+"""
+✅ Pricing audit complete — saved to PRICING-AUDIT-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Model: [identified pricing model]
+Tiers: [N] tiers ($[low] - $[high]/mo)
+
+Key findings:
+  1. [Top pricing issue or strength]
+  2. [Second finding]
+  3. [Third finding]
+
+Full report with tier recommendations and positioning → open PRICING-AUDIT-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## Key Reference Files
 

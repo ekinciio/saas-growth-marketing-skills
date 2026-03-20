@@ -8,6 +8,76 @@ description: >
   or subscription analytics.
 ---
 
+## First Run
+
+When a user runs `/subscription-metrics calculate`, ALWAYS display this
+input summary before asking for any data:
+
+"""
+📊 SaaS Metrics Calculator
+
+What I'll ask you (4 data groups, ~10 numbers):
+
+  Revenue data:
+    1. New MRR this month ($)           → e.g. 15000
+    2. Expansion MRR ($)                → e.g. 3000
+    3. Contraction MRR ($)              → e.g. 1000
+    4. Churned MRR ($)                  → e.g. 2000
+
+  Customer counts:
+    5. Customers at start of month      → e.g. 200
+    6. New customers this month         → e.g. 25
+    7. Churned customers this month     → e.g. 8
+
+  Costs:
+    8. Total S&M spend this month ($)   → e.g. 30000
+
+  Growth:
+    9. YoY revenue growth rate (%)      → e.g. 80
+   10. EBITDA or profit margin (%)      → e.g. -20
+
+  Type "skip" for any you don't have.
+  Type "demo" to see a sample report with example data first.
+
+What you'll get:
+  → MRR, ARR, churn rates, CAC, LTV, LTV:CAC ratio
+  → Rule of 40, burn multiple, SaaS Quick Ratio
+  → Traffic-light health assessment (GREEN/YELLOW/RED)
+  → Saved to SAAS-METRICS-REPORT.md
+
+Ready? Let's start — what's your New MRR this month?
+"""
+
+### Demo Mode
+
+If the user types "demo", use this data to generate a full sample report:
+
+```json
+{
+  "new_mrr": 15000,
+  "expansion_mrr": 3000,
+  "contraction_mrr": 1000,
+  "churned_mrr": 2000,
+  "customers_start": 200,
+  "new_customers": 25,
+  "churned_customers": 8,
+  "total_sm_spend": 30000,
+  "yoy_growth_rate": 80,
+  "profit_margin": -20
+}
+```
+
+Save the demo report as `SAAS-METRICS-REPORT-DEMO.md`.
+After showing the summary, ask: "Want to run this with your own numbers now?"
+
+### Skip Handling
+
+If the user types "skip" for any metric:
+- Mark it as "Not provided" in the report
+- Calculate all metrics that are possible with available data
+- Note which metrics could not be calculated and why
+- Never block the entire report because one input is missing
+
 # Subscription Metrics
 
 Calculate, analyze, and benchmark SaaS subscription metrics to understand business health and growth trajectory.
@@ -99,25 +169,33 @@ Simple MRR/ARR forecast based on current trajectory and assumptions.
 
 **Report:** Save output to `SAAS-FORECAST-REPORT.md`
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `calculate` | `SAAS-METRICS-REPORT.md` |
-| `health` | `SAAS-HEALTH-REPORT.md` |
-| `benchmark` | `SAAS-BENCHMARK-REPORT.md` |
-| `forecast` | `SAAS-FORECAST-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Company name and stage
-- Full metric calculations with traffic-light indicators
-- Benchmark comparisons
-- Health grade and recommendations
+"""
+✅ Metrics calculated — saved to SAAS-METRICS-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Health Grade: [A-F]
+MRR: $[X] | ARR: $[X] | Monthly Churn: [X]%
+
+Highlights:
+  🟢 [Strongest metric + value]
+  🔴 [Weakest metric + value]
+  🔴 [Second weakest + value]
+
+Full dashboard with all metrics and benchmarks → open SAAS-METRICS-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## Key Reference Files
 

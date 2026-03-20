@@ -9,6 +9,55 @@ description: >
   or wants to understand customer sentiment from reviews.
 ---
 
+## First Run
+
+When a user runs `/review-sentiment analyze`, ALWAYS display this
+guidance before asking for input:
+
+"""
+📝 Review Sentiment Analyzer
+
+What I'll need:
+  Paste your customer reviews below — one per line or separated
+  by blank lines. Works with any source: app stores, G2, Capterra,
+  Yelp, Google, support tickets, survey responses.
+
+  Minimum: 5 reviews for meaningful patterns
+  Ideal: 20-50 reviews for strong analysis
+  Format: Plain text. Star ratings optional but helpful.
+
+  Type "demo" to see analysis on 10 sample reviews first.
+
+What you'll get:
+  → Sentiment breakdown (positive/negative/neutral %)
+  → Theme extraction (UX, pricing, support, bugs, etc.)
+  → Top complaints and praise patterns
+  → Feature requests ranked by frequency
+  → Saved to REVIEW-SENTIMENT-REPORT.md
+
+Paste your reviews below:
+"""
+
+### Demo Mode
+
+If the user types "demo", use these 10 sample reviews:
+
+```
+"Love the new dashboard! So much easier to navigate now."
+"Terrible customer support. Waited 3 days for a response."
+"It's okay. Does what I need but pricing feels high."
+"App crashes every time I try to export a PDF. Very frustrating."
+"Onboarding was smooth and the docs are great."
+"The automation features saved us hours every week."
+"Can't believe there's still no dark mode in 2026."
+"Best tool I've found for small team project management."
+"Billing is confusing. Got charged twice last month."
+"Fast, reliable, and the API is well documented."
+```
+
+Save the demo report as `REVIEW-SENTIMENT-REPORT-DEMO.md`.
+After showing the summary, ask: "Want to analyze your own reviews now?"
+
 # Review Sentiment Analyzer
 
 Analyze customer reviews to extract sentiment, identify themes, surface feature requests and complaints, and generate actionable summaries. Works with reviews from any source - app stores, Google, Yelp, G2, Capterra, or any text-based feedback.
@@ -139,24 +188,33 @@ Top Themes: Support, Pricing, UX/UI, Bugs, Onboarding
 - Theme detection relies on curated keyword lists; highly domain-specific terminology may not be captured without customization.
 - For best results, provide at least 10-20 reviews to get meaningful aggregate statistics.
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `analyze` | `REVIEW-SENTIMENT-REPORT.md` |
-| `themes` | `REVIEW-THEMES-REPORT.md` |
-| `summary` | `REVIEW-SUMMARY-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Product/app name
-- Sentiment distribution with per-review breakdown
-- Theme analysis with frequencies
-- Executive summary and action items
+"""
+✅ Sentiment analysis complete — saved to REVIEW-SENTIMENT-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Reviews analyzed: [N]
+Sentiment: [X]% positive, [X]% negative, [X]% neutral
+
+Top themes:
+  👍 Most praised: [theme]
+  👎 Most criticized: [theme]
+  💡 Top feature request: [request]
+
+Full report with per-review breakdown → open REVIEW-SENTIMENT-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## References
 

@@ -7,6 +7,67 @@ description: >
   engagement scoring, customer health, or reducing cancellations.
 ---
 
+## First Run
+
+When a user runs `/retention-playbook diagnose`, ALWAYS display this input
+summary before asking for any data:
+
+"""
+📊 Retention Playbook
+
+What I'll ask you:
+
+  Product context:
+    1. SaaS vertical                → e.g. "project management"
+    2. Pricing model                → e.g. "per-seat"
+    3. Avg contract length          → e.g. "monthly"
+
+  Churn metrics:
+    4. Monthly logo churn (%)       → e.g. 5
+    5. Monthly revenue churn (%)    → e.g. 3
+    6. Net Revenue Retention (%)    → e.g. 102
+
+  Current tracking:
+    7. Which churn signals do you track? → e.g. "login frequency, support tickets"
+
+  Type "skip" for any you don't have.
+  Type "demo" to see a sample diagnosis first.
+
+What you'll get:
+  → Churn categorization (preventable vs structural vs competitive)
+  → Top 3 churn drivers identified
+  → Prioritized retention action plan with timeline
+  → Saved to RETENTION-DIAGNOSIS-REPORT.md
+
+Ready? What's your SaaS vertical?
+"""
+
+### Demo Mode
+
+If the user types "demo", use this data to generate a full sample report:
+
+```json
+{
+  "vertical": "project management SaaS",
+  "pricing_model": "per-seat",
+  "avg_contract": "monthly",
+  "monthly_logo_churn": 6.5,
+  "monthly_revenue_churn": 4.2,
+  "nrr": 97,
+  "signals_tracked": ["login frequency", "support tickets"]
+}
+```
+
+Save the demo report as `RETENTION-DIAGNOSIS-REPORT-DEMO.md`.
+After showing the summary, ask: "Want to run this with your own data now?"
+
+### Skip Handling
+
+If the user types "skip" for any metric:
+- Proceed with available data
+- Provide general retention recommendations when specific data is missing
+- Never block the report because one metric is unknown
+
 # Retention Playbook
 
 Detect churn risks early, score customer engagement health, and deploy proven retention and win-back strategies for SaaS products.
@@ -133,25 +194,32 @@ Build an engagement scoring model to proactively identify healthy and at-risk cu
 
 **Report:** Save output to `RETENTION-ENGAGEMENT-REPORT.md`
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `diagnose` | `RETENTION-DIAGNOSIS-REPORT.md` |
-| `signals` | `RETENTION-SIGNALS-REPORT.md` |
-| `winback` | `RETENTION-WINBACK-REPORT.md` |
-| `engagement` | `RETENTION-ENGAGEMENT-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Product/company context
-- Full analysis results with metrics and breakdowns
-- Churn risk assessment
-- Prioritized action plan with timeline
+"""
+✅ Churn diagnosis complete — saved to RETENTION-DIAGNOSIS-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Monthly Logo Churn: [X]% | Revenue Churn: [X]% | NRR: [X]%
+
+Top churn drivers:
+  1. [#1 driver] — Impact: [HIGH/MED] — Addressable: [YES/PARTIAL]
+  2. [#2 driver] — Impact: [HIGH/MED] — Addressable: [YES/PARTIAL]
+  3. [#3 driver] — Impact: [MED] — Addressable: [YES/PARTIAL]
+
+Full diagnosis with action plan → open RETENTION-DIAGNOSIS-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## Key Reference Files
 

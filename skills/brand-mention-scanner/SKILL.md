@@ -8,6 +8,33 @@ description: >
   or wants to find where their product is being talked about online.
 ---
 
+## First Run
+
+When a user runs `/brand-mention-scanner scan <brand>` for the first time,
+display this intro before starting:
+
+"""
+🔍 Brand Mention Scanner
+
+What I'll do:
+  Search Reddit, Hacker News, and GitHub for mentions of "[brand]".
+
+What you'll get:
+  → Total mention count across all 3 platforms
+  → Sentiment breakdown (positive/negative/neutral/question/comparison)
+  → Top mentions sorted by engagement
+  → Unresponded opportunities
+
+Note: 3 platforms scanned sequentially. Takes ~90 seconds total.
+      Rate limits apply (see SKILL.md for optional API keys).
+
+Output: Saved to BRAND-MENTIONS-REPORT.md
+
+Scanning...
+"""
+
+Then proceed immediately.
+
 # Brand Mention Scanner
 
 A multi-platform brand monitoring skill that scans Reddit, Hacker News, and GitHub for mentions of your brand or product. Identifies where you are being discussed, analyzes sentiment context, and surfaces unresponded opportunities.
@@ -188,26 +215,33 @@ export GITHUB_TOKEN="your_personal_access_token"
 **When results are limited:** If a scan hits rate limits, returns fewer results than expected, or a platform times out, inform the user which API credentials would help. Example:
 > ⚠️ GitHub rate limit reached (10 req/min unauthenticated). Set `GITHUB_TOKEN` for 30 req/min. See the API Integrations section in this skill's SKILL.md for setup instructions.
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `scan` | `BRAND-MENTIONS-REPORT.md` |
-| `reddit` | `BRAND-MENTIONS-REDDIT-REPORT.md` |
-| `hn` | `BRAND-MENTIONS-HN-REPORT.md` |
-| `github` | `BRAND-MENTIONS-GITHUB-REPORT.md` |
-| `report` | `BRAND-MENTIONS-FULL-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of scan
-- Brand name searched
-- Platform-by-platform results with sentiment breakdown
-- Top mentions by engagement
-- Action items and recommendations
+"""
+✅ Brand scan complete — saved to BRAND-MENTIONS-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Brand: "[brand]"
+Total mentions: [N] (Reddit: [N], HN: [N], GitHub: [N])
+
+Sentiment: [X]% positive, [X]% negative, [X]% neutral
+
+Top finding:
+  [Most notable mention or pattern]
+
+Full report with all mentions and recommendations → open BRAND-MENTIONS-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## Integration with Other Skills
 

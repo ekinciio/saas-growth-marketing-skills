@@ -9,6 +9,73 @@ description: >
   NAP consistency, or local business optimization.
 ---
 
+## First Run
+
+When a user runs `/local-seo-optimizer audit <business>`, ALWAYS display
+this intro before starting to collect information:
+
+"""
+🔍 Local SEO Optimizer
+
+What I'll do:
+  Score your Google Business Profile against a 35+ item checklist
+  and identify gaps in your local search presence.
+
+What I'll ask you:
+  - Business name and full address
+  - Primary and secondary categories
+  - GBP profile details (hours, photos, description, attributes)
+  - Review count and average rating
+  - Known directory listings (Yelp, Facebook, BBB, etc.)
+
+  I'll walk you through each section. Type "skip" for unknowns.
+  Type "demo" to see a sample audit with example data first.
+
+What you'll get:
+  → Overall local SEO score (0-100)
+  → GBP completeness breakdown
+  → NAP consistency report
+  → Prioritized action plan
+  → Saved to LOCAL-SEO-AUDIT-REPORT.md
+
+Let's start — what's the full business name and address?
+"""
+
+### Demo Mode
+
+If the user types "demo", use this data to generate a full sample report:
+
+```json
+{
+  "business_name": "Acme Coffee Roasters",
+  "address": "123 Main Street, Brooklyn, NY 11201",
+  "phone": "(718) 555-0123",
+  "website": "https://acmecoffee.com",
+  "primary_category": "Coffee Shop",
+  "secondary_categories": ["Cafe", "Coffee Roaster"],
+  "hours_set": true,
+  "special_hours_set": false,
+  "description_length": 320,
+  "photos_count": 8,
+  "review_count": 47,
+  "avg_rating": 4.3,
+  "response_rate_pct": 60,
+  "google_posts_active": false,
+  "qa_populated": false,
+  "citations_claimed": ["Google", "Yelp", "Facebook"]
+}
+```
+
+Save the demo report as `LOCAL-SEO-AUDIT-REPORT-DEMO.md`.
+After showing the summary, ask: "Want to run this for your own business now?"
+
+### Skip Handling
+
+If the user types "skip" for any section:
+- Score that section as "incomplete/unknown"
+- Continue with remaining sections
+- Note which areas could not be assessed
+
 # Local SEO Optimizer
 
 A checklist-based local SEO audit skill that scores your Google Business Profile completeness, evaluates local ranking factors, checks NAP consistency across citation sources, and provides a prioritized action plan.
@@ -146,24 +213,36 @@ Then produce:
 - Local Content: 40/100 (no Google Posts, no local blog content)
 ```
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `audit` | `LOCAL-SEO-AUDIT-REPORT.md` |
-| `gbp-check` | `LOCAL-SEO-GBP-REPORT.md` |
-| `citations` | `LOCAL-SEO-CITATIONS-REPORT.md` |
-| `local-content` | `LOCAL-SEO-CONTENT-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Business name and location
-- Full scores with dimension breakdowns
-- Prioritized recommendations with quick wins and long-term items
+"""
+✅ Local SEO audit complete — saved to LOCAL-SEO-AUDIT-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Score: [X]/100 ([interpretation])
+
+Breakdown:
+  GBP Completeness: [X]/100
+  Review Signals: [X]/100
+  Citations: [X]/100
+
+Top quick wins:
+  1. [Highest impact missing item]
+  2. [Second item]
+
+Full report with 35+ item checklist → open LOCAL-SEO-AUDIT-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## References
 

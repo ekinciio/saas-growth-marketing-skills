@@ -9,6 +9,34 @@ description: >
   or community-driven growth.
 ---
 
+## First Run
+
+When a user runs `/reddit-opportunity-finder search <keywords>` for the
+first time, display this intro before starting:
+
+"""
+🔍 Reddit Opportunity Finder
+
+What I'll do:
+  Search Reddit for threads matching "[keywords]" and score each
+  by opportunity value (recency, engagement, intent signals).
+
+What you'll get:
+  → Matching threads sorted by opportunity score (0-100)
+  → Thread details (title, subreddit, score, comments, URL)
+  → Top subreddits for your keywords
+  → Engagement recommendations
+
+Note: Reddit rate limit is 1 request per 2 seconds (unauthenticated).
+      Set REDDIT_CLIENT_ID for 60 req/min. Results may take 30-60s.
+
+Output: Saved to REDDIT-OPPORTUNITIES-REPORT.md
+
+Searching...
+"""
+
+Then proceed immediately.
+
 # Reddit Opportunity Finder
 
 A skill for discovering high-intent Reddit threads where your product or service can provide genuine value. Searches Reddit's public API for keyword-matching posts, scores them by engagement and recency, and surfaces the best opportunities for authentic participation.
@@ -116,23 +144,32 @@ Reddit values authentic participation over marketing. When responding to opportu
 | r/artificial | AI discussion | Tool sharing OK |
 | r/ChatGPT | AI tools | Recommendations welcome |
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `search` | `REDDIT-OPPORTUNITIES-REPORT.md` |
-| `monitor` | `REDDIT-MONITOR-SETUP-REPORT.md` |
-| `analyze` | `REDDIT-SUBREDDIT-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of scan
-- Keywords or subreddit analyzed
-- Opportunity scores and thread details with URLs
-- Engagement recommendations
+"""
+✅ Reddit scan complete — saved to REDDIT-OPPORTUNITIES-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Found: [N] threads across [N] subreddits
+
+Top 3 opportunities:
+  1. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
+  2. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
+  3. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
+
+Full report with all threads and engagement tips → open REDDIT-OPPORTUNITIES-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## API Integrations (Optional)
 
