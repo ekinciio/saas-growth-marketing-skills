@@ -1,0 +1,171 @@
+---
+name: aso-optimizer
+description: >
+  App Store Optimization toolkit for iOS and Android apps. Fetches live app
+  metadata from the iTunes Search API, validates character limits, scores
+  metadata quality against best practices, and compares with competitor apps.
+  Use when the user mentions ASO, app store optimization, app metadata,
+  app title optimization, or app store listing improvement.
+---
+
+# ASO Optimizer Skill
+
+App Store Optimization toolkit that helps improve app visibility and conversion
+rates on the Apple App Store and Google Play Store.
+
+## Commands
+
+### `/aso-optimizer analyze <app-name>`
+
+Fetch live app metadata from the iTunes Search API and score it against ASO
+best practices.
+
+**Example:**
+```
+/aso-optimizer analyze "Slack"
+```
+
+### `/aso-optimizer validate`
+
+Validate metadata fields against platform-specific character limits for iOS,
+Android, or both.
+
+**Example:**
+```
+/aso-optimizer validate
+```
+
+### `/aso-optimizer compare <app1> <app2>`
+
+Side-by-side metadata comparison between two apps. Highlights strengths and
+weaknesses of each listing.
+
+**Example:**
+```
+/aso-optimizer compare "Slack" "Microsoft Teams"
+```
+
+### `/aso-optimizer score`
+
+Calculate a detailed ASO health score (0-100) with a breakdown across four
+weighted categories.
+
+**Example:**
+```
+/aso-optimizer score
+```
+
+### `/aso-optimizer optimize`
+
+Generate improved metadata suggestions based on the current listing analysis
+and competitor benchmarks.
+
+**Example:**
+```
+/aso-optimizer optimize
+```
+
+## Full Analyze Flow
+
+When running the `analyze` command, the skill follows this sequence:
+
+1. **Fetch live data** - Query the iTunes Search API for the target app
+   (`https://itunes.apple.com/search?term={app_name}&entity=software&country=us&limit=1`)
+2. **Evaluate metadata** - Compare metadata against best practices including
+   title keyword placement, description structure, ratings health, and
+   screenshot count
+3. **Fetch competitors** - Pull the top 5 competitor apps in the same primary
+   category for benchmarking
+4. **Calculate ASO health score** - Generate a weighted score from 0 to 100
+5. **Generate recommendations** - Produce prioritized, actionable suggestions
+   for improving the listing
+
+## ASO Health Score Breakdown
+
+The health score is calculated across four weighted categories:
+
+| Category | Weight | What It Measures |
+|----------|--------|------------------|
+| Title Optimization | 30% | Keyword presence, character length usage, brand-keyword balance |
+| Description Quality | 25% | Length (ideal 2000-4000 chars), structural formatting, keyword density, call-to-action presence |
+| Ratings Health | 25% | Average rating (4.0+ good, 4.5+ great), total rating count, recent review sentiment |
+| Metadata Completeness | 20% | All fields populated, subtitle utilized, keyword field maximized, screenshots present |
+
+### Score Ranges
+
+- **90-100**: Excellent - App listing is highly optimized
+- **70-89**: Good - Minor improvements possible
+- **50-69**: Needs Work - Several optimization opportunities exist
+- **30-49**: Poor - Significant gaps in metadata strategy
+- **0-29**: Critical - Listing needs a complete overhaul
+
+## Metadata Best Practices
+
+### Title (30 characters max)
+- Place the highest-value keyword after the brand name
+- Use the full 30 characters when possible
+- Format: `Brand - Primary Keyword` or `Brand: Primary Keyword`
+
+### Subtitle (iOS only, 30 characters)
+- Include secondary keywords not in the title
+- Describe the core value proposition
+- Avoid repeating title keywords
+
+### Keywords Field (iOS only, 100 characters)
+- Use commas to separate terms, no spaces after commas
+- Never repeat words already in the title or subtitle
+- Prioritize single words over phrases (the system combines them)
+- Use all 100 characters
+
+### Description (4,000 characters max)
+- Front-load the first 3 lines (visible before "Read More")
+- Use line breaks and bullet points for readability
+- Include keywords naturally - not stuffed
+- End with a clear call-to-action
+
+### Ratings and Reviews
+- Aim for 4.0+ average rating
+- Higher rating counts build trust
+- Respond to negative reviews promptly
+- Use in-app review prompts strategically
+
+## Platform Character Limits Reference
+
+| Field | Apple App Store | Google Play Store |
+|-------|----------------|-------------------|
+| App Name/Title | 30 chars | 30 chars |
+| Subtitle | 30 chars | N/A |
+| Short Description | N/A | 80 chars |
+| Keywords Field | 100 chars | N/A |
+| Promotional Text | 170 chars | N/A |
+| Full Description | 4,000 chars | 4,000 chars |
+| What's New | 4,000 chars | 500 chars |
+| Developer Name | 50 chars | varies |
+
+## Scripts
+
+### `scripts/metadata_validator.py`
+
+Validates metadata fields against platform character limits. Accepts a metadata
+dictionary and platform target (ios, android, or both). Returns pass/fail
+status and remaining character counts per field.
+
+### `scripts/aso_scorer.py`
+
+Fetches app data from the iTunes Search API and calculates an ASO health score.
+Accepts an app name string or a pre-built metadata dictionary. Returns a score
+breakdown, competitor comparison, and prioritized recommendations.
+
+## Limitation
+
+This skill uses the free iTunes Search API for live app data. It does NOT
+provide keyword search volume, keyword difficulty scores, or download estimates
+- these require paid tools like Sensor Tower, data.ai, or Apple Search Ads.
+This skill focuses on what is freely measurable: metadata quality, best
+practice compliance, and competitor metadata comparison.
+
+## References
+
+- `references/aso-checklist.md` - Pre-launch and post-launch ASO checklists
+- `references/keyword-strategy.md` - Keyword research and placement strategy
+- `references/metadata-limits.md` - Detailed platform character limits

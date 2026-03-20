@@ -1,0 +1,229 @@
+# Go-to-Market Strategy Template
+
+## 1. Market Analysis
+
+### Total Addressable Market (TAM)
+- **Market size:** $___
+- **Data source:** ___
+- **Growth rate:** ___% CAGR
+
+### Serviceable Addressable Market (SAM)
+- **Geographic focus:** ___
+- **Segment focus:** ___
+- **SAM size:** $___
+
+### Serviceable Obtainable Market (SOM)
+- **Realistic capture rate:** ___%
+- **Year 1 target:** $___
+- **Year 3 target:** $___
+
+### Market Trends
+- [ ] Trend 1: ___
+- [ ] Trend 2: ___
+- [ ] Trend 3: ___
+
+---
+
+## 2. Customer Segments
+
+### Ideal Customer Profile (ICP)
+
+**Primary ICP:**
+- **Company size:** ___
+- **Industry:** ___
+- **Revenue range:** $___
+- **Tech stack:** ___
+- **Pain points:** ___
+- **Budget authority:** ___
+
+**Secondary ICP:**
+- **Company size:** ___
+- **Industry:** ___
+- **Revenue range:** $___
+
+### Buyer Personas
+
+**Persona 1: [Name/Title]**
+- Role: ___
+- Goals: ___
+- Challenges: ___
+- Decision criteria: ___
+- Information sources: ___
+- Objections: ___
+
+**Persona 2: [Name/Title]**
+- Role: ___
+- Goals: ___
+- Challenges: ___
+
+---
+
+## 3. Value Proposition Canvas
+
+### Customer Jobs
+- Functional: ___
+- Social: ___
+- Emotional: ___
+
+### Pains
+1. ___
+2. ___
+3. ___
+
+### Gains
+1. ___
+2. ___
+3. ___
+
+### Pain Relievers (Your Product)
+1. ___
+2. ___
+3. ___
+
+### Gain Creators (Your Product)
+1. ___
+2. ___
+3. ___
+
+### One-Line Value Proposition
+> [Product] helps [audience] [achieve outcome] by [mechanism], unlike [alternative].
+
+---
+
+## 4. Channel Strategy
+
+### Organic Channels
+
+| Channel | Strategy | Expected CAC | Timeline to Results |
+|---------|----------|-------------|-------------------|
+| SEO / GEO | ___ | $___ | ___ months |
+| Content Marketing | ___ | $___ | ___ months |
+| Social Media | ___ | $___ | ___ months |
+| Community | ___ | $___ | ___ months |
+| Referral | ___ | $___ | ___ months |
+| Product-Led | ___ | $___ | ___ months |
+
+### Paid Channels
+
+| Channel | Budget | Expected CAC | Expected Volume |
+|---------|--------|-------------|----------------|
+| Google Ads | $___ | $___ | ___ leads/mo |
+| LinkedIn Ads | $___ | $___ | ___ leads/mo |
+| Facebook/Meta | $___ | $___ | ___ leads/mo |
+| Content Syndication | $___ | $___ | ___ leads/mo |
+
+### Partnership Channels
+- Technology partners: ___
+- Agency partners: ___
+- Integration partners: ___
+- Affiliate program: ___
+
+---
+
+## 5. Pricing Strategy
+
+### Pricing Model
+- [ ] Flat rate
+- [ ] Per-seat
+- [ ] Usage-based
+- [ ] Hybrid
+- [ ] Freemium
+- [ ] Reverse trial
+
+### Tier Structure
+
+| Tier | Price | Target Segment | Key Features |
+|------|-------|---------------|-------------|
+| Free/Trial | $0 | ___ | ___ |
+| Starter | $___ | ___ | ___ |
+| Professional | $___ | ___ | ___ |
+| Enterprise | Custom | ___ | ___ |
+
+### Pricing Rationale
+- Competitor benchmark: ___
+- Value-based justification: ___
+- Willingness-to-pay data: ___
+
+---
+
+## 6. Launch Timeline
+
+### Phase 1: Foundation (Weeks 1-4)
+- [ ] Finalize positioning and messaging
+- [ ] Build landing page
+- [ ] Set up analytics and tracking
+- [ ] Create initial content assets
+- [ ] Prepare press kit
+
+### Phase 2: Pre-Launch (Weeks 5-8)
+- [ ] Launch waitlist / early access
+- [ ] Begin content marketing
+- [ ] Activate PR outreach
+- [ ] Set up paid acquisition tests
+- [ ] Beta program with feedback loop
+
+### Phase 3: Launch (Week 9)
+- [ ] Coordinated multi-channel launch
+- [ ] ProductHunt / Hacker News submission
+- [ ] Press coverage activation
+- [ ] Community engagement push
+- [ ] Email announcement to waitlist
+
+### Phase 4: Post-Launch (Weeks 10-16)
+- [ ] Optimization based on data
+- [ ] Scale winning channels
+- [ ] Kill underperforming channels
+- [ ] Iterate on messaging
+- [ ] Build case studies from early users
+
+---
+
+## 7. Success Metrics
+
+### Primary KPIs
+
+| Metric | Month 1 Target | Month 3 Target | Month 6 Target |
+|--------|---------------|---------------|---------------|
+| MRR | $___ | $___ | $___ |
+| Customers | ___ | ___ | ___ |
+| CAC | $___ | $___ | $___ |
+| Activation Rate | ___% | ___% | ___% |
+| Monthly Churn | ___% | ___% | ___% |
+
+### Leading Indicators (Weekly)
+- Website traffic
+- Signup rate
+- Activation rate
+- Feature adoption
+- NPS / satisfaction
+
+### Lagging Indicators (Monthly)
+- Revenue growth rate
+- Net revenue retention
+- LTV:CAC ratio
+- Payback period
+
+---
+
+## 8. Budget Allocation
+
+### Monthly Budget: $___
+
+| Category | Allocation | Amount |
+|----------|-----------|--------|
+| Content & SEO | ___% | $___ |
+| Paid Acquisition | ___% | $___ |
+| Tools & Software | ___% | $___ |
+| Design & Creative | ___% | $___ |
+| Events & Sponsorships | ___% | $___ |
+| PR & Communications | ___% | $___ |
+| Reserve / Testing | ___% | $___ |
+
+### Budget Review Cadence
+- Weekly: paid acquisition ROI check
+- Monthly: full budget review and reallocation
+- Quarterly: strategic budget planning
+
+---
+
+*Generated by SaaS Growth Marketing Skills - github.com/ekinciio/saas-growth-marketing-skills*
