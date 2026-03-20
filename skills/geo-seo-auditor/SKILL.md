@@ -259,6 +259,9 @@ export AHREFS_API_KEY="your_ahrefs_api_key"
 - If not set → Use HTML-only analysis (current default behavior, no change)
 - Each integration is independent - you can set one without the others
 
+**When data is limited:** If the audit cannot measure page speed accurately or lacks backlink data, inform the user which API keys would enrich the results. Example:
+> ℹ️ Page speed score is estimated from HTML signals only. For real Core Web Vitals (LCP, CLS, INP), set `GOOGLE_API_KEY`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+
 ## Important Notes
 
 ### SPA Limitation

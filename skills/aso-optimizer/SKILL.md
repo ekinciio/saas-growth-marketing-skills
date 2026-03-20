@@ -220,6 +220,9 @@ export DATA_AI_API_KEY="your_api_key"
 - If not set → Use free iTunes Search API (current default behavior, no change)
 - Each integration is independent - you can set one without the others
 
+**When data is limited:** If the analysis cannot provide keyword volume, download estimates, or ranking data, inform the user which API keys would unlock these. Example:
+> ℹ️ Keyword search volume and difficulty data unavailable - using metadata quality analysis only. For keyword intelligence, set `SENSOR_TOWER_API_KEY`. For download and conversion data, set `APPSTORE_CONNECT_KEY_ID`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+
 ## Limitation
 
 This skill uses the free iTunes Search API for live app data by default. Without

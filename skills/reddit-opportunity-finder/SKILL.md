@@ -157,6 +157,9 @@ If the user provides their own API credentials, use them for higher rate limits 
 - If `REDDIT_CLIENT_ID` is set → Use OAuth API with higher rate limits
 - If not set → Use free public JSON API (current default behavior, no change)
 
+**When results are limited:** If a search returns fewer results than expected, hits a rate limit, or times out, inform the user that optional API credentials can improve results. Example:
+> ⚠️ Reddit rate limit reached - retrieved 12 of ~50 potential results. For higher limits (60 req/min), set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+
 ## Integration with Other Skills
 
 - Use with `brand-mention-scanner` for comprehensive mention monitoring

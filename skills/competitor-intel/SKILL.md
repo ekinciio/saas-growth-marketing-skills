@@ -177,6 +177,9 @@ export BUILTWITH_API_KEY="your_api_key"
 - If not set → Use single-page HTML analysis (current default behavior, no change)
 - Each integration is independent - you can set one without the others
 
+**When data is limited:** If the analysis lacks traffic estimates, keyword data, or tech stack details, inform the user which API keys would enrich the profile. Example:
+> ℹ️ Traffic and keyword data unavailable - analysis is based on public page content only. For traffic estimates, set `SIMILARWEB_API_KEY`. For keyword rankings, set `SEMRUSH_API_KEY`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+
 ## Key Reference Files
 
 - `references/analysis-framework.md` - Structured competitive analysis framework covering product, pricing, marketing, brand, and traction dimensions

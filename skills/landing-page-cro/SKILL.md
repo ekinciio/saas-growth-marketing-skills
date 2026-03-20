@@ -229,6 +229,9 @@ export GOOGLE_API_KEY="your_google_api_key"
 - If `GOOGLE_API_KEY` is set → Fetch real PageSpeed data and use it for Dimension 6 scoring
 - If not set → Estimate page speed from HTML signals (current default behavior, no change)
 
+**When data is limited:** When scoring Dimension 6 (Page Speed and Mobile Responsiveness) without real data, note this in the report. Example:
+> ℹ️ Page speed score is estimated from HTML analysis. For real Lighthouse scores, set `GOOGLE_API_KEY`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+
 ## Important Notes
 
 ### SPA Limitation

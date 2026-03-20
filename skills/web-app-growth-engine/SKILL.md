@@ -158,6 +158,9 @@ export GOOGLE_ANALYTICS_JSON="/path/to/service-account.json"
 - If not set → Use HTML-only analysis (current default behavior, no change)
 - Each integration is independent - you can set one without the others
 
+**When data is limited:** If the audit lacks real performance or conversion data, inform the user which API keys would improve accuracy. Example:
+> ℹ️ Signup conversion rate could not be measured - only HTML structure was analyzed. For real conversion data, set `GOOGLE_ANALYTICS_JSON`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+
 ## SPA Limitation Note
 
 This skill performs static HTML analysis using HTTP requests. Single-page applications (SPAs) built with frameworks like React, Angular, or Vue.js may render signup forms dynamically via JavaScript. In these cases, the static analysis may not capture all form elements, and results should be verified manually. For SPA-heavy sites, consider using browser automation tools like Playwright or Puppeteer for a more complete analysis.

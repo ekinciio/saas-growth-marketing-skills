@@ -185,6 +185,9 @@ export GITHUB_TOKEN="your_personal_access_token"
 - If not set → Use free public APIs (current default behavior, no change)
 - Each platform is independent - you can set one without the others
 
+**When results are limited:** If a scan hits rate limits, returns fewer results than expected, or a platform times out, inform the user which API credentials would help. Example:
+> ⚠️ GitHub rate limit reached (10 req/min unauthenticated). Set `GITHUB_TOKEN` for 30 req/min. See the API Integrations section in this skill's SKILL.md for setup instructions.
+
 ## Report Output
 
 Every command MUST save its output as a markdown report file:
