@@ -8,6 +8,34 @@ description: >
   battle cards, competitive positioning, or market landscape.
 ---
 
+## First Run
+
+When a user runs `/competitor-intel analyze <url>` for the first time,
+display this intro before starting:
+
+"""
+📡 Competitor Intel
+
+What I'll do:
+  Fetch the competitor URL and extract publicly visible signals —
+  positioning, features, CTAs, social channels, and trust elements.
+
+What you'll get:
+  → Competitor profile (value prop, audience, platform)
+  → Strengths and weaknesses
+  → Opportunities against them
+
+Note: I scan only the provided URL (single page). For deeper analysis,
+      provide specific pages (pricing, features, about) separately.
+
+Output: Saved to COMPETITOR-ANALYSIS-REPORT.md
+Time: ~60 seconds.
+
+Starting...
+"""
+
+Then proceed immediately.
+
 # Competitor Intel
 
 Conduct structured competitive analysis for SaaS products, generate sales battle cards, map market landscapes, and build competitive positioning strategies.
@@ -129,24 +157,33 @@ Develop a competitive positioning strategy.
 
 **Report:** Save output to `COMPETITOR-POSITIONING-REPORT.md`
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `analyze` | `COMPETITOR-ANALYSIS-REPORT.md` |
-| `battlecard` | `COMPETITOR-BATTLECARD-REPORT.md` |
-| `landscape` | `COMPETITOR-LANDSCAPE-REPORT.md` |
-| `positioning` | `COMPETITOR-POSITIONING-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Competitor name(s) and URL(s)
-- Full analysis with strengths, weaknesses, and opportunities
-- Actionable recommendations
+"""
+✅ Competitor analysis complete — saved to COMPETITOR-ANALYSIS-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Competitor: [Name]
+Positioning: [one-line value prop extracted]
+
+Key findings:
+  1. [Top strength]
+  2. [Top weakness]
+  3. [Biggest opportunity against them]
+
+Full profile with battle card framework → open COMPETITOR-ANALYSIS-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## API Integrations (Optional)
 

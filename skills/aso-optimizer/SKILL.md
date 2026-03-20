@@ -8,6 +8,35 @@ description: >
   app title optimization, or app store listing improvement.
 ---
 
+## First Run
+
+When a user runs `/aso-optimizer analyze <app>` for the first time,
+display this intro before starting:
+
+"""
+🔍 ASO Optimizer
+
+What I'll do:
+  Search the iTunes API for "[app name]" and score the listing
+  against ASO best practices. Then fetch top 5 competitors for comparison.
+
+What you'll get:
+  → ASO health score (0-100)
+  → Metadata quality breakdown (title, description, ratings, completeness)
+  → Competitor comparison
+  → Prioritized optimization suggestions
+
+Note: Uses the free iTunes Search API. Keyword volume and download
+      estimates require optional API keys (see SKILL.md for details).
+
+Output: Saved to ASO-REPORT.md
+Time: ~30 seconds.
+
+Searching...
+"""
+
+Then proceed immediately.
+
 # ASO Optimizer Skill
 
 App Store Optimization toolkit that helps improve app visibility and conversion
@@ -92,26 +121,33 @@ When running the `analyze` command, the skill follows this sequence:
 6. **Generate report** - Save the complete analysis to `ASO-REPORT.md` in the
    current working directory
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `analyze` | `ASO-REPORT.md` |
-| `validate` | `ASO-VALIDATION-REPORT.md` |
-| `compare` | `ASO-COMPARE-REPORT.md` |
-| `score` | `ASO-SCORE-REPORT.md` |
-| `optimize` | `ASO-OPTIMIZE-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- App name and store URL
-- Full analysis results with scores and breakdowns
-- Prioritized recommendations
-- Competitor comparison data (when available)
+"""
+✅ ASO analysis complete — saved to ASO-REPORT.md
 
-Always inform the user where the report was saved after completion.
+App: [App Name]
+ASO Health Score: [X]/100 ([interpretation])
+
+Top findings:
+  1. [Most impactful metadata issue]
+  2. [Second issue]
+  3. [Third issue]
+
+Full report with competitor comparison and keyword strategy → open ASO-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## ASO Health Score Breakdown
 

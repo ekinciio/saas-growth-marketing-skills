@@ -8,6 +8,31 @@ description: >
   or wants help building a marketing page.
 ---
 
+## First Run
+
+When a user runs `/saas-landing-builder review <url>` for the first time,
+display this intro before starting:
+
+"""
+📡 SaaS Landing Builder
+
+What I'll do:
+  Fetch your landing page and check it against the 12-section framework.
+
+What you'll get:
+  → Section completeness score (X/12)
+  → Missing sections identified
+  → Section ordering assessment
+  → Copy and CTA recommendations
+
+Output: Saved to LANDING-PAGE-REVIEW-REPORT.md
+Time: ~60 seconds.
+
+Starting...
+"""
+
+Then proceed immediately.
+
 # SaaS Landing Builder
 
 A comprehensive skill for designing and optimizing high-converting SaaS landing pages. Provides section-by-section page structure guidance, copy frameworks, conversion best practices, and tools for analyzing existing pages.
@@ -161,25 +186,32 @@ Every high-converting SaaS landing page follows a predictable structure. Not eve
 5. Review platform ratings (G2, Capterra)
 6. Media mentions and awards
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `create` | `LANDING-PAGE-BLUEPRINT-REPORT.md` |
-| `review` | `LANDING-PAGE-REVIEW-REPORT.md` |
-| `copy` | `LANDING-PAGE-COPY-REPORT.md` |
-| `wireframe` | `LANDING-PAGE-WIREFRAME-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Product name and target audience
-- Full page structure or review results
-- Copy suggestions and CTA recommendations
-- Visual hierarchy guidelines
+"""
+✅ Landing page review complete — saved to LANDING-PAGE-REVIEW-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Completeness: [X]/12 sections present
+
+Top findings:
+  1. [Most impactful missing section]
+  2. [Second issue]
+  3. [Third issue]
+
+Full report with section-by-section analysis → open LANDING-PAGE-REVIEW-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## Integration with Other Skills
 

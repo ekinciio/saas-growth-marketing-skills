@@ -8,6 +8,61 @@ description: >
   metrics, or growth loops.
 ---
 
+## First Run
+
+When a user runs `/plg-funnel-analyzer audit`, ALWAYS display this input
+summary before asking for any data:
+
+"""
+📊 PLG Funnel Analyzer
+
+What I'll ask you (6 numbers):
+  1. Signup-to-Active rate (%)       → e.g. 25
+  2. Free-to-Paid conversion (%)    → e.g. 5
+  3. Monthly churn rate (%)          → e.g. 4
+  4. Net Revenue Retention (%)       → e.g. 105
+  5. Time-to-Value (days)            → e.g. 3
+  6. Payback period (months)         → e.g. 12
+
+  Type "skip" for any you don't have.
+  Type "demo" to see a sample report with example data first.
+
+What you'll get:
+  → Traffic-light per metric (RED/YELLOW/GREEN)
+  → Overall funnel health grade (A through F)
+  → Biggest funnel leak identified
+  → 5 prioritized fixes with expected impact
+  → Saved to PLG-FUNNEL-AUDIT-REPORT.md
+
+Ready? What's your Signup-to-Active rate?
+"""
+
+### Demo Mode
+
+If the user types "demo", use this data to generate a full sample report:
+
+```json
+{
+  "signup_to_active": 18,
+  "free_to_paid": 3,
+  "monthly_churn": 7,
+  "nrr": 98,
+  "time_to_value_days": 5,
+  "payback_months": 15
+}
+```
+
+Save the demo report as `PLG-FUNNEL-AUDIT-REPORT-DEMO.md`.
+After showing the summary, ask: "Want to run this with your own metrics now?"
+
+### Skip Handling
+
+If the user types "skip" for any metric:
+- Mark it as "Not provided" in the report
+- Benchmark and score all available metrics
+- Note which funnel stages could not be assessed
+- Never block the report because one metric is missing
+
 # PLG Funnel Analyzer
 
 Analyze and optimize Product-Led Growth funnels using the AARRR (Pirate Metrics) framework. Compares your metrics against industry benchmarks, identifies the biggest funnel leaks, and generates prioritized recommendations to improve conversion at every stage.
@@ -174,25 +229,33 @@ Benchmarks represent aggregated data across PLG SaaS companies. Your specific ve
 ### Privacy
 No metrics or data entered during the audit are stored, cached, or transmitted beyond the current session.
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `audit` | `PLG-FUNNEL-AUDIT-REPORT.md` |
-| `benchmark` | `PLG-BENCHMARK-REPORT.md` |
-| `loops` | `PLG-GROWTH-LOOPS-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Company/product name
-- Full metric assessment with traffic-light indicators
-- Funnel health grade
-- Biggest leak identified with recommendations
-- Growth loop opportunities
+"""
+✅ Funnel audit complete — saved to PLG-FUNNEL-AUDIT-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Funnel Health: Grade [A-F]
+Biggest Leak: [stage] — [metric] is [value] (benchmark: [benchmark])
+
+Assessment:
+  🟢 [Best metric]
+  🔴 [Worst metric]
+  🟡 [Borderline metric]
+
+Full report with benchmarks and 5 prioritized fixes → open PLG-FUNNEL-AUDIT-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## References
 

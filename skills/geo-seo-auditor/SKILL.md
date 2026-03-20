@@ -8,6 +8,31 @@ description: >
   AI crawler, or wants to optimize content for AI-powered search engines.
 ---
 
+## First Run
+
+When a user runs any geo-seo-auditor command for the first time, display
+this intro before starting execution:
+
+"""
+📡 GEO SEO Auditor
+
+What I'll do:
+  Fetch your URL and evaluate AI search readiness across 6 dimensions.
+
+What you'll get:
+  → AI visibility score (0-100)
+  → AI crawler access status (14 crawlers checked)
+  → Citability analysis of key content blocks
+  → Top 5 prioritized fixes
+
+Output: Saved to GEO-AUDIT-REPORT.md
+Time: ~90 seconds.
+
+Starting...
+"""
+
+Then proceed immediately. Do not wait for user confirmation.
+
 # GEO SEO Auditor
 
 Comprehensive audit tool for Generative Engine Optimization (GEO) and traditional SEO. Evaluates how well a website is positioned to be cited by AI-powered search engines including ChatGPT, Claude, Perplexity, and Google AI Overviews.
@@ -261,6 +286,33 @@ export AHREFS_API_KEY="your_ahrefs_api_key"
 
 **When data is limited:** If the audit cannot measure page speed accurately or lacks backlink data, inform the user which API keys would enrich the results. Example:
 > ℹ️ Page speed score is estimated from HTML signals only. For real Core Web Vitals (LCP, CLS, INP), set `GOOGLE_API_KEY`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+
+## Output Rules (MANDATORY)
+
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it (latest analysis wins).
+- Follow the structure from `templates/report-template.md`.
+
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
+
+"""
+✅ GEO audit complete — saved to GEO-AUDIT-REPORT.md
+
+Score: [X]/100 ([interpretation])
+
+Top findings:
+  1. [Most important finding]
+  2. [Second finding]
+  3. [Third finding]
+
+Full report with all 6 dimensions and fixes → open GEO-AUDIT-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## Important Notes
 

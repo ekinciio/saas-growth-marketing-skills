@@ -8,6 +8,30 @@ description: >
   landing page audit, conversion rate, A/B testing ideas, or page optimization.
 ---
 
+## First Run
+
+When a user runs any landing-page-cro command for the first time, display
+this intro before starting:
+
+"""
+📡 Landing Page CRO Audit
+
+What I'll do:
+  Fetch your URL and score conversion effectiveness across 10 dimensions.
+
+What you'll get:
+  → CRO score (0-100) with per-dimension breakdown
+  → Top 5 conversion fixes prioritized by impact
+  → A/B test hypotheses for each recommendation
+
+Output: Saved to CRO-AUDIT-REPORT.md
+Time: ~60 seconds.
+
+Starting...
+"""
+
+Then proceed immediately. Do not wait for user confirmation.
+
 # Landing Page CRO
 
 Comprehensive conversion rate optimization audit tool for landing pages. Evaluates 10 key dimensions of page effectiveness, scores each on a 0-10 scale, and delivers prioritized recommendations to improve conversion rates.
@@ -190,25 +214,32 @@ Analyzes the page and generates a prioritized list of A/B test ideas.
 - **1-3**: Feature-heavy copy with little connection to customer outcomes
 - **0**: Technical jargon, no identifiable benefits, or copy that focuses entirely on the company
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `audit` | `CRO-AUDIT-REPORT.md` |
-| `score` | `CRO-SCORE-REPORT.md` |
-| `copy-review` | `CRO-COPY-REPORT.md` |
-| `ab-ideas` | `CRO-AB-IDEAS-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- URL analyzed
-- Overall CRO score with per-dimension breakdown
-- Prioritized recommendations with A/B test hypotheses
-- Quick wins vs long-term improvements
+"""
+✅ CRO audit complete — saved to CRO-AUDIT-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Score: [X]/100 ([interpretation])
+
+Top findings:
+  1. [Weakest dimension + issue]
+  2. [Second weakest + issue]
+  3. [Third + issue]
+
+Full report with 10-dimension breakdown and A/B test ideas → open CRO-AUDIT-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## API Integrations (Optional)
 

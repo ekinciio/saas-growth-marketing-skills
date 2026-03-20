@@ -8,6 +8,69 @@ description: >
   welcome flow, or setup wizard optimization.
 ---
 
+## First Run
+
+When a user runs `/onboarding-optimizer audit`, ALWAYS display this
+summary before asking questions:
+
+"""
+📝 Onboarding Optimizer
+
+What I'll ask you (10 questions about your current onboarding):
+  1.  Product type and primary use case
+  2.  Steps from signup to first value moment    → a number
+  3.  Required fields at signup                  → a number
+  4.  Progress indicator?                        → yes/no
+  5.  Can users skip optional steps?             → yes/no
+  6.  Template gallery or starter content?       → yes/no
+  7.  Time to first value moment                 → minutes
+  8.  Credit card required before trial?         → yes/no
+  9.  Welcome email sequence?                    → yes/no
+  10. In-app guidance (tooltips, checklists)?    → yes/no
+
+  Most answers are yes/no or a number. Takes ~3 minutes.
+  Type "demo" to see a sample audit first.
+
+What you'll get:
+  → Onboarding score (0-100) with letter grade
+  → Scoring breakdown (what helped, what hurt)
+  → Recommended onboarding pattern for your product type
+  → Prioritized improvements with estimated activation lift
+  → Saved to ONBOARDING-AUDIT-REPORT.md
+
+Let's start — what's your product type?
+"""
+
+### Demo Mode
+
+If the user types "demo", use this data to generate a full sample report:
+
+```json
+{
+  "product_type": "project management tool",
+  "steps_to_value": 4,
+  "required_fields": 2,
+  "has_progress_indicator": true,
+  "can_skip_steps": true,
+  "has_template_gallery": true,
+  "time_to_value_minutes": 8,
+  "credit_card_required": false,
+  "has_welcome_email": true,
+  "has_in_app_guidance": false,
+  "has_empty_state_education": false
+}
+```
+
+Save the demo report as `ONBOARDING-AUDIT-REPORT-DEMO.md`.
+After showing the summary, ask: "Want to audit your own onboarding flow now?"
+
+### Skip Handling
+
+If the user doesn't know an answer:
+- Accept "not sure" or "skip" and score that factor as neutral (0 points)
+- Continue with remaining questions
+- Note which factors were unknown in the report
+
 # Onboarding Optimizer
 
 Evaluate, score, and improve SaaS user onboarding flows to maximize activation rates and reduce time-to-value.
@@ -113,24 +176,36 @@ Generate a customized onboarding improvement checklist based on the current flow
 
 **Report:** Save output to `ONBOARDING-CHECKLIST-REPORT.md`
 
-## Report Output
+## Output Rules (MANDATORY)
 
-Every command MUST save its output as a markdown report file:
+### File Output
+- ALWAYS save the complete report to the specified `.md` file in the current working directory.
+- NEVER ask "should I save this?" — just save it automatically.
+- Include `**Date:** YYYY-MM-DD` in the report header.
+- If the file already exists, overwrite it.
+- Follow the structure from `templates/report-template.md`.
 
-| Command | Output File |
-|---------|-------------|
-| `audit` | `ONBOARDING-AUDIT-REPORT.md` |
-| `patterns` | `ONBOARDING-PATTERNS-REPORT.md` |
-| `checklist` | `ONBOARDING-CHECKLIST-REPORT.md` |
+### Chat Output
+After saving, show a SHORT summary in chat (max 10 lines):
 
-The report file should include:
-- Date of analysis
-- Product name and type
-- Onboarding score with full breakdown
-- Recommended pattern and rationale
-- Prioritized improvements with estimated activation lift
+"""
+✅ Onboarding audit complete — saved to ONBOARDING-AUDIT-REPORT.md
 
-Always inform the user where the report was saved after completion.
+Score: [X]/100 (Grade: [A-F])
+Recommended Pattern: [pattern name]
+
+What helped:
+  + [factor] (+[X] points)
+  + [factor] (+[X] points)
+
+What hurt:
+  - [factor] (-[X] points)
+  - [factor] (-[X] points)
+
+Full report with improvement roadmap → open ONBOARDING-AUDIT-REPORT.md
+"""
+
+NEVER dump the full report in chat. The file is the deliverable.
 
 ## Key Reference Files
 
