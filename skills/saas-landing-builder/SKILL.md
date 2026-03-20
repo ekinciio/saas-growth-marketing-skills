@@ -38,6 +38,8 @@ Interactive landing page builder that guides you through creating a complete lan
 - Social proof placement strategy
 - Visual hierarchy guidelines
 
+**Report:** Save output to `LANDING-PAGE-BLUEPRINT-REPORT.md`
+
 ### `/saas-landing-builder review <url>`
 
 Reviews an existing landing page against best practices and the 12-section anatomy framework.
@@ -56,6 +58,8 @@ Reviews an existing landing page against best practices and the 12-section anato
 - Above-the-fold content assessment
 - Mobile responsiveness indicators
 - Page load performance signals
+
+**Report:** Save output to `LANDING-PAGE-REVIEW-REPORT.md`
 
 ### `/saas-landing-builder copy`
 
@@ -81,6 +85,8 @@ Generates landing page copy using proven frameworks.
 - CTA copy variations
 - FAQ content suggestions
 
+**Report:** Save output to `LANDING-PAGE-COPY-REPORT.md`
+
 ### `/saas-landing-builder wireframe`
 
 Generates an ASCII wireframe of a recommended landing page layout.
@@ -95,6 +101,8 @@ Generates an ASCII wireframe of a recommended landing page layout.
 - Responsive layout notes
 - Content block dimensions and spacing
 - Visual hierarchy annotations
+
+**Report:** Save output to `LANDING-PAGE-WIREFRAME-REPORT.md`
 
 ## SPA Limitation Note
 

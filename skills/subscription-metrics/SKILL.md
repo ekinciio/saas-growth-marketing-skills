@@ -38,6 +38,8 @@ Net Revenue Retention   | 108%       | GREEN   | >100%
 ...
 ```
 
+**Report:** Save output to `SAAS-METRICS-REPORT.md`
+
 ### `/subscription-metrics health`
 SaaS health scorecard. Generate a comprehensive health assessment based on provided metrics.
 
@@ -48,6 +50,8 @@ SaaS health scorecard. Generate a comprehensive health assessment based on provi
 4. Produce an overall health grade (A through F)
 5. List the top 3 strengths and top 3 areas for improvement
 6. Provide specific, actionable recommendations for each RED or YELLOW metric
+
+**Report:** Save output to `SAAS-HEALTH-REPORT.md`
 
 **Health grade scale:**
 - A: 80-100% of metrics GREEN
@@ -66,6 +70,8 @@ Compare metrics to industry benchmarks segmented by stage and vertical.
 4. Compare each metric against stage-appropriate and vertical-appropriate benchmarks
 5. Show percentile ranking where possible (top 10%, top 25%, median, below median)
 6. Highlight where the company over-performs or under-performs relative to peers
+
+**Report:** Save output to `SAAS-BENCHMARK-REPORT.md`
 
 **Benchmark ranges by stage (MRR example):**
 - Seed: $5K-$50K MRR typical
@@ -90,6 +96,8 @@ Simple MRR/ARR forecast based on current trajectory and assumptions.
 - ARR milestones timeline
 - Revenue growth chart description (text-based)
 - Cash runway estimate if burn data is provided
+
+**Report:** Save output to `SAAS-FORECAST-REPORT.md`
 
 ## Report Output
 

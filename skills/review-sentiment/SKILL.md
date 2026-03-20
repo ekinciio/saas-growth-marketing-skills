@@ -44,6 +44,8 @@ Performs sentiment analysis on a set of review texts. Each review is classified 
 - Keyword frequency table (top 20)
 - Sentiment trend (if timestamps provided)
 
+**Report:** Save output to `REVIEW-SENTIMENT-REPORT.md`
+
 ### `/review-sentiment themes` - Extract Common Themes
 
 Focused analysis that groups reviews by theme and highlights patterns.
@@ -64,6 +66,8 @@ Focused analysis that groups reviews by theme and highlights patterns.
 - Feature requests extracted from reviews
 - Complaint patterns with frequency
 
+**Report:** Save output to `REVIEW-THEMES-REPORT.md`
+
 ### `/review-sentiment summary` - Executive Summary
 
 Generates a concise executive summary suitable for stakeholders.
@@ -76,6 +80,8 @@ Generates a concise executive summary suitable for stakeholders.
 - Feature requests ranked by mention frequency
 - Recommended actions based on review patterns
 - Comparison benchmarks (if industry data available)
+
+**Report:** Save output to `REVIEW-SUMMARY-REPORT.md`
 
 ## How It Works
 

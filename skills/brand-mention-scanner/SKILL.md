@@ -32,6 +32,8 @@ Performs a full mention scan across all three platforms (Reddit, Hacker News, Gi
 - Unresponded opportunities
 - Trending analysis
 
+**Report:** Save output to `BRAND-MENTIONS-REPORT.md`
+
 ### `/brand-mention-scanner reddit <brand-name>`
 
 Scans Reddit only for brand mentions.
@@ -48,6 +50,8 @@ Scans Reddit only for brand mentions.
 - Engagement metrics (upvotes, comments)
 - Thread age and recency
 
+**Report:** Save output to `BRAND-MENTIONS-REDDIT-REPORT.md`
+
 ### `/brand-mention-scanner hn <brand-name>`
 
 Scans Hacker News only for brand mentions.
@@ -62,6 +66,8 @@ Scans Hacker News only for brand mentions.
 - Points and comment counts
 - Author information
 - Discussion context and sentiment
+
+**Report:** Save output to `BRAND-MENTIONS-HN-REPORT.md`
 
 ### `/brand-mention-scanner github <brand-name>`
 
@@ -79,6 +85,8 @@ Scans GitHub only for repositories mentioning or related to the brand.
 - Last update timestamps
 - Community engagement metrics
 
+**Report:** Save output to `BRAND-MENTIONS-GITHUB-REPORT.md`
+
 ### `/brand-mention-scanner report <brand-name>`
 
 Generates a comprehensive mention report suitable for sharing with stakeholders.
@@ -95,6 +103,8 @@ Generates a comprehensive mention report suitable for sharing with stakeholders.
 - Competitive mention comparison
 - Trend analysis (increasing/decreasing mentions)
 - Action items and recommendations
+
+**Report:** Save output to `BRAND-MENTIONS-FULL-REPORT.md`
 
 ## Platform APIs
 

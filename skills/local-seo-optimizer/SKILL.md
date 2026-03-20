@@ -46,6 +46,8 @@ Runs a comprehensive local SEO audit covering all four areas below. Produces an 
 - Local ranking factor breakdown
 - Prioritized quick wins and long-term recommendations
 
+**Report:** Save output to `LOCAL-SEO-AUDIT-REPORT.md`
+
 ### `/local-seo-optimizer gbp-check` - GBP Profile Completeness Checker
 
 Focused audit of your Google Business Profile against the full completeness checklist.
@@ -66,6 +68,8 @@ Focused audit of your Google Business Profile against the full completeness chec
 - 50-69: Fair - several important items missing
 - Below 50: Needs work - significant optimization required
 
+**Report:** Save output to `LOCAL-SEO-GBP-REPORT.md`
+
 ### `/local-seo-optimizer citations` - NAP Citation Source Recommendations
 
 Evaluates NAP (Name, Address, Phone) consistency and recommends citation sources.
@@ -83,6 +87,8 @@ Evaluates NAP (Name, Address, Phone) consistency and recommends citation sources
 - NAP formatting standards to follow
 - How to handle inconsistencies and duplicates
 - Estimated timeline for citation building
+
+**Report:** Save output to `LOCAL-SEO-CITATIONS-REPORT.md`
 
 ### `/local-seo-optimizer local-content` - Local Content Strategy Recommendations
 
@@ -102,6 +108,8 @@ Provides a local content optimization plan for your website.
 - Local blog post topic frameworks
 - Google Posts scheduling recommendations
 - Local FAQ content suggestions
+
+**Report:** Save output to `LOCAL-SEO-CONTENT-REPORT.md`
 
 ## Scoring Methodology
 

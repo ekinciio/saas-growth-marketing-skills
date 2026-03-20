@@ -102,6 +102,8 @@ Runs the complete 6-step audit. This is the most thorough analysis and covers ev
 - llms.txt compliance check
 - Platform-specific readiness scores
 
+**Report:** Save output to `GEO-AUDIT-REPORT.md`
+
 ### `/geo-seo-auditor quick <url>`
 
 A rapid 60-second snapshot that covers the essentials:
@@ -110,6 +112,8 @@ A rapid 60-second snapshot that covers the essentials:
 - Page citability score (top 3 blocks)
 - llms.txt existence check
 - Top 3 quick-win recommendations
+
+**Report:** Save output to `GEO-QUICK-REPORT.md`
 
 Use this when you need a fast overview before diving deeper.
 
@@ -129,6 +133,8 @@ Deep-dive into content citability. Analyzes every content block on the page and 
 - Top 5 most citable passages
 - Bottom 5 least citable passages
 - Specific rewrite suggestions for low-scoring blocks
+
+**Report:** Save output to `GEO-CITABILITY-REPORT.md`
 
 ### `/geo-seo-auditor crawlers <url>`
 
@@ -157,6 +163,8 @@ Checks the site's robots.txt against 14+ known AI crawlers.
 - Recommendations for which crawlers to allow/block
 - Sample robots.txt directives
 
+**Report:** Save output to `GEO-CRAWLERS-REPORT.md`
+
 ### `/geo-seo-auditor llmstxt <url>`
 
 Checks for the presence and validity of an llms.txt file at the site root.
@@ -171,6 +179,8 @@ Checks for the presence and validity of an llms.txt file at the site root.
 - Generates a recommended llms.txt based on site structure
 - Explains the benefits of adding one
 - Provides implementation instructions
+
+**Report:** Save output to `GEO-LLMSTXT-REPORT.md`
 
 ### `/geo-seo-auditor brands <url>`
 
@@ -189,6 +199,8 @@ Scans for brand authority signals across platforms commonly indexed by AI engine
 - Authority score per platform
 - Gaps in brand presence
 - Recommendations for strengthening authority signals
+
+**Report:** Save output to `GEO-BRANDS-REPORT.md`
 
 ### `/geo-seo-auditor platforms <url>`
 
@@ -215,6 +227,8 @@ Generates platform-specific optimization recommendations for each major AI searc
 - Google-Extended crawler status
 - Featured snippet optimization
 - Structured data for AI extraction
+
+**Report:** Save output to `GEO-PLATFORMS-REPORT.md`
 
 ## Important Notes
 

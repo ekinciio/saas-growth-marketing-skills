@@ -57,6 +57,8 @@ Recommended Pattern: Progressive Disclosure
 Top Improvements: [...]
 ```
 
+**Report:** Save output to `ONBOARDING-AUDIT-REPORT.md`
+
 ### `/onboarding-optimizer patterns`
 Display the onboarding pattern library with guidance on when to use each pattern.
 
@@ -72,6 +74,8 @@ Display the onboarding pattern library with guidance on when to use each pattern
 3. Highlight which pattern is the best fit for their product type
 4. Explain why that pattern works for their context
 5. Provide implementation tips specific to their product
+
+**Report:** Save output to `ONBOARDING-PATTERNS-REPORT.md`
 
 ### `/onboarding-optimizer checklist`
 Generate a customized onboarding improvement checklist based on the current flow.
@@ -106,6 +110,8 @@ Generate a customized onboarding improvement checklist based on the current flow
 - Implement progressive disclosure for complex features
 - Remove credit card requirement from trial signup
 - Create personalized onboarding paths based on user role or use case
+
+**Report:** Save output to `ONBOARDING-CHECKLIST-REPORT.md`
 
 ## Report Output
 

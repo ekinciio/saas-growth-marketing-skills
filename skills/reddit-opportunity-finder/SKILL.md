@@ -38,6 +38,8 @@ Searches Reddit for threads matching your keywords and scores each by opportunit
 - Intent signals: Question marks, "best", "recommend", "looking for"
 - Subreddit relevance: Known SaaS-friendly subreddits score higher
 
+**Report:** Save output to `REDDIT-OPPORTUNITIES-REPORT.md`
+
 ### `/reddit-opportunity-finder monitor <keywords>`
 
 Generates a monitoring setup guide for ongoing keyword tracking on Reddit.
@@ -53,6 +55,8 @@ Generates a monitoring setup guide for ongoing keyword tracking on Reddit.
 - Alert configuration guidance
 - RSS feed setup instructions
 - Automation suggestions using Reddit's JSON API
+
+**Report:** Save output to `REDDIT-MONITOR-SETUP-REPORT.md`
 
 ### `/reddit-opportunity-finder analyze <subreddit>`
 
@@ -70,6 +74,8 @@ Analyzes a specific subreddit for opportunity fit and engagement patterns.
 - Best posting times and days
 - Competitor presence analysis
 - Opportunity assessment score
+
+**Report:** Save output to `REDDIT-SUBREDDIT-REPORT.md`
 
 ## Technical Details
 

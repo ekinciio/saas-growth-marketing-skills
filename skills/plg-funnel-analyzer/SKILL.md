@@ -82,6 +82,8 @@ Interactive full funnel audit. Prompts the user for their current metrics and re
 - 5 prioritized recommendations ranked by expected impact
 - Suggested experiments for each recommendation
 
+**Report:** Save output to `PLG-FUNNEL-AUDIT-REPORT.md`
+
 **Example interaction:**
 ```
 > /plg-funnel-analyzer audit
@@ -101,6 +103,8 @@ Analyzing...
 ### `/plg-funnel-analyzer benchmark <category>`
 
 Returns detailed benchmark data for the specified category with context on what top performers do differently.
+
+**Report:** Save output to `PLG-BENCHMARK-REPORT.md`
 
 **Example:**
 ```
@@ -134,6 +138,8 @@ Identifies potential growth loops in the user's product and suggests optimizatio
 - Current loop health assessment
 - Specific tactics to strengthen each loop
 - Metrics to track loop effectiveness
+
+**Report:** Save output to `PLG-GROWTH-LOOPS-REPORT.md`
 
 ## AARRR Framework Reference
 

@@ -81,6 +81,8 @@ Runs the complete CRO audit across all 10 dimensions. Returns a detailed report 
 - Suggested A/B test hypotheses
 - Quick wins vs. long-term improvements
 
+**Report:** Save output to `CRO-AUDIT-REPORT.md`
+
 ### `/landing-page-cro score <url>`
 
 A rapid scoring pass that returns the overall CRO score and dimension breakdown without detailed recommendations. Use this for a quick health check.
@@ -91,6 +93,8 @@ A rapid scoring pass that returns the overall CRO score and dimension breakdown 
 - Traffic light indicators (red/yellow/green per dimension)
 - Top 3 weakest dimensions flagged
 
+**Report:** Save output to `CRO-SCORE-REPORT.md`
+
 ### `/landing-page-cro copy-review`
 
 Interactive copy review mode. Provide landing page copy (headline, subheadline, body, CTA text) and receive:
@@ -99,6 +103,8 @@ Interactive copy review mode. Provide landing page copy (headline, subheadline, 
 - Emotional trigger assessment
 - Suggested rewrites for weak sections
 - CTA copy alternatives ranked by strength
+
+**Report:** Save output to `CRO-COPY-REPORT.md`
 
 ### `/landing-page-cro ab-ideas <url>`
 
@@ -109,6 +115,8 @@ Analyzes the page and generates a prioritized list of A/B test ideas.
 - For each test: hypothesis statement, control vs. variant description, expected lift range, implementation difficulty (easy/medium/hard)
 - Quick-win tests that can be implemented in under an hour
 - High-impact tests that require more development effort
+
+**Report:** Save output to `CRO-AB-IDEAS-REPORT.md`
 
 ## Scoring Methodology Details
 

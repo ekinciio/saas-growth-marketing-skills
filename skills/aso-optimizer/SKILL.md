@@ -30,6 +30,8 @@ best practices.
 Validate metadata fields against platform-specific character limits for iOS,
 Android, or both.
 
+**Report:** Save output to `ASO-VALIDATION-REPORT.md`
+
 **Example:**
 ```
 /aso-optimizer validate
@@ -39,6 +41,8 @@ Android, or both.
 
 Side-by-side metadata comparison between two apps. Highlights strengths and
 weaknesses of each listing.
+
+**Report:** Save output to `ASO-COMPARE-REPORT.md`
 
 **Example:**
 ```
@@ -50,6 +54,8 @@ weaknesses of each listing.
 Calculate a detailed ASO health score (0-100) with a breakdown across four
 weighted categories.
 
+**Report:** Save output to `ASO-SCORE-REPORT.md`
+
 **Example:**
 ```
 /aso-optimizer score
@@ -59,6 +65,8 @@ weighted categories.
 
 Generate improved metadata suggestions based on the current listing analysis
 and competitor benchmarks.
+
+**Report:** Save output to `ASO-OPTIMIZE-REPORT.md`
 
 **Example:**
 ```
@@ -79,6 +87,8 @@ When running the `analyze` command, the skill follows this sequence:
 4. **Calculate ASO health score** - Generate a weighted score from 0 to 100
 5. **Generate recommendations** - Produce prioritized, actionable suggestions
    for improving the listing
+
+**Report:** Save output to `ASO-REPORT.md`
 6. **Generate report** - Save the complete analysis to `ASO-REPORT.md` in the
    current working directory
 

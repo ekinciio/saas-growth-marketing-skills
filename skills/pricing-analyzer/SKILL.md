@@ -51,6 +51,8 @@ Recommended Changes:
   [Prioritized list of pricing changes with expected impact]
 ```
 
+**Report:** Save output to `PRICING-AUDIT-REPORT.md`
+
 ### `/pricing-analyzer compare`
 
 Competitive pricing comparison based on manually entered data.
@@ -71,6 +73,8 @@ Competitive pricing comparison based on manually entered data.
 - Positioning map (text-based)
 - Gap analysis highlighting underserved price points
 - Recommended positioning strategy
+
+**Report:** Save output to `PRICING-COMPARE-REPORT.md`
 
 ### `/pricing-analyzer tiers`
 
@@ -97,6 +101,8 @@ Generate tier structure recommendations based on the user's product and market.
 - Pricing guidance (ranges, not exact numbers unless data supports it)
 - Upgrade trigger identification (features that motivate tier upgrades)
 - Tier naming suggestions
+
+**Report:** Save output to `PRICING-TIERS-REPORT.md`
 
 ### `/pricing-analyzer sensitivity`
 
@@ -125,6 +131,8 @@ Guide the user through a Van Westendorp Price Sensitivity analysis.
 - Four intersection points with values
 - Acceptable price range
 - Optimal price recommendation with rationale
+
+**Report:** Save output to `PRICING-SENSITIVITY-REPORT.md`
 
 ## Report Output
 

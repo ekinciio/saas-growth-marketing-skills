@@ -51,6 +51,8 @@ Retention Action Plan:
   [Prioritized actions with timeline]
 ```
 
+**Report:** Save output to `RETENTION-DIAGNOSIS-REPORT.md`
+
 ### `/retention-playbook signals`
 
 Map early warning churn signals to detection methods and intervention strategies.
@@ -74,6 +76,8 @@ Map early warning churn signals to detection methods and intervention strategies
 - Intervention playbook per signal type
 - Monitoring dashboard specification
 - Alert priority framework (P0 through P3)
+
+**Report:** Save output to `RETENTION-SIGNALS-REPORT.md`
 
 ### `/retention-playbook winback`
 
@@ -100,6 +104,8 @@ Generate win-back campaign templates for churned or at-risk customers.
 - CTA text and landing page recommendations
 - Segmentation rules by churn reason
 
+**Report:** Save output to `RETENTION-WINBACK-REPORT.md`
+
 ### `/retention-playbook engagement`
 
 Build an engagement scoring model to proactively identify healthy and at-risk customers.
@@ -124,6 +130,8 @@ Build an engagement scoring model to proactively identify healthy and at-risk cu
 - Tier thresholds and definitions
 - Action playbook per tier
 - Suggested review cadence (weekly for At-Risk and below, monthly for Healthy and above)
+
+**Report:** Save output to `RETENTION-ENGAGEMENT-REPORT.md`
 
 ## Report Output
 

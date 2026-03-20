@@ -59,6 +59,8 @@ Opportunities Against:
   - [Opportunity 2]
 ```
 
+**Report:** Save output to `COMPETITOR-ANALYSIS-REPORT.md`
+
 **Single-page limitation:** The scanner fetches only the provided URL. It does not crawl additional pages or subdomains. For deeper analysis, the user should provide specific page URLs (pricing page, features page, about page) as separate analysis runs.
 
 ### `/competitor-intel battlecard <competitor-name>`
@@ -83,6 +85,8 @@ Generate a sales battle card for use by the sales team when competing against a 
 - Competitive landmines (things to establish early that favor your product)
 - Customer proof points (case studies or quotes that counter the competitor)
 
+**Report:** Save output to `COMPETITOR-BATTLECARD-REPORT.md`
+
 ### `/competitor-intel landscape`
 
 Map the competitive landscape for the user's market.
@@ -102,6 +106,8 @@ Map the competitive landscape for the user's market.
 - Crowded segment warnings
 - Recommended positioning quadrant
 
+**Report:** Save output to `COMPETITOR-LANDSCAPE-REPORT.md`
+
 ### `/competitor-intel positioning`
 
 Develop a competitive positioning strategy.
@@ -120,6 +126,8 @@ Develop a competitive positioning strategy.
 - Recommended positioning statement
 - Messaging pillars (3-5 key messages that reinforce the positioning)
 - Proof points for each pillar
+
+**Report:** Save output to `COMPETITOR-POSITIONING-REPORT.md`
 
 ## Report Output
 

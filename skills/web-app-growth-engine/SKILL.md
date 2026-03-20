@@ -37,6 +37,8 @@ Performs a full web growth audit on the specified URL. This includes:
 - Activation metric recommendations
 - Growth loop opportunities
 
+**Report:** Save output to `WEB-GROWTH-AUDIT-REPORT.md`
+
 ### `/web-app-growth-engine signup-flow <url>`
 
 Performs a focused signup flow friction analysis on the specified URL.
@@ -55,6 +57,8 @@ Performs a focused signup flow friction analysis on the specified URL.
 - Trust signals (badges, testimonials, security icons)
 - CTA button text and placement
 - Progressive profiling implementation
+
+**Report:** Save output to `WEB-GROWTH-SIGNUP-REPORT.md`
 
 **Friction scoring breakdown:**
 - Each required field: +8 points
@@ -91,6 +95,8 @@ Generates an activation metric framework tailored to your product type.
 - E-commerce enablers (e.g., payment, shipping, storefront)
 - Design tools (e.g., editors, prototyping)
 
+**Report:** Save output to `WEB-GROWTH-ACTIVATION-REPORT.md`
+
 ### `/web-app-growth-engine loops`
 
 Designs growth loops specific to your SaaS product.
@@ -124,6 +130,8 @@ Designs growth loops specific to your SaaS product.
    - Usage-based expansion
    - Feature gating strategy
    - Self-serve upgrade flows
+
+**Report:** Save output to `WEB-GROWTH-LOOPS-REPORT.md`
 
 ## SPA Limitation Note
 
