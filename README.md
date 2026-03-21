@@ -168,6 +168,45 @@ See each skill's `SKILL.md` for full setup instructions.
 
 ---
 
+## Data Quality & Accuracy
+
+> The more data you feed, the better results you get.
+
+These skills are designed to work at two levels:
+
+### Quick Mode (URL only)
+Just pass a URL and get instant insights. Skills will scrape publicly available data - HTML, meta tags, structured data, App Store listings, Reddit threads - and generate a scored report with recommendations.
+
+**This is great for a fast overview**, but the analysis is limited to what's publicly visible.
+
+### Full Mode (connect your data)
+For the most accurate results, feed your real business data:
+
+| Skill | What to connect for best results |
+|-------|----------------------------------|
+| **Subscription Metrics** | RevenueCat, Stripe, or Baremetrics export (MRR, churn, ARPU, LTV) |
+| **Pricing Analyzer** | Your actual pricing tiers, competitor pricing data, conversion rates per tier |
+| **PLG Funnel Analyzer** | Real funnel metrics (signup-to-active %, free-to-paid %, NRR, churn rate) |
+| **Retention Playbook** | Cohort data, churn reasons, customer segment breakdown |
+| **Onboarding Optimizer** | Onboarding flow screenshots, activation funnel data, drop-off rates |
+| **Review Sentiment** | Full review exports from App Store Connect, Google Play Console, G2, or Capterra |
+| **ASO Optimizer** | App Store Connect keyword data, impression/conversion metrics |
+| **Competitor Intel** | Internal competitive research, win/loss data, sales objections |
+
+### Pro Tip: Connect Your APIs
+
+For real-time, always-accurate data, you can extend these skills by connecting your own APIs:
+
+- **App Store Connect API** - real keyword rankings, impression data, conversion rates
+- **Google Search Console API** - actual search performance, click-through rates
+- **RevenueCat / Stripe API** - live revenue metrics, churn data, subscription analytics
+- **Google Business Profile API** - real review data, local SEO metrics
+- **Reddit API (with auth)** - deeper thread analysis, comment sentiment
+
+> **Bottom line:** These skills work out of the box with just a URL. But if you want results you can actually make business decisions on, connect your real data. The difference between a "good enough" audit and a "boardroom-ready" audit is the data you feed it.
+
+---
+
 ## Use Cases
 
 - **SaaS Founders** - Audit your product's growth health across all dimensions
