@@ -33,6 +33,7 @@ SKILLS=(
     "saas-landing-builder"
     "reddit-opportunity-finder"
     "brand-mention-scanner"
+    "growth-skills"
 )
 
 AGENTS=(
@@ -45,6 +46,7 @@ TEMPLATES_LIST=(
     "gtm-strategy.md"
     "pricing-analysis.md"
     "launch-checklist.md"
+    "report-template.md"
 )
 
 echo ""

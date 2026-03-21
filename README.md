@@ -89,6 +89,7 @@ pip install -r requirements.txt
 | 13 | saas-landing-builder | `/saas-landing-builder create` | Landing page structure design and copy frameworks |
 | 14 | reddit-opportunity-finder | `/reddit-opportunity-finder search <kw>` | Find high-intent Reddit threads for your product |
 | 15 | brand-mention-scanner | `/brand-mention-scanner scan <brand>` | Brand mention tracking across Reddit, HN, and GitHub |
+| — | growth-skills | `/growth-skills` | Index of all available skills and commands |
 
 ---
 
