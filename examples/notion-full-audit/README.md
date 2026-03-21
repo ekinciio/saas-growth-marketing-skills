@@ -23,18 +23,18 @@ Notion is a $10B+ productivity platform with 100M+ users - one of the most succe
 
 | # | Skill | Report | Score |
 |---|-------|--------|-------|
-| 1 | GEO SEO Auditor | [View Report](reports/01-GEO-AUDIT.md) | 68/100 |
-| 2 | Landing Page CRO | [View Report](reports/02-CRO-AUDIT.md) | 74/100 |
-| 3 | Competitor Intel | [View Report](reports/03-COMPETITOR-ANALYSIS.md) | SWOT |
-| 4 | Web App Growth Engine | [View Report](reports/04-WEB-GROWTH-AUDIT.md) | 42/50 PLG |
-| 5 | Landing Page Review | [View Report](reports/05-LANDING-PAGE-BLUEPRINT.md) | 9/12 Sections |
-| 6 | ASO Optimizer | [View Report](reports/06-ASO-REPORT.md) | 72/100 |
-| 7 | Reddit Opportunities | [View Report](reports/07-REDDIT-OPPORTUNITIES.md) | — |
-| 8 | Brand Mentions | [View Report](reports/08-BRAND-MENTIONS.md) | 44/50 |
-| 9 | Review Sentiment | [View Report](reports/09-REVIEW-SENTIMENT.md) | 4.2/5.0 |
-| 10 | Onboarding Optimizer | [View Report](reports/10-ONBOARDING-AUDIT.md) | 80/100 |
-| 11 | Growth Strategist | [View Report](reports/11-GROWTH-STRATEGY.md) | — |
-| 12 | Launch Planner | [View Report](reports/12-LAUNCH-PLAYBOOK.md) | — |
+| 1 | geo-seo-auditor | [View Report](reports/geo-seo-auditor.md) | 68/100 |
+| 2 | landing-page-cro | [View Report](reports/landing-page-cro.md) | 74/100 |
+| 3 | competitor-intel | [View Report](reports/competitor-intel.md) | SWOT |
+| 4 | web-app-growth-engine | [View Report](reports/web-app-growth-engine.md) | 42/50 PLG |
+| 5 | saas-landing-builder | [View Report](reports/saas-landing-builder.md) | 9/12 Sections |
+| 6 | aso-optimizer | [View Report](reports/aso-optimizer.md) | 72/100 |
+| 7 | reddit-opportunity-finder | [View Report](reports/reddit-opportunity-finder.md) | — |
+| 8 | brand-mention-scanner | [View Report](reports/brand-mention-scanner.md) | 44/50 |
+| 9 | review-sentiment | [View Report](reports/review-sentiment.md) | 4.2/5.0 |
+| 10 | onboarding-optimizer | [View Report](reports/onboarding-optimizer.md) | 80/100 |
+| 11 | growth-strategist | [View Report](reports/growth-strategist.md) | — |
+| 12 | launch-planner | [View Report](reports/launch-planner.md) | — |
 
 ## Key Takeaways
 
