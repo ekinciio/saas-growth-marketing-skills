@@ -7,13 +7,17 @@ Detects which sections are present, evaluates section order, and provides
 recommendations for missing sections.
 
 Usage:
-    python page_structure_analyzer.py <landing_page_url>
+    python page_structure_analyzer.py <landing_page_url_or_html_file>
 
 Example:
     python page_structure_analyzer.py https://example.com
+    python page_structure_analyzer.py ./saved-page.html
 """
 
+from __future__ import annotations
+
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass, field, asdict
@@ -132,7 +136,7 @@ SECTION_DEFINITIONS: dict[str, dict] = {
         ],
         "recommendation": (
             "Add 2-3 testimonials with real names, photos, titles, and "
-            "specific outcomes. Video testimonials perform 2-3x better."
+            "specific outcomes. Video testimonials often outperform text."
         ),
     },
     "pricing": {
@@ -186,7 +190,7 @@ SECTION_DEFINITIONS: dict[str, dict] = {
         "name": "Final CTA",
         "order": 11,
         "description": "Bottom-of-page conversion section",
-        "html_patterns": ["final-cta", "bottom-cta", "cta-section", "cta-banner"],
+        "html_patterns": ["final-cta", "bottom-cta", "cta-section", "cta-banner", "form"],
         "text_patterns": [
             r"ready\s+to", r"get\s+started\s+today", r"start\s+your",
             r"join\s+\d", r"try\s+it\s+free", r"what\s+are\s+you\s+waiting",
@@ -223,6 +227,7 @@ class SectionResult:
     detected: bool = False
     confidence: str = "none"
     signals: list = field(default_factory=list)
+    first_position: Optional[int] = None  # document-order index of first signal
 
 
 @dataclass
@@ -232,10 +237,12 @@ class PageAnalysisResult:
     url: str
     sections_found: list = field(default_factory=list)
     sections_missing: list = field(default_factory=list)
+    sections_possible: list = field(default_factory=list)
     completeness_score: float = 0.0
     section_order_optimal: bool = True
     section_details: list = field(default_factory=list)
     recommendations: list = field(default_factory=list)
+    warnings: list = field(default_factory=list)
     errors: list = field(default_factory=list)
 
 
@@ -249,11 +256,12 @@ def fetch_page(url: str, timeout: int = 15) -> Optional[BeautifulSoup]:
     Returns:
         BeautifulSoup object or None if fetch failed.
     """
+    # NOTE: refresh the Chrome version below periodically so the UA stays current.
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
+            "Chrome/138.0.0.0 Safari/537.36"
         ),
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.5",
@@ -267,19 +275,56 @@ def fetch_page(url: str, timeout: int = 15) -> Optional[BeautifulSoup]:
         return None
 
 
-def detect_section(soup: BeautifulSoup, section_key: str, definition: dict) -> SectionResult:
+def load_source(source: str) -> Optional[BeautifulSoup]:
+    """Load a page from a URL or a local HTML file path."""
+    if os.path.isfile(source):
+        try:
+            with open(source, encoding="utf-8", errors="replace") as fh:
+                return BeautifulSoup(fh.read(), "html.parser")
+        except OSError as e:
+            print(f"Error reading {source}: {e}")
+            return None
+    return fetch_page(source)
+
+
+def detect_page_language(soup: BeautifulSoup) -> str:
+    """Return the declared <html lang> value (lowercased), or '' if unset."""
+    html_tag = soup.find("html")
+    if html_tag is None:
+        return ""
+    return (html_tag.get("lang") or "").strip().lower()
+
+
+def build_position_index(soup: BeautifulSoup) -> dict:
+    """Map each node's id() to its document-order index.
+
+    Used to compare the actual on-page position of detected sections.
+    """
+    return {id(node): i for i, node in enumerate(soup.descendants)}
+
+
+def detect_section(
+    soup: BeautifulSoup,
+    section_key: str,
+    definition: dict,
+    positions: Optional[dict] = None,
+) -> SectionResult:
     """Detect whether a specific section exists on the page.
 
     Uses a combination of HTML structure analysis (class names, IDs, tag names)
-    and text content pattern matching.
+    and text content pattern matching. Requires at least 2 signals to mark a
+    section as detected; a single weak signal is reported as "possible" and
+    is not counted toward the completeness score.
 
     Args:
         soup: Parsed HTML page.
         section_key: The section identifier.
         definition: The section definition with detection patterns.
+        positions: Optional map of id(node) -> document-order index, used to
+            record where the section's first signal appears on the page.
 
     Returns:
-        SectionResult with detection status and confidence.
+        SectionResult with detection status, confidence, and first position.
     """
     result = SectionResult(
         key=section_key,
@@ -287,9 +332,17 @@ def detect_section(soup: BeautifulSoup, section_key: str, definition: dict) -> S
         order=definition["order"],
     )
 
-    page_html = str(soup).lower()
     page_text = soup.get_text().lower()
     signals = []
+    signal_positions = []
+
+    def record_elements(elements) -> None:
+        if positions is None:
+            return
+        for el in elements:
+            pos = positions.get(id(el))
+            if pos is not None:
+                signal_positions.append(pos)
 
     # Check HTML patterns (class names, IDs, data attributes)
     for pattern in definition["html_patterns"]:
@@ -297,24 +350,38 @@ def detect_section(soup: BeautifulSoup, section_key: str, definition: dict) -> S
         elements_by_id = soup.find_all(id=re.compile(pattern, re.IGNORECASE))
         if elements_by_id:
             signals.append(f"Found element with ID matching '{pattern}'")
+            record_elements(elements_by_id)
 
         # Check class names
         elements_by_class = soup.find_all(class_=re.compile(pattern, re.IGNORECASE))
         if elements_by_class:
             signals.append(f"Found element with class matching '{pattern}'")
+            record_elements(elements_by_class)
 
-        # Check tag-specific patterns (e.g., footer tag)
-        if pattern in ("footer", "header", "nav"):
+        # Check tag-specific patterns (e.g., footer, h1, form tags)
+        if pattern in ("footer", "header", "nav", "h1", "form"):
             tag_elements = soup.find_all(pattern)
             if tag_elements:
                 signals.append(f"Found <{pattern}> tag")
+                record_elements(tag_elements)
 
     # Check text patterns
     for pattern in definition["text_patterns"]:
         if re.search(pattern, page_text, re.IGNORECASE):
             signals.append(f"Found text matching '{pattern}'")
+            # Locate the first text node matching this pattern for its position
+            if positions is not None:
+                text_node = soup.find(string=re.compile(pattern, re.IGNORECASE))
+                if text_node is not None:
+                    pos = positions.get(id(text_node))
+                    if pos is not None:
+                        signal_positions.append(pos)
 
-    # Determine detection and confidence
+    if signal_positions:
+        result.first_position = min(signal_positions)
+
+    # Determine detection and confidence.
+    # A single weak signal is NOT enough to count the section as present.
     result.signals = signals
     if len(signals) >= 3:
         result.detected = True
@@ -322,9 +389,9 @@ def detect_section(soup: BeautifulSoup, section_key: str, definition: dict) -> S
     elif len(signals) >= 2:
         result.detected = True
         result.confidence = "medium"
-    elif len(signals) >= 1:
-        result.detected = True
-        result.confidence = "low"
+    elif len(signals) == 1:
+        result.detected = False
+        result.confidence = "possible"
     else:
         result.detected = False
         result.confidence = "none"
@@ -335,45 +402,55 @@ def detect_section(soup: BeautifulSoup, section_key: str, definition: dict) -> S
 def evaluate_section_order(detected_sections: list[SectionResult]) -> bool:
     """Evaluate whether detected sections follow the optimal order.
 
+    Compares the actual on-page position (document-order index of each
+    section's first matched signal) against the recommended section order.
+
     Args:
         detected_sections: List of detected section results.
 
     Returns:
-        True if sections are in optimal order.
+        True if sections appear on the page in the recommended order.
     """
-    found_orders = [s.order for s in detected_sections if s.detected]
-    if len(found_orders) <= 1:
+    positioned = [
+        s for s in detected_sections
+        if s.detected and s.first_position is not None
+    ]
+    if len(positioned) <= 1:
         return True
 
-    # Check if the found sections are in ascending order
-    for i in range(1, len(found_orders)):
-        if found_orders[i] < found_orders[i - 1]:
+    # Sort by where each section actually appears on the page, then check
+    # that the recommended order values are non-decreasing.
+    positioned.sort(key=lambda s: s.first_position)
+    actual_orders = [s.order for s in positioned]
+    for i in range(1, len(actual_orders)):
+        if actual_orders[i] < actual_orders[i - 1]:
             return False
     return True
 
 
-def analyze_page_structure(url: str) -> PageAnalysisResult:
+def analyze_page_structure(source: str) -> PageAnalysisResult:
     """Perform a complete page structure analysis.
 
-    Fetches the landing page and checks for the presence of all 12
-    sections in the landing page anatomy framework.
+    Fetches the landing page (or reads a local HTML file) and checks for the
+    presence of all 12 sections in the landing page anatomy framework.
 
     Args:
-        url: The landing page URL to analyze.
+        source: The landing page URL or local HTML file path to analyze.
 
     Returns:
         PageAnalysisResult with findings and recommendations.
     """
-    result = PageAnalysisResult(url=url)
+    result = PageAnalysisResult(url=source)
 
-    # Validate URL
-    parsed = urlparse(url)
-    if not parsed.scheme or not parsed.netloc:
-        result.errors.append("Invalid URL. Please provide a full URL including https://")
-        return result
+    # Validate URL (skip validation for local files)
+    if not os.path.isfile(source):
+        parsed = urlparse(source)
+        if not parsed.scheme or not parsed.netloc:
+            result.errors.append("Invalid URL. Please provide a full URL including https://")
+            return result
 
-    # Fetch the page
-    soup = fetch_page(url)
+    # Fetch the page (or read the local file)
+    soup = load_source(source)
     if soup is None:
         result.errors.append(
             "Could not fetch the page. This may be due to JavaScript rendering "
@@ -381,17 +458,32 @@ def analyze_page_structure(url: str) -> PageAnalysisResult:
         )
         return result
 
-    # Detect each section
+    # Non-English pages: the text patterns are English-only and would
+    # silently miss sections. Warn prominently instead.
+    lang = detect_page_language(soup)
+    if lang and not lang.startswith("en"):
+        result.warnings.append(
+            f"Page language is '{lang}'. Text-pattern section detection is "
+            "unreliable for non-English pages - verify section presence "
+            "manually from the page content."
+        )
+
+    # Detect each section (positions enable the section-order check)
+    positions = build_position_index(soup)
     section_results = []
     for section_key, definition in SECTION_DEFINITIONS.items():
-        section_result = detect_section(soup, section_key, definition)
+        section_result = detect_section(soup, section_key, definition, positions)
         section_results.append(section_result)
 
     # Sort by order for display
     section_results.sort(key=lambda s: s.order)
 
-    # Categorize found and missing
+    # Categorize found, possible (1 weak signal, not scored), and missing
     result.sections_found = [s.name for s in section_results if s.detected]
+    result.sections_possible = [
+        s.name for s in section_results
+        if not s.detected and s.confidence == "possible"
+    ]
     result.sections_missing = [s.name for s in section_results if not s.detected]
 
     # Calculate completeness
@@ -454,13 +546,23 @@ def format_report(result: PageAnalysisResult) -> str:
         "LANDING PAGE STRUCTURE ANALYSIS",
         "=" * 60,
         f"URL: {result.url}",
+    ]
+
+    if result.warnings:
+        lines.append("")
+        lines.append("!" * 60)
+        for warning in result.warnings:
+            lines.append(f"WARNING: {warning}")
+        lines.append("!" * 60)
+
+    lines.extend([
         "",
         f"COMPLETENESS: {len(result.sections_found)}/12 sections "
         f"({result.completeness_score}%)",
         f"Section Order: {'Optimal' if result.section_order_optimal else 'Suboptimal'}",
         "",
         "--- Sections Found ---",
-    ]
+    ])
 
     for detail in result.section_details:
         if detail["detected"]:
@@ -474,7 +576,13 @@ def format_report(result: PageAnalysisResult) -> str:
 
     for detail in result.section_details:
         if not detail["detected"]:
-            lines.append(f"  [-] {detail['section']}")
+            if detail["confidence"] == "possible":
+                lines.append(
+                    f"  [?] {detail['section']} "
+                    f"(possible - 1 weak signal, not scored)"
+                )
+            else:
+                lines.append(f"  [-] {detail['section']}")
 
     lines.append("")
     lines.append("--- Recommendations ---")
@@ -494,21 +602,22 @@ def format_report(result: PageAnalysisResult) -> str:
 def main() -> None:
     """Run the page structure analyzer from the command line."""
     if len(sys.argv) < 2:
-        print("Usage: python page_structure_analyzer.py <landing_page_url>")
+        print("Usage: python page_structure_analyzer.py <landing_page_url_or_html_file>")
         print("Example: python page_structure_analyzer.py https://example.com")
+        print("Example: python page_structure_analyzer.py ./saved-page.html")
         sys.exit(1)
 
-    url = sys.argv[1]
+    source = sys.argv[1]
 
-    # Ensure URL has scheme
-    if not url.startswith("http"):
-        url = "https://" + url
+    # Ensure URL has scheme (skip for local HTML files)
+    if not os.path.isfile(source) and not source.startswith("http"):
+        source = "https://" + source
 
-    print(f"Analyzing page structure: {url}")
-    print("Fetching page...")
+    print(f"Analyzing page structure: {source}")
+    print("Loading page...")
     print()
 
-    result = analyze_page_structure(url)
+    result = analyze_page_structure(source)
 
     # Print formatted report
     print(format_report(result))

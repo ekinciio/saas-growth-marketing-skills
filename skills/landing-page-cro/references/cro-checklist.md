@@ -9,6 +9,7 @@ Comprehensive checklist for evaluating landing page conversion rate optimization
 - [ ] Subheadline expands on the headline with supporting detail
 - [ ] Visitor can understand the value proposition within 5 seconds
 - [ ] Hero image or visual reinforces the message (not generic stock)
+- [ ] Consider an interactive product demo/tour as the hero visual (higher engagement than static screenshots)
 - [ ] No competing messages or distractions above the fold
 - [ ] The page passes the "squint test" - key elements are visible when squinting
 
@@ -59,11 +60,12 @@ Comprehensive checklist for evaluating landing page conversion rate optimization
 
 ## 6. Page Speed and Mobile Responsiveness
 
-- [ ] Page loads in under 3 seconds on desktop
-- [ ] Page loads in under 4 seconds on mobile (3G connection)
+- [ ] Largest Contentful Paint (LCP) is 2.5 seconds or less
+- [ ] Interaction to Next Paint (INP) is 200 ms or less
+- [ ] Cumulative Layout Shift (CLS) is 0.1 or less
 - [ ] Images are optimized and use modern formats (WebP, AVIF)
 - [ ] Lazy loading is implemented for below-the-fold images
-- [ ] No Cumulative Layout Shift (CLS) during load
+- [ ] Cookie/consent banner is unobtrusive and does not block the hero or delay interaction
 - [ ] Page is fully responsive across common breakpoints
 - [ ] Touch targets are at least 44x44px on mobile
 - [ ] Text is readable without zooming on mobile
@@ -90,6 +92,7 @@ Comprehensive checklist for evaluating landing page conversion rate optimization
 - [ ] "How it works" section reduces complexity objections
 - [ ] Integration or compatibility concerns are addressed
 - [ ] Support availability is mentioned (live chat, email, phone)
+- [ ] AI chat widget/concierge is available to answer buyer questions in real time
 - [ ] Migration or onboarding assistance is offered
 - [ ] Data security and privacy concerns are addressed
 

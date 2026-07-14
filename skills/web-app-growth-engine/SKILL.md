@@ -4,14 +4,16 @@ description: >
   Analyze and optimize SaaS web application growth funnels. Evaluates signup
   flows, activation metrics, conversion points, and growth loops for
   web-based SaaS products. Use when the user mentions web app growth,
-  signup funnel, SaaS conversion, web activation, user acquisition for
-  web apps, or growth engine optimization.
+  signup funnel, signup conversion, activation rate, web activation,
+  user acquisition for web apps, or growth engine optimization. Use for
+  post-click product funnels (signup, onboarding, activation, growth
+  loops) - for auditing the landing page itself, use landing-page-cro.
 ---
 
-## First Run
+## Audit Intro
 
-When a user runs `/web-app-growth-engine audit <url>` for the first time,
-display this intro before starting:
+When starting an audit (`/web-app-growth-engine audit <url>`), show this
+intro before proceeding:
 
 """
 📡 Web App Growth Engine
@@ -87,12 +89,15 @@ Performs a focused signup flow friction analysis on the specified URL.
 
 **Friction scoring breakdown:**
 - Each required field: +8 points
+- Each required checkbox (consent/terms): +2 points
 - No SSO option: +15 points
 - Password requirement: +10 points
 - CAPTCHA present: +10 points
 - Credit card required: +25 points
 - More than 5 fields: +15 points
 - No trust signals: +10 points
+
+If the page cannot be fetched or no signup form is found, the script reports an error or "N/A" instead of a score and exits non-zero - never present a failed audit as a low-friction result.
 
 ### `/web-app-growth-engine activation`
 
@@ -158,37 +163,40 @@ Designs growth loops specific to your SaaS product.
 
 **Report:** Save output to `WEB-GROWTH-LOOPS-REPORT.md`
 
-## API Integrations (Optional)
+## Richer Data (Optional)
 
 This skill works out of the box by fetching public web pages. However, real page performance data and analytics cannot be measured from a simple HTML fetch alone.
 
-If the user provides their own API keys, use them to enrich the growth audit with real data.
+**PageSpeed data (`GOOGLE_API_KEY`):** if the user provides a Google API key, fetch real Core Web Vitals directly (e.g. with curl or WebFetch) - no script changes needed:
 
-| Environment Variable | Service | What It Unlocks |
-|---------------------|---------|-----------------|
-| `GOOGLE_API_KEY` | Google PageSpeed Insights API | Real Core Web Vitals scores, mobile performance data, Lighthouse audit |
-| `GOOGLE_ANALYTICS_JSON` | Google Analytics Data API | Actual signup conversion rates, traffic sources, bounce rates, session data |
-
-**How to set up:**
-```bash
-# Google PageSpeed (optional)
-export GOOGLE_API_KEY="your_google_api_key"
-
-# Google Analytics (optional) - path to service account JSON
-export GOOGLE_ANALYTICS_JSON="/path/to/service-account.json"
+```
+https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=<url>&key=$GOOGLE_API_KEY&strategy=mobile
 ```
 
-**Behavior:**
-- If API keys are set → Enrich the audit with real performance and analytics data
-- If not set → Use HTML-only analysis (current default behavior, no change)
-- Each integration is independent - you can set one without the others
+Read these fields from the JSON response and cite them in the audit:
+- `lighthouseResult.categories.performance.score` — overall performance (0-1)
+- `lighthouseResult.audits['largest-contentful-paint']` — LCP (good: ≤ 2.5s)
+- `lighthouseResult.audits['interaction-to-next-paint']` — INP (good: ≤ 200ms)
+- `lighthouseResult.audits['cumulative-layout-shift']` — CLS (good: ≤ 0.1)
 
-**When data is limited:** If the audit lacks real performance or conversion data, inform the user which API keys would improve accuracy. Example:
-> ℹ️ Signup conversion rate could not be measured - only HTML structure was analyzed. For real conversion data, set `GOOGLE_ANALYTICS_JSON`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+```bash
+export GOOGLE_API_KEY="your_google_api_key"
+```
+
+**Analytics data (paste/export):** there is no automated Google Analytics integration. If the user can paste or export their GA4 funnel numbers (signup conversion rate, traffic sources, drop-off by step), incorporate them into the analysis and benchmark them against the tables below. Without user-provided numbers, the audit is based on HTML structure alone - say so in the report:
+> ℹ️ Signup conversion rate could not be measured - only HTML structure was analyzed. Paste your GA4 funnel numbers (signups / visitors, by traffic source) and I will fold them into the analysis.
 
 ## SPA Limitation Note
 
-This skill performs static HTML analysis using HTTP requests. Single-page applications (SPAs) built with frameworks like React, Angular, or Vue.js may render signup forms dynamically via JavaScript. In these cases, the static analysis may not capture all form elements, and results should be verified manually. For SPA-heavy sites, consider using browser automation tools like Playwright or Puppeteer for a more complete analysis.
+This skill performs static HTML analysis using HTTP requests. Single-page applications (SPAs) built with frameworks like React, Angular, or Vue.js may render signup forms dynamically via JavaScript. In these cases, the static analysis may not capture all form elements, and results should be verified manually. For SPA-heavy sites, save the fully rendered HTML from the browser and audit that file instead.
+
+## Local HTML Files
+
+`scripts/signup_auditor.py` accepts either a URL or a path to a saved HTML file (`python signup_auditor.py ./saved-signup-page.html`). Use this to audit rendered SPA output, staging pages behind auth, or any page saved from the browser.
+
+## Non-English Pages
+
+The script's text-pattern checks (trust signals, credit card mentions, SSO button text) are English-only. When the page's `<html lang>` is not English, the script prints a prominent warning and those checks are unreliable. In that case, evaluate trust signals, credit card requirements, and SSO options yourself by reading the actual page content, and note in the report which findings were assessed manually.
 
 ## Growth Audit Methodology
 
@@ -249,7 +257,7 @@ The audit follows a structured approach based on the pirate metrics framework (A
 - NEVER ask "should I save this?" — just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
+- Structure the report as: header (title, URL, `**Date:**`) → friction score and benchmark → form analysis → authentication and trust findings → recommendations.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---

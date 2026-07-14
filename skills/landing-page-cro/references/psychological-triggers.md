@@ -57,13 +57,13 @@ Key psychological principles that drive conversion on SaaS landing pages, with p
 - **Expert endorsements:** Industry leaders recommending the product
 - **Certifications:** SOC 2, ISO 27001, GDPR compliance badges
 - **Media mentions:** "Featured in TechCrunch, Forbes, and Product Hunt"
-- **Awards:** "Best SaaS Product 2025 - SaaS Awards"
+- **Awards:** "Best SaaS Product [current year] - SaaS Awards"
 - **Partnerships:** "Official AWS/Google/Microsoft partner"
 - **Thought leadership:** Blog posts, research reports, speaking appearances
 
 **SaaS Examples:**
 - "SOC 2 Type II certified - your data is secure"
-- "Recommended by Gartner in the 2025 Magic Quadrant"
+- "Recommended by Gartner in the [current year] Magic Quadrant"
 - "#1 Product of the Day on Product Hunt"
 - "Our CTO previously led engineering at Datadog"
 

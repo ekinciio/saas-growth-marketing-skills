@@ -1,17 +1,18 @@
 ---
 name: saas-landing-builder
 description: >
-  Design and optimize high-converting SaaS landing pages. Provides
-  section-by-section page structure, copy frameworks, and conversion
-  best practices. Use when the user mentions landing page design,
-  SaaS homepage, conversion page, landing page copy, page structure,
-  or wants help building a marketing page.
+  Design and structure new SaaS landing pages section-by-section:
+  12-section blueprints, copy frameworks (PAS, AIDA, BAB, 4Ps, StoryBrand),
+  wireframes, and section-completeness reviews. Use when the user wants to
+  build, plan, or write a landing page, mentions page structure, landing
+  page copy, or SaaS homepage design. For scoring/auditing an existing
+  page's conversion performance, use landing-page-cro instead.
 ---
 
-## First Run
+## Review Intro
 
-When a user runs `/saas-landing-builder review <url>` for the first time,
-display this intro before starting:
+When starting a review (`/saas-landing-builder review <url>`), show this
+intro before proceeding:
 
 """
 📡 SaaS Landing Builder
@@ -131,7 +132,15 @@ Generates an ASCII wireframe of a recommended landing page layout.
 
 ## SPA Limitation Note
 
-This skill performs static HTML analysis when reviewing existing pages. Single-page applications (SPAs) built with frameworks like React, Angular, or Vue.js render content dynamically via JavaScript. In these cases, the static analysis may not detect all page sections, and results should be verified manually. For SPA-heavy sites, consider using browser automation tools like Playwright or Puppeteer for more complete analysis.
+This skill performs static HTML analysis when reviewing existing pages. Single-page applications (SPAs) built with frameworks like React, Angular, or Vue.js render content dynamically via JavaScript. In these cases, the static analysis may not detect all page sections, and results should be verified manually. For SPA-heavy sites, save the fully rendered HTML from the browser and analyze that file instead.
+
+## Local HTML Files
+
+`scripts/page_structure_analyzer.py` accepts either a URL or a path to a saved HTML file (`python page_structure_analyzer.py ./saved-page.html`). Use this to analyze rendered SPA output, staging pages behind auth, or any page saved from the browser.
+
+## Non-English Pages
+
+The analyzer's text patterns are English-only. When the page's `<html lang>` is not English, the script prints a prominent warning and section detection is unreliable. In that case, determine section presence yourself by reading the actual page content, and note in the report which sections were assessed manually.
 
 ## The 12-Section Landing Page Framework
 
@@ -152,15 +161,18 @@ Every high-converting SaaS landing page follows a predictable structure. Not eve
 11. **Final CTA** - Last conversion opportunity
 12. **Footer** - Navigation, legal, trust signals
 
-### Conversion Benchmarks
+### Which Elements Matter Most
 
-| Page Element | Average Impact |
-|-------------|---------------|
-| Hero with clear value prop | +20-30% conversion |
-| Social proof bar | +10-15% trust |
-| Testimonials with photos | +15-25% credibility |
-| FAQ section | -20-30% support tickets |
-| Single CTA focus | +15-20% vs multiple CTAs |
+Exact lift varies by audience and baseline, so treat these as directional
+rather than as promised percentages:
+
+| Page Element | Typical Impact in A/B Tests |
+|-------------|------------------------------|
+| Hero with clear value prop | Consistently among the highest-impact elements |
+| Social proof bar | Reliable trust builder, especially with recognizable logos |
+| Testimonials with photos | Strong credibility gains vs anonymous quotes |
+| FAQ section | Reduces pre-sale support questions and objection drop-off |
+| Single CTA focus | Usually outperforms competing multiple CTAs |
 
 ## Copy Principles for SaaS Landing Pages
 
@@ -193,7 +205,7 @@ Every high-converting SaaS landing page follows a predictable structure. Not eve
 - NEVER ask "should I save this?" — just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
+- Structure the report as: header (title, URL, `**Date:**`) → completeness score (X/12) → sections found/missing → section-by-section findings → recommendations.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
