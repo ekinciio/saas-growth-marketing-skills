@@ -21,6 +21,11 @@ Usage:
     results = validate_metadata(metadata, platform="both")
 """
 
+from __future__ import annotations
+
+import argparse
+import json
+import sys
 from typing import Any
 
 
@@ -53,6 +58,10 @@ def validate_field(
     max_chars: int,
 ) -> dict[str, Any]:
     """Validate a single metadata field against its character limit.
+
+    Note: len() counts Unicode code points, so emoji and ZWJ sequences can
+    count higher than the visible character count - treat results near the
+    limit boundary as approximate.
 
     Args:
         field_name: Name of the metadata field.
@@ -120,6 +129,37 @@ def validate_metadata(
             f"Invalid platform '{platform}'. Must be 'ios', 'android', or 'both'."
         )
 
+    # In "both" mode, validate each platform separately so fields with
+    # different limits (e.g. whats_new: iOS 4000 vs Android 500) are each
+    # checked against the correct limit, then merge with per-platform rows.
+    if platform == "both":
+        ios_results = validate_metadata(metadata, platform="ios")
+        android_results = validate_metadata(metadata, platform="android")
+
+        merged: dict[str, Any] = {
+            "platform": "both",
+            "overall_passed": (
+                ios_results["overall_passed"] and android_results["overall_passed"]
+            ),
+            "fields": [],
+            "summary": {"passed": 0, "failed": 0, "missing": 0, "warnings": 0},
+            "warnings": [],
+        }
+        for plat_name, plat_results in (
+            ("ios", ios_results),
+            ("android", android_results),
+        ):
+            for field_result in plat_results["fields"]:
+                labeled = dict(field_result)
+                labeled["field"] = f"{field_result['field']} ({plat_name})"
+                merged["fields"].append(labeled)
+            for key in merged["summary"]:
+                merged["summary"][key] += plat_results["summary"][key]
+            merged["warnings"].extend(
+                f"[{plat_name}] {warning}" for warning in plat_results["warnings"]
+            )
+        return merged
+
     results: dict[str, Any] = {
         "platform": platform,
         "overall_passed": True,
@@ -130,9 +170,9 @@ def validate_metadata(
 
     # Determine which limits to check
     limits_to_check: dict[str, int] = {}
-    if platform in ("ios", "both"):
+    if platform == "ios":
         limits_to_check.update(IOS_LIMITS)
-    if platform in ("android", "both"):
+    else:
         limits_to_check.update(ANDROID_LIMITS)
 
     for field_name, max_chars in limits_to_check.items():
@@ -303,9 +343,11 @@ def format_results(results: dict[str, Any]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Standalone demo
+# Command-line interface
 # ---------------------------------------------------------------------------
-if __name__ == "__main__":
+
+def run_demo() -> None:
+    """Validate a built-in sample metadata dictionary on all platforms."""
     sample_metadata = {
         "title": "FocusFlow - Pomodoro Timer",
         "subtitle": "Stay Productive Daily",
@@ -338,3 +380,67 @@ if __name__ == "__main__":
     print("\n")
     print("Validating for both platforms:")
     print(format_results(validate_metadata(sample_metadata, platform="both")))
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point.
+
+    Usage:
+        python3 metadata_validator.py --platform both --file metadata.json
+        python3 metadata_validator.py --demo
+    """
+    parser = argparse.ArgumentParser(
+        description=(
+            "Validate app store metadata fields against platform-specific "
+            "character limits."
+        ),
+    )
+    parser.add_argument(
+        "--platform",
+        default="both",
+        choices=["ios", "android", "both"],
+        help="Target platform to validate against (default: both).",
+    )
+    parser.add_argument(
+        "--file",
+        help=(
+            "Path to a JSON file containing metadata fields (title, subtitle, "
+            "keywords, short_description, description, whats_new, "
+            "promotional_text, developer_name)."
+        ),
+    )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Validate the built-in sample metadata on all platforms.",
+    )
+    args = parser.parse_args(argv)
+
+    if args.demo:
+        run_demo()
+        return 0
+
+    if not args.file:
+        parser.error("provide --file metadata.json, or use --demo")
+
+    try:
+        with open(args.file, "r", encoding="utf-8") as fh:
+            metadata = json.load(fh)
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"Error reading metadata file '{args.file}': {exc}", file=sys.stderr)
+        return 1
+
+    if not isinstance(metadata, dict):
+        print(
+            f"Error: '{args.file}' must contain a JSON object of metadata fields.",
+            file=sys.stderr,
+        )
+        return 1
+
+    results = validate_metadata(metadata, platform=args.platform)
+    print(format_results(results))
+    return 0 if results["overall_passed"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

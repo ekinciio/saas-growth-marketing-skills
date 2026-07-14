@@ -141,7 +141,10 @@ Ratings and reviews directly impact ASO ranking and conversion.
 - Space requests at least 60 days apart for the same user
 
 ### How to Ask
-- Use the native `SKStoreReviewController` (iOS) or Google Play In-App Review API
+- Use StoreKit's native review prompt on iOS: `AppStore.requestReview(in:)` or
+  the SwiftUI `requestReview` environment action (the older
+  `SKStoreReviewController` API is deprecated since iOS 18); on Android, use
+  the Google Play In-App Review API
 - These native prompts have higher completion rates than custom dialogs
 - Apple limits the native prompt to 3 times per 365-day period per user
 - Pre-qualify with a "sentiment gate" - ask "Are you enjoying the app?" first

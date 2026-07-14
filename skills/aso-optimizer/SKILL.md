@@ -5,12 +5,18 @@ description: >
   metadata from the iTunes Search API, validates character limits, scores
   metadata quality against best practices, and compares with competitor apps.
   Use when the user mentions ASO, app store optimization, app metadata,
-  app title optimization, or app store listing improvement.
+  app title optimization, app store listing improvement, Google Play or
+  Play Store optimization, or Android app listing improvement.
 ---
+
+# ASO Optimizer Skill
+
+App Store Optimization toolkit that helps improve app visibility and conversion
+rates on the Apple App Store and Google Play Store.
 
 ## First Run
 
-When a user runs `/aso-optimizer analyze <app>` for the first time,
+When a user runs `/aso-optimizer analyze <app>`,
 display this intro before starting:
 
 """
@@ -36,11 +42,6 @@ Searching...
 """
 
 Then proceed immediately.
-
-# ASO Optimizer Skill
-
-App Store Optimization toolkit that helps improve app visibility and conversion
-rates on the Apple App Store and Google Play Store.
 
 ## Commands
 
@@ -107,7 +108,8 @@ and competitor benchmarks.
 When running the `analyze` command, the skill follows this sequence:
 
 1. **Fetch live data** - Query the iTunes Search API for the target app
-   (`https://itunes.apple.com/search?term={app_name}&entity=software&country=us&limit=1`)
+   (`https://itunes.apple.com/search?term={app_name}&entity=software&country=us&limit=10`,
+   preferring an exact name match among the results)
 2. **Evaluate metadata** - Compare metadata against best practices including
    title keyword placement, description structure, ratings health, and
    screenshot count
@@ -116,8 +118,6 @@ When running the `analyze` command, the skill follows this sequence:
 4. **Calculate ASO health score** - Generate a weighted score from 0 to 100
 5. **Generate recommendations** - Produce prioritized, actionable suggestions
    for improving the listing
-
-**Report:** Save output to `ASO-REPORT.md`
 6. **Generate report** - Save the complete analysis to `ASO-REPORT.md` in the
    current working directory
 
@@ -128,7 +128,8 @@ When running the `analyze` command, the skill follows this sequence:
 - NEVER ask "should I save this?" — just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
+- Structure the report as: header (app name + date), overall score and grade,
+  category breakdown table, competitor comparison, prioritized recommendations.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -222,14 +223,41 @@ The health score is calculated across four weighted categories:
 ### `scripts/metadata_validator.py`
 
 Validates metadata fields against platform character limits. Accepts a metadata
-dictionary and platform target (ios, android, or both). Returns pass/fail
-status and remaining character counts per field.
+dictionary and platform target (ios, android, or both). In "both" mode each
+platform is validated separately with per-platform result rows (e.g.
+`whats_new (ios)` vs `whats_new (android)`). Returns pass/fail status and
+remaining character counts per field.
+
+**Run:**
+```bash
+# Validate a JSON file of metadata fields (title, subtitle, keywords,
+# short_description, description, whats_new, promotional_text, developer_name)
+python3 scripts/metadata_validator.py --platform both --file metadata.json
+
+# Single platform
+python3 scripts/metadata_validator.py --platform ios --file metadata.json
+
+# Built-in sample metadata
+python3 scripts/metadata_validator.py --demo
+```
 
 ### `scripts/aso_scorer.py`
 
 Fetches app data from the iTunes Search API and calculates an ASO health score.
 Accepts an app name string or a pre-built metadata dictionary. Returns a score
 breakdown, competitor comparison, and prioritized recommendations.
+
+**Run:**
+```bash
+# Score a live app (with competitor comparison)
+python3 scripts/aso_scorer.py "App Name"
+
+# Options: store country, skip competitors, JSON output
+python3 scripts/aso_scorer.py "App Name" --country us --no-competitors --json
+
+# Built-in demo (sample metadata + live Slack fetch)
+python3 scripts/aso_scorer.py --demo
+```
 
 ## API Integrations (Optional)
 
@@ -241,7 +269,10 @@ If the user provides their own API keys, use them for deeper ASO intelligence.
 |---------------------|---------|-----------------|
 | `APPSTORE_CONNECT_KEY_ID` + `APPSTORE_CONNECT_ISSUER_ID` + `APPSTORE_CONNECT_KEY_PATH` | App Store Connect API | Real download counts, conversion rates, keyword rankings, A/B test results |
 | `SENSOR_TOWER_API_KEY` | Sensor Tower API | Keyword search volume, keyword difficulty scores, download estimates, category rankings |
-| `DATA_AI_API_KEY` | data.ai (App Annie) API | Market data, competitive downloads, revenue estimates, usage metrics |
+
+Other active commercial ASO platforms with APIs include AppTweak and
+AppFigures. (data.ai, formerly App Annie, was acquired by Sensor Tower in
+2024 and is no longer a separate service.)
 
 **How to set up:**
 ```bash
@@ -252,9 +283,6 @@ export APPSTORE_CONNECT_KEY_PATH="/path/to/AuthKey.p8"
 
 # Sensor Tower (optional)
 export SENSOR_TOWER_API_KEY="your_api_key"
-
-# data.ai (optional)
-export DATA_AI_API_KEY="your_api_key"
 ```
 
 **Behavior:**

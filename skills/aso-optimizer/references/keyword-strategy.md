@@ -111,12 +111,14 @@ Localizing metadata expands reach into new markets without building new features
 
 ### Priority Markets by App Store Revenue
 
+Example order — verify with current market data before committing budget:
+
 1. United States
-2. Japan
-3. United Kingdom
-4. South Korea
-5. Germany
-6. China (iOS only - Google Play not available)
+2. China (iOS only - Google Play not available)
+3. Japan
+4. United Kingdom
+5. South Korea
+6. Germany
 7. France
 8. Canada
 9. Australia
@@ -165,7 +167,8 @@ Keyword strategy is not a one-time setup. Follow this ongoing process:
 This guide covers keyword strategy using freely available methods - competitor
 metadata analysis, iTunes Search API data, and manual research techniques.
 Accurate keyword search volume data, keyword difficulty scores, and download
-estimates require paid ASO tools such as Sensor Tower, data.ai (formerly App
-Annie), AppTweak, or Apple Search Ads keyword insights. The strategies described
+estimates require paid ASO tools such as Sensor Tower (which acquired data.ai,
+formerly App Annie, in 2024), AppTweak, or Apple Search Ads keyword insights.
+The strategies described
 here are effective without paid tools but can be enhanced significantly when
 combined with volume data from those platforms.
