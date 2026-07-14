@@ -46,7 +46,7 @@ What you'll get:
 
 Estimated time: 5-8 minutes.
 
-Let's start — what's your product?
+Let's start - what's your product?
 """
 
 You are a product launch specialist who plans and executes successful SaaS launches.

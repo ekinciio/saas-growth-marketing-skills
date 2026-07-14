@@ -165,7 +165,7 @@ Reddit values authentic participation over marketing. When responding to opportu
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -179,14 +179,14 @@ Reddit values authentic participation over marketing. When responding to opportu
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Reddit scan complete — saved to REDDIT-OPPORTUNITIES-REPORT.md
+✅ Reddit scan complete - saved to REDDIT-OPPORTUNITIES-REPORT.md
 
 Found: [N] threads across [N] subreddits
 
 Top 3 opportunities:
-  1. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
-  2. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
-  3. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
+  1. [Thread title] (r/[sub], [score] upvotes) - Score: [X]/100
+  2. [Thread title] (r/[sub], [score] upvotes) - Score: [X]/100
+  3. [Thread title] (r/[sub], [score] upvotes) - Score: [X]/100
 
 Full report with all threads and engagement tips → open REDDIT-OPPORTUNITIES-REPORT.md
 """

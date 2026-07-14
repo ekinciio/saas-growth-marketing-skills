@@ -6,7 +6,7 @@
 
 Unlike `robots.txt` (access control) or `sitemap.xml` (exhaustive page list), llms.txt is a short, human- and LLM-readable Markdown document that highlights only the most useful content, primarily for use at **inference time** (when a user asks an AI about the site), not for training.
 
-**Honest status note:** llms.txt is a community proposal with debated adoption, not an established web standard. Some major AI vendors do not currently fetch or use llms.txt at all, and there is no guarantee that adding one improves AI visibility. It is cheap to add and popular in developer-documentation circles (nbdev, FastHTML, many docs platforms), so it is a reasonable low-effort optimization — but present it as such, never as a compliance requirement.
+**Honest status note:** llms.txt is a community proposal with debated adoption, not an established web standard. Some major AI vendors do not currently fetch or use llms.txt at all, and there is no guarantee that adding one improves AI visibility. It is cheap to add and popular in developer-documentation circles (nbdev, FastHTML, many docs platforms), so it is a reasonable low-effort optimization - but present it as such, never as a compliance requirement.
 
 ## File Location
 
@@ -20,9 +20,9 @@ The file should be served as Markdown text (typically `Content-Type: text/plain`
 
 The file is **pure Markdown** with a fixed section order. There are no key-value fields. In order:
 
-1. **An H1 with the site or project name** — the only *required* element.
+1. **An H1 with the site or project name** - the only *required* element.
 2. **A blockquote** (`> ...`) with a short summary containing the key information needed to understand the rest of the file. Recommended.
-3. **Zero or more Markdown sections** (paragraphs, lists, etc. — anything except headings) with more detail about the site and how to interpret the linked files.
+3. **Zero or more Markdown sections** (paragraphs, lists, etc. - anything except headings) with more detail about the site and how to interpret the linked files.
 4. **Zero or more H2-delimited sections containing "file lists"**: Markdown lists where each entry is a required hyperlink `[name](url)`, optionally followed by `: notes about the file`.
 
 ### Skeleton
@@ -91,7 +91,7 @@ When validating an llms.txt file, check:
 3. **Recommended:** A blockquote summary (`> ...`) directly after the H1.
 4. **Recommended:** At least one H2 section containing a link list with `- [name](url)` entries.
 5. **Recommended:** All link URLs are well-formed (absolute `http(s)://` URLs).
-6. **Recommended:** Reasonable length — a curated overview, not a full sitemap dump (roughly a few dozen links, not thousands of lines).
+6. **Recommended:** Reasonable length - a curated overview, not a full sitemap dump (roughly a few dozen links, not thousands of lines).
 7. **Optional:** An `## Optional` section for skippable secondary links.
 
 ## Implementation Tips

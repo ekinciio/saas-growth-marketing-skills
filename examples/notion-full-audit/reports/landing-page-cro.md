@@ -9,7 +9,7 @@
 
 ---
 
-## Overall CRO Score: 74/100 — Good
+## Overall CRO Score: 74/100 - Good
 
 > Notion's homepage is a strong, well-structured landing page with excellent social proof and clear above-the-fold messaging. Key gaps are the lack of on-page objection handling (FAQ), absence of visible trust badges, and no urgency mechanisms. Structured data and form-free conversion reduce friction but also remove opportunities for on-page micro-conversions.
 
@@ -35,10 +35,10 @@
 
 ## Detailed Dimension Analysis
 
-### 1. Above-the-fold Clarity — 9/10 🟢
+### 1. Above-the-fold Clarity - 9/10 🟢
 
 **What's there:**
-- **H1:** "One workspace. Zero busywork." — Clear, concise, benefit-driven
+- **H1:** "One workspace. Zero busywork." - Clear, concise, benefit-driven
 - **Subheadline:** "Notion is where your teams and AI agents capture knowledge, find answers, and automate projects. Now a team of 7 feels like 70."
 - **Dual CTAs:** "Get Notion free" (primary) + "Request a demo" (secondary)
 - **Hero video/image:** Desktop and mobile variants served
@@ -55,17 +55,17 @@
 
 ---
 
-### 2. CTA Visibility and Copy Strength — 9/10 🟢
+### 2. CTA Visibility and Copy Strength - 9/10 🟢
 
 **What's there:**
-- **Primary CTA:** "Get Notion free" — action-oriented, includes "free" (reduces friction)
-- **Secondary CTA:** "Request a demo" — serves enterprise buyers
+- **Primary CTA:** "Get Notion free" - action-oriented, includes "free" (reduces friction)
+- **Secondary CTA:** "Request a demo" - serves enterprise buyers
 - **Sticky nav CTA:** "Get Notion free" persists while scrolling
 - **Repeated CTAs:** "Try for free," "Get started on Notion" appear at page bottom
 - **Mid-page CTAs:** Feature-specific "Learn more" and "Try it" links
 
 **Strengths:**
-- "Get Notion free" is excellent — uses product name + "free" in 3 words
+- "Get Notion free" is excellent - uses product name + "free" in 3 words
 - Blue primary button provides strong visual contrast
 - CTA repeats at logical intervals (hero, mid-page, bottom)
 - Dual-CTA pattern correctly segments self-serve vs. sales-assisted
@@ -76,11 +76,11 @@
 
 ---
 
-### 3. Social Proof Presence and Quality — 10/10 🟢
+### 3. Social Proof Presence and Quality - 10/10 🟢
 
 **What's there:**
 - **Customer logos:** Figma, OpenAI, Ramp, Cursor, Vercel, NVIDIA, Volvo, Perplexity AI
-- **Named testimonials (7):** OpenAI, Toyota, Ramp, Vercel, Match Group, Cursor, Figma — all with direct quotes and company attribution
+- **Named testimonials (7):** OpenAI, Toyota, Ramp, Vercel, Match Group, Cursor, Figma - all with direct quotes and company attribution
 - **Forbes quote:** "Your AI everything app"
 - **Statistics:** 100M+ users, 62% of Fortune 100, 50%+ of YC companies, 1.4M+ community members
 - **G2 rankings:** #1 in 3 categories (knowledge base, AI search, AI writing)
@@ -91,7 +91,7 @@ This is best-in-class social proof. Named quotes from recognizable tech companie
 
 ---
 
-### 4. Trust Signals — 6/10 🟡
+### 4. Trust Signals - 6/10 🟡
 
 **What's there:**
 - Enterprise customer logos serve double duty as trust signals
@@ -112,14 +112,14 @@ This is best-in-class social proof. Named quotes from recognizable tech companie
 
 ---
 
-### 5. Form Simplicity — 9/10 🟢
+### 5. Form Simplicity - 9/10 🟢
 
 **What's there:**
 - **No on-page forms.** All conversion happens via external links to `/signup` and `/contact-sales`
 - The signup flow is a separate, dedicated page
 
 **Why 9/10:**
-Zero-form homepages eliminate form friction entirely. The "Get Notion free" CTA leads to a streamlined signup — this is a PLG best practice. Visitors aren't asked to commit information before understanding value.
+Zero-form homepages eliminate form friction entirely. The "Get Notion free" CTA leads to a streamlined signup - this is a PLG best practice. Visitors aren't asked to commit information before understanding value.
 
 **Why not 10:**
 - No email capture alternative (e.g., newsletter, "get updates") for visitors not ready to sign up
@@ -127,10 +127,10 @@ Zero-form homepages eliminate form friction entirely. The "Get Notion free" CTA 
 
 ---
 
-### 6. Page Speed and Mobile Responsiveness — 7/10 🟢
+### 6. Page Speed and Mobile Responsiveness - 7/10 🟢
 
 **What's there:**
-- Next.js SSR with hydration — content renders server-side
+- Next.js SSR with hydration - content renders server-side
 - Responsive hero images (desktop: 2560x1600, mobile: 1600x1600)
 - Mobile-specific content variants served
 
@@ -143,7 +143,7 @@ Zero-form homepages eliminate form friction entirely. The "Get Notion free" CTA 
 
 ---
 
-### 7. Visual Hierarchy and Scan-ability — 8/10 🟢
+### 7. Visual Hierarchy and Scan-ability - 8/10 🟢
 
 **What's there:**
 - Clear H1 → H2 → H3 heading hierarchy
@@ -158,13 +158,13 @@ Zero-form homepages eliminate form friction entirely. The "Get Notion free" CTA 
 - Heading text doubles as benefit statements
 
 **Weaknesses:**
-- Page is very long (15+ sections) — may cause scroll fatigue
+- Page is very long (15+ sections) - may cause scroll fatigue
 - Some sections feel repetitive (stats appear 3 times)
-- Heavy reliance on carousels/sliders — content behind interactions may be missed
+- Heavy reliance on carousels/sliders - content behind interactions may be missed
 
 ---
 
-### 8. Objection Handling — 5/10 🟡
+### 8. Objection Handling - 5/10 🟡
 
 **What's there:**
 - **Free tier:** "Get Notion free" addresses price objection immediately
@@ -185,10 +185,10 @@ Zero-form homepages eliminate form friction entirely. The "Get Notion free" CTA 
 
 ---
 
-### 9. Urgency and Scarcity — 3/10 🔴
+### 9. Urgency and Scarcity - 3/10 🔴
 
 **What's there:**
-- "Introducing Notion 3.0" — newness signal
+- "Introducing Notion 3.0" - newness signal
 - "New" badge on Custom Agents section
 - "See what's new" navigation link
 
@@ -199,29 +199,29 @@ Zero-form homepages eliminate form friction entirely. The "Get Notion free" CTA 
 - ❌ No seasonal promotions visible
 - ❌ No "limited beta" access framing
 
-**Context:** This is intentional for Notion's brand positioning. As an established PLG product, artificial urgency would feel off-brand. The 3/10 score reflects the absence of urgency mechanics, not necessarily a flaw — but it is a conversion lever left unpulled.
+**Context:** This is intentional for Notion's brand positioning. As an established PLG product, artificial urgency would feel off-brand. The 3/10 score reflects the absence of urgency mechanics, not necessarily a flaw - but it is a conversion lever left unpulled.
 
 **Note:** Scoring 3/10 rather than 0 because "new product launch" framing (Notion 3.0, Custom Agents) creates mild curiosity-driven urgency.
 
 ---
 
-### 10. Copy Clarity and Benefit-driven Language — 8/10 🟢
+### 10. Copy Clarity and Benefit-driven Language - 8/10 🟢
 
 **What's there:**
 
 **Benefit-driven (strong):**
-- "One workspace. Zero busywork." — Pure outcome
-- "Now a team of 7 feels like 70." — Concrete, relatable benefit
-- "What used to take days in minutes." — Time-saving framed dramatically
-- "It's like having a built-in power user." — Analogy makes abstract concrete
+- "One workspace. Zero busywork." - Pure outcome
+- "Now a team of 7 feels like 70." - Concrete, relatable benefit
+- "What used to take days in minutes." - Time-saving framed dramatically
+- "It's like having a built-in power user." - Analogy makes abstract concrete
 
 **Feature-driven (weaker):**
-- "Searches all your pages, messages, files, and the web" — Capability list
-- "Automate repetitive tasks" — Functional, not outcome-focused
-- "Knowledge Base, Docs, Projects, Integrations" — Feature names
+- "Searches all your pages, messages, files, and the web" - Capability list
+- "Automate repetitive tasks" - Functional, not outcome-focused
+- "Knowledge Base, Docs, Projects, Integrations" - Feature names
 
 **Why 8/10:**
-Copy leads with benefits and supports with features — this is the right order. The hero section is especially strong. Mid-page feature cards slip into feature-speak but maintain readable, jargon-free language throughout.
+Copy leads with benefits and supports with features - this is the right order. The hero section is especially strong. Mid-page feature cards slip into feature-speak but maintain readable, jargon-free language throughout.
 
 **Why not 10:**
 - Some feature sections are tagline-only ("One search for everything," "Perfect notes, every time") without enough supporting detail to fully convince
@@ -234,7 +234,7 @@ Copy leads with benefits and supports with features — this is the right order.
 ### 1. Add an FAQ section to the homepage
 **Current state:** FAQ exists only on the pricing page. Homepage has no objection-handling content block.
 **Recommendation:** Add 5-7 FAQs covering: "Is Notion free?", "How does Notion compare to [competitor]?", "Can I import from other tools?", "Is my data secure?", "Who uses Notion?"
-**Expected impact:** High — reduces bounce from unanswered questions, improves SEO, supports AI citability
+**Expected impact:** High - reduces bounce from unanswered questions, improves SEO, supports AI citability
 **Difficulty:** Easy
 
 **A/B Test Hypothesis:** Adding a 5-question FAQ section above the footer will increase signup CTR by 8-12% by addressing key objections before the final CTA.
@@ -244,7 +244,7 @@ Copy leads with benefits and supports with features — this is the right order.
 ### 2. Add visible trust/security badges to the homepage
 **Current state:** Security info buried in /security page. No badges visible on homepage.
 **Recommendation:** Add SOC 2 Type II, GDPR, ISO 27001 badges in a "Trusted & Secure" strip near the enterprise testimonials section.
-**Expected impact:** High — enterprise evaluators often scan for compliance before engaging
+**Expected impact:** High - enterprise evaluators often scan for compliance before engaging
 **Difficulty:** Easy
 
 **A/B Test Hypothesis:** Adding a security badge strip below the customer logos section will increase "Request a demo" clicks by 10-15% among enterprise visitors (identified by UTM or company size).
@@ -254,7 +254,7 @@ Copy leads with benefits and supports with features — this is the right order.
 ### 3. Add customer outcome metrics alongside testimonials
 **Current state:** Testimonials are quote-based ("There's power in a single platform...") without quantified outcomes.
 **Recommendation:** Pair each testimonial with a result metric: "Toyota reduced project timelines by 3x" (this data exists but isn't visually prominent). Add metrics like "X hours saved/week" or "Y% faster onboarding."
-**Expected impact:** Medium-High — specific numbers convert better than general praise
+**Expected impact:** Medium-High - specific numbers convert better than general praise
 **Difficulty:** Medium (requires customer data gathering)
 
 **A/B Test Hypothesis:** Adding a quantified result metric (e.g., "3x faster") next to each testimonial card will increase scroll depth by 15% and signup CTR by 5-8%.
@@ -264,7 +264,7 @@ Copy leads with benefits and supports with features — this is the right order.
 ### 4. Add a "How it works" 3-step section
 **Current state:** No step-by-step explanation of how to get started with Notion.
 **Recommendation:** Add a simple 3-step section: "1. Sign up free → 2. Choose a template → 3. Start collaborating" with icons or mini-illustrations.
-**Expected impact:** Medium — reduces perceived complexity for first-time visitors unfamiliar with the product
+**Expected impact:** Medium - reduces perceived complexity for first-time visitors unfamiliar with the product
 **Difficulty:** Easy
 
 **A/B Test Hypothesis:** Inserting a "How it works" 3-step section between the hero and feature cards will reduce bounce rate by 5-10% among first-time visitors (no prior Notion cookie).
@@ -274,7 +274,7 @@ Copy leads with benefits and supports with features — this is the right order.
 ### 5. Strengthen mid-page CTAs with specific copy
 **Current state:** Mid-page CTAs use generic text: "Learn more →", "Try it →", "Explore more →"
 **Recommendation:** Replace with benefit-specific CTAs: "Build your first Agent →", "Search across all your apps →", "See AI Meeting Notes in action →"
-**Expected impact:** Medium — specific CTAs outperform generic ones by 20-30% in click-through rate
+**Expected impact:** Medium - specific CTAs outperform generic ones by 20-30% in click-through rate
 **Difficulty:** Easy
 
 **A/B Test Hypothesis:** Replacing "Learn more →" with action-specific CTAs on feature cards will increase feature page visits by 20-25%.
@@ -285,7 +285,7 @@ Copy leads with benefits and supports with features — this is the right order.
 
 | # | Action | Impact | Difficulty |
 |---|--------|--------|------------|
-| 6 | Reduce page length — consolidate repeated stats sections (stats appear 3x) | Medium | Easy |
+| 6 | Reduce page length - consolidate repeated stats sections (stats appear 3x) | Medium | Easy |
 | 7 | Add an interactive demo or "try without signing up" experience | High | Hard |
 | 8 | Add pricing preview on homepage (even just "Free forever / Paid from $10/mo") | Medium | Easy |
 | 9 | Add a sticky bottom bar CTA for mobile visitors | Medium | Medium |
@@ -295,7 +295,7 @@ Copy leads with benefits and supports with features — this is the right order.
 
 ## Quick Wins (< 1 day effort)
 
-1. **Add FAQ section** (5 questions, accordion format) above the footer — addresses objections, boosts SEO
+1. **Add FAQ section** (5 questions, accordion format) above the footer - addresses objections, boosts SEO
 2. **Add trust badges** (SOC 2, GDPR icons) in a horizontal strip near testimonials
 3. **Replace generic mid-page CTAs** ("Learn more") with specific action copy
 4. **Add pricing anchor text** near a CTA: "Free forever. Paid plans from $10/seat/mo."

@@ -37,8 +37,8 @@ What I'll ask you (4 data groups, ~13 numbers):
 
   Costs:
     9. Total S&M spend this month ($)   → e.g. 30000
-   10. Monthly net burn ($) — optional (needed for burn multiple) → e.g. 40000
-   11. Total operating costs ($) — optional (used to estimate net burn
+   10. Monthly net burn ($) - optional (needed for burn multiple) → e.g. 40000
+   11. Total operating costs ($) - optional (used to estimate net burn
        as operating costs − MRR when net burn is not provided) → e.g. 150000
 
   Growth:
@@ -54,7 +54,7 @@ What you'll get:
   → Traffic-light health assessment (GREEN/YELLOW/RED)
   → Saved to SAAS-METRICS-REPORT.md
 
-Ready? Let's start — what's your New MRR this month?
+Ready? Let's start - what's your New MRR this month?
 """
 
 ### Demo Mode
@@ -97,7 +97,7 @@ Interactive metric calculator. Walk the user through providing their raw busines
 **Steps:**
 1. Ask for monthly revenue data (beginning MRR, new MRR, expansion MRR, contraction MRR, churned MRR)
 2. Ask for customer counts (beginning of period, new, churned, end of period)
-3. Ask for cost data (total S&M spend, optional monthly net burn; total operating costs may be provided as a fallback — net burn is then estimated as operating costs − MRR)
+3. Ask for cost data (total S&M spend, optional monthly net burn; total operating costs may be provided as a fallback - net burn is then estimated as operating costs − MRR)
 4. Ask for growth data (YoY revenue growth rate, profit margin or EBITDA margin)
 5. Run `scripts/metrics_calculator.py` logic to compute all metrics
 6. Present results in a structured table with traffic-light indicators
@@ -130,7 +130,7 @@ SaaS health scorecard. Generate a comprehensive health assessment based on provi
 
 **Report:** Save output to `SAAS-HEALTH-REPORT.md`
 
-**Health grade scale** (computed over assessed metrics only — ARPU, CAC, LTV, MRR, and ARR are informational and excluded from the grade):
+**Health grade scale** (computed over assessed metrics only - ARPU, CAC, LTV, MRR, and ARR are informational and excluded from the grade):
 - A: ≥80% GREEN and 0 RED
 - B: ≥60% GREEN and ≤1 RED
 - C: ≥40% GREEN and ≤1 RED
@@ -180,7 +180,7 @@ Simple MRR/ARR forecast based on current trajectory and assumptions.
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -194,7 +194,7 @@ Simple MRR/ARR forecast based on current trajectory and assumptions.
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Metrics calculated — saved to SAAS-METRICS-REPORT.md
+✅ Metrics calculated - saved to SAAS-METRICS-REPORT.md
 
 Health Grade: [A-F]
 MRR: $[X] | ARR: $[X] | Monthly Churn: [X]%

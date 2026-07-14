@@ -202,7 +202,7 @@ rather than as promised percentages:
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - Structure the report as: header (title, URL, `**Date:**`) → completeness score (X/12) → sections found/missing → section-by-section findings → recommendations.
@@ -217,7 +217,7 @@ rather than as promised percentages:
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Landing page review complete — saved to LANDING-PAGE-REVIEW-REPORT.md
+✅ Landing page review complete - saved to LANDING-PAGE-REVIEW-REPORT.md
 
 Completeness: [X]/12 sections present
 

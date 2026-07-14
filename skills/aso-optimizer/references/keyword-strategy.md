@@ -111,7 +111,7 @@ Localizing metadata expands reach into new markets without building new features
 
 ### Priority Markets by App Store Revenue
 
-Example order — verify with current market data before committing budget:
+Example order - verify with current market data before committing budget:
 
 1. United States
 2. China (iOS only - Google Play not available)

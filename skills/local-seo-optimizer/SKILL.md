@@ -43,7 +43,7 @@ What you'll get:
   → Prioritized action plan
   → Saved to LOCAL-SEO-AUDIT-REPORT.md
 
-Let's start — what's the full business name and address?
+Let's start - what's the full business name and address?
 """
 
 ### Demo Mode
@@ -243,7 +243,7 @@ Then produce:
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -257,7 +257,7 @@ Then produce:
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Local SEO audit complete — saved to LOCAL-SEO-AUDIT-REPORT.md
+✅ Local SEO audit complete - saved to LOCAL-SEO-AUDIT-REPORT.md
 
 Score: [X]/100 ([interpretation])
 

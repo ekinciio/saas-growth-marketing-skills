@@ -9,7 +9,7 @@
 
 ---
 
-## Overall GEO Readiness Score: 68/100 — Fair
+## Overall GEO Readiness Score: 68/100 - Fair
 
 > Notion has strong brand authority and excellent content on its homepage, but critical gaps in AI crawler access, structured data, and llms.txt compliance hold it back from top-tier AI search visibility.
 
@@ -25,37 +25,37 @@
 
 ---
 
-## 1. AI Citability & Visibility — 72/100
+## 1. AI Citability & Visibility - 72/100
 
 ### What Works
 - **Clear value proposition:** "One workspace. Zero busywork." is concise and memorable
-- **Strong stat-rich content:** "100M+ users," "62% of Fortune 100," "#1 knowledge base 3 years running (G2)" — excellent for AI citation
+- **Strong stat-rich content:** "100M+ users," "62% of Fortune 100," "#1 knowledge base 3 years running (G2)" - excellent for AI citation
 - **Named customer testimonials** from recognizable brands (OpenAI, Figma, Ramp, Cursor, Vercel, Toyota, NVIDIA) add factual density
 - **Forbes quote** ("Your AI everything app") provides third-party validation
 
 ### What Needs Work
 - **Homepage is marketing-heavy, fact-light:** Most content blocks are aspirational rather than definitional. AI engines prefer passages that directly answer "What is Notion?" or "What does Notion do?"
-- **No standalone definitional paragraph:** There's no single self-contained block that explains what Notion is in a way an AI could cite. The closest is: "Notion is where your teams and AI agents capture knowledge, find answers, and automate projects" — but it lacks specifics (pricing, founding year, key differentiators).
-- **Feature descriptions are vague:** "Automate repetitive tasks," "One search for everything," "Perfect notes, every time" — these are taglines, not citable content blocks.
+- **No standalone definitional paragraph:** There's no single self-contained block that explains what Notion is in a way an AI could cite. The closest is: "Notion is where your teams and AI agents capture knowledge, find answers, and automate projects" - but it lacks specifics (pricing, founding year, key differentiators).
+- **Feature descriptions are vague:** "Automate repetitive tasks," "One search for everything," "Perfect notes, every time" - these are taglines, not citable content blocks.
 
 ### Top Content Blocks by Citability
 
 | Block | Score | Notes |
 |-------|-------|-------|
-| Stats section (100M users, Fortune 100, G2 rankings) | 85/100 | Highly citable — factual, specific, verifiable |
+| Stats section (100M users, Fortune 100, G2 rankings) | 85/100 | Highly citable - factual, specific, verifiable |
 | Forbes quote + brand positioning | 70/100 | Good but short; needs more context |
 | Hero paragraph (teams + AI agents) | 60/100 | Decent but aspirational, not definitional |
 | Feature taglines (Agent, Search, Notes) | 35/100 | Too vague for AI citation |
 | Testimonial quotes | 65/100 | Citable as social proof but not as product definitions |
 
 ### Recommendations
-1. **Add a definitional paragraph** near the top: "Notion is a [category] platform founded in [year] by [founder], used by [X] million people to [specific capabilities]. It offers [key features] and is available on [platforms]." — This is the #1 fix for AI citability.
+1. **Add a definitional paragraph** near the top: "Notion is a [category] platform founded in [year] by [founder], used by [X] million people to [specific capabilities]. It offers [key features] and is available on [platforms]." - This is the #1 fix for AI citability.
 2. **Expand feature blocks** with specific details: Instead of "One search for everything," try "Enterprise Search connects to [X] integrations and searches across [types of content]."
-3. **Add a FAQ section** with structured Q&A pairs — these are the highest-citability format for AI engines.
+3. **Add a FAQ section** with structured Q&A pairs - these are the highest-citability format for AI engines.
 
 ---
 
-## 2. Brand Authority Signals — 92/100
+## 2. Brand Authority Signals - 92/100
 
 ### Platform Presence
 
@@ -82,16 +82,16 @@
 | Trustworthiness | 8/10 | Security page exists, SOC 2 compliance, but no visible trust badges on homepage |
 
 ### Recommendations
-4. **Add trust badges** (SOC 2, GDPR, ISO 27001) visibly on the homepage — AI engines scan for these as trustworthiness signals.
+4. **Add trust badges** (SOC 2, GDPR, ISO 27001) visibly on the homepage - AI engines scan for these as trustworthiness signals.
 
 ---
 
-## 3. Content Quality & E-E-A-T — 78/100
+## 3. Content Quality & E-E-A-T - 78/100
 
 ### Strengths
 - **Social proof is exceptional:** Named enterprise customers (OpenAI, NVIDIA, Toyota, Figma) with direct quotes
 - **Statistical claims are specific and verifiable:** "100M users," "62% of Fortune 100," "1.4M+ community members"
-- **Clear use case segmentation:** Enterprise, small business, personal — helps AI engines categorize
+- **Clear use case segmentation:** Enterprise, small business, personal - helps AI engines categorize
 - **Multi-language support:** 31 locales signal global authority
 
 ### Weaknesses
@@ -106,14 +106,14 @@
 
 ---
 
-## 4. Technical Foundations — 70/100
+## 4. Technical Foundations - 70/100
 
 ### Analysis
 
 | Factor | Status | Notes |
 |--------|--------|-------|
 | HTTPS | ✅ Yes | Secure connection |
-| SSR / Pre-rendering | ✅ Yes | Next.js with SSR (`__N_SSP: true`) — content is crawlable |
+| SSR / Pre-rendering | ✅ Yes | Next.js with SSR (`__N_SSP: true`) - content is crawlable |
 | Mobile-friendly | ✅ Yes | Responsive design |
 | Sitemap | ✅ Yes | 261 sitemaps across 14 content categories and 31 languages |
 | Canonical URL | ⚠️ Not detected | Missing canonical tag on homepage |
@@ -124,11 +124,11 @@
 
 ### Recommendations
 7. **Add canonical tag** (`<link rel="canonical" href="https://www.notion.com/" />`) to prevent duplicate content issues across localized variants.
-8. **Add hreflang tags** to connect all 31 language variants — critical for international AI search visibility.
+8. **Add hreflang tags** to connect all 31 language variants - critical for international AI search visibility.
 
 ---
 
-## 5. Structured Data — 18/100
+## 5. Structured Data - 18/100
 
 ### Current State: Critical Gap
 
@@ -175,12 +175,12 @@
 ```
 
 ### Recommendations
-9. **Add Organization, WebSite, and SoftwareApplication JSON-LD** to the homepage immediately — this is the single highest-impact fix.
+9. **Add Organization, WebSite, and SoftwareApplication JSON-LD** to the homepage immediately - this is the single highest-impact fix.
 10. **Add FAQPage schema** with common questions about Notion (pricing, features, integrations).
 
 ---
 
-## 6. Platform Optimization — 38/100
+## 6. Platform Optimization - 38/100
 
 ### AI Crawler Access Map
 
@@ -245,19 +245,19 @@ No llms.txt file exists at `https://www.notion.com/llms.txt`. The URL redirects 
 
 ## Quick Wins (< 1 day effort)
 
-1. **Deploy JSON-LD structured data** — Organization, WebSite, SoftwareApplication schemas. Estimated lift: +15 points on Structured Data dimension.
-2. **Create and deploy llms.txt** — Simple text file at site root. Estimated lift: +10 points on Platform Optimization.
-3. **Add one definitional paragraph** — "Notion is an AI-powered workspace platform founded in 2013..." in the hero section. Estimated lift: +8 points on AI Citability.
+1. **Deploy JSON-LD structured data** - Organization, WebSite, SoftwareApplication schemas. Estimated lift: +15 points on Structured Data dimension.
+2. **Create and deploy llms.txt** - Simple text file at site root. Estimated lift: +10 points on Platform Optimization.
+3. **Add one definitional paragraph** - "Notion is an AI-powered workspace platform founded in 2013..." in the hero section. Estimated lift: +8 points on AI Citability.
 
 ---
 
 ## Competitive Context
 
 Notion competes in AI search visibility with tools like:
-- **Slack** — strong documentation, extensive schema markup
-- **Asana** — comprehensive FAQ sections, good structured data
-- **Monday.com** — aggressive SEO with comparison pages
-- **Coda** — emerging AI-native positioning
+- **Slack** - strong documentation, extensive schema markup
+- **Asana** - comprehensive FAQ sections, good structured data
+- **Monday.com** - aggressive SEO with comparison pages
+- **Coda** - emerging AI-native positioning
 
 Notion's brand authority (92/100) is best-in-class, but competitors with weaker brands may outperform in AI citations due to better technical optimization (structured data, llms.txt).
 

@@ -19,14 +19,14 @@ Do not add commentary before or after. Do not modify the formatting.
 🚀 SaaS Growth Marketing Skills
 ════════════════════════════════
 
-GIVE ME A URL — I'LL AUDIT IT:
+GIVE ME A URL - I'LL AUDIT IT:
   /geo-seo-auditor audit <url>       AI search visibility score (0-100)
   /landing-page-cro audit <url>      Conversion optimization score (0-100)
   /competitor-intel analyze <url>    Competitor profile + battle card
   /web-app-growth-engine audit <url> Signup friction analysis
   /saas-landing-builder review <url> Page structure completeness (X/12)
 
-GIVE ME YOUR METRICS — I'LL BENCHMARK:
+GIVE ME YOUR METRICS - I'LL BENCHMARK:
   /subscription-metrics calculate    MRR, ARR, CAC, LTV, Rule of 40
   /plg-funnel-analyzer audit         Funnel leak detection vs benchmarks
   /pricing-analyzer audit            Pricing strategy evaluation
@@ -38,11 +38,11 @@ GIVE ME A KEYWORD OR BRAND:
   /brand-mention-scanner scan        Mentions across Reddit/HN/GitHub
   /local-seo-optimizer audit         Google Business Profile audit
 
-GIVE ME TEXT — I'LL ANALYZE:
+GIVE ME TEXT - I'LL ANALYZE:
   /review-sentiment analyze          Sentiment + theme extraction
   /onboarding-optimizer audit        Onboarding flow scoring
 
-AGENTS (combine multiple skills — say "use the <name> agent"):
+AGENTS (combine multiple skills - say "use the <name> agent"):
   growth-strategist                  Full growth audit → 90-day plan
   launch-planner                     Product launch playbook
   metrics-analyst                    SaaS health scorecard

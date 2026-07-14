@@ -234,7 +234,7 @@ export GITHUB_TOKEN="your_personal_access_token"
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -248,7 +248,7 @@ export GITHUB_TOKEN="your_personal_access_token"
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Brand scan complete — saved to BRAND-MENTIONS-REPORT.md
+✅ Brand scan complete - saved to BRAND-MENTIONS-REPORT.md
 
 Brand: "[brand]"
 Total mentions: [N] (Reddit: [N], HN: [N], GitHub: [N])

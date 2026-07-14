@@ -125,7 +125,7 @@ When running the `analyze` command, the skill follows this sequence:
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - Structure the report as: header (app name + date), overall score and grade,
@@ -141,7 +141,7 @@ When running the `analyze` command, the skill follows this sequence:
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ ASO analysis complete — saved to ASO-REPORT.md
+✅ ASO analysis complete - saved to ASO-REPORT.md
 
 App: [App Name]
 ASO Health Score: [X]/100 ([interpretation])

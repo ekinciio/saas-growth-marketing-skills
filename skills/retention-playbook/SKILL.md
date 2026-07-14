@@ -200,7 +200,7 @@ Build an engagement scoring model to proactively identify healthy and at-risk cu
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -214,14 +214,14 @@ Build an engagement scoring model to proactively identify healthy and at-risk cu
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Churn diagnosis complete — saved to RETENTION-DIAGNOSIS-REPORT.md
+✅ Churn diagnosis complete - saved to RETENTION-DIAGNOSIS-REPORT.md
 
 Monthly Logo Churn: [X]% | Revenue Churn: [X]% | NRR: [X]%
 
 Top churn drivers:
-  1. [#1 driver] — Impact: [HIGH/MED] — Addressable: [YES/PARTIAL]
-  2. [#2 driver] — Impact: [HIGH/MED] — Addressable: [YES/PARTIAL]
-  3. [#3 driver] — Impact: [MED] — Addressable: [YES/PARTIAL]
+  1. [#1 driver] - Impact: [HIGH/MED] - Addressable: [YES/PARTIAL]
+  2. [#2 driver] - Impact: [HIGH/MED] - Addressable: [YES/PARTIAL]
+  3. [#3 driver] - Impact: [MED] - Addressable: [YES/PARTIAL]
 
 Full diagnosis with action plan → open RETENTION-DIAGNOSIS-REPORT.md
 """

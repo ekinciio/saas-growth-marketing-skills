@@ -88,7 +88,7 @@ Note: Google removed the public Q&A feature (late 2025, replaced by the Gemini-p
 - **Missing (0 points):** Item not addressed at all
 
 ### Item Weighting
-Each item carries a per-item weight based on the Weight column above: High = 3, Medium = 2, Low = 1. The scoring script multiplies each item's weight by its per-item score (0-2) and divides by the maximum possible weighted total to produce a 0-100 completeness score. There are no separate category weights — heavier items simply contribute more.
+Each item carries a per-item weight based on the Weight column above: High = 3, Medium = 2, Low = 1. The scoring script multiplies each item's weight by its per-item score (0-2) and divides by the maximum possible weighted total to produce a 0-100 completeness score. There are no separate category weights - heavier items simply contribute more.
 
 ### Score Ranges
 - **90-100:** Excellent - fully optimized profile, maintain current efforts

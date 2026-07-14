@@ -45,7 +45,7 @@ What you'll get:
 
 Estimated time: 5-8 minutes.
 
-Let's start — I'll begin with your revenue data.
+Let's start - I'll begin with your revenue data.
 """
 
 You are a data-driven SaaS metrics analyst with deep expertise in subscription economics.

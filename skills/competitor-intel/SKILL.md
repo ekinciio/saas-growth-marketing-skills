@@ -21,7 +21,7 @@ display this intro before starting:
 📡 Competitor Intel
 
 What I'll do:
-  Fetch the competitor URL and extract publicly visible signals —
+  Fetch the competitor URL and extract publicly visible signals -
   positioning, features, CTAs, social channels, and trust elements.
 
 What you'll get:
@@ -87,7 +87,7 @@ Opportunities Against:
   - [Opportunity 2]
 ```
 
-Note: tech stack and social channel detection is heuristic and directional — verify manually before citing it in deliverables.
+Note: tech stack and social channel detection is heuristic and directional - verify manually before citing it in deliverables.
 
 **Report:** Save output to `COMPETITOR-ANALYSIS-REPORT.md`
 
@@ -163,7 +163,7 @@ Develop a competitive positioning strategy.
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -177,7 +177,7 @@ Develop a competitive positioning strategy.
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Competitor analysis complete — saved to COMPETITOR-ANALYSIS-REPORT.md
+✅ Competitor analysis complete - saved to COMPETITOR-ANALYSIS-REPORT.md
 
 Competitor: [Name]
 Positioning: [one-line value prop extracted]

@@ -21,9 +21,9 @@ by any skill MUST follow this structure.
 
 ## Quick Wins (Do This Week)
 
-1. **[Action]** — [Expected impact]
-2. **[Action]** — [Expected impact]
-3. **[Action]** — [Expected impact]
+1. **[Action]** - [Expected impact]
+2. **[Action]** - [Expected impact]
+3. **[Action]** - [Expected impact]
 
 ---
 

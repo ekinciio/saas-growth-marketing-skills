@@ -10,7 +10,7 @@ Citability measures how likely an AI search engine is to select and quote a spec
 
 Passages that get cited by AI search engines tend to share consistent characteristics:
 
-- **Length:** roughly 130-170 words (a working heuristic used by this skill's scorer, not a published research finding — the practical point is "one complete, self-contained idea per passage")
+- **Length:** roughly 130-170 words (a working heuristic used by this skill's scorer, not a published research finding - the practical point is "one complete, self-contained idea per passage")
 - **Structure:** Self-contained - makes sense without surrounding context
 - **Content:** Fact-rich with specific data points, statistics, or definitions
 - **Format:** Clear and direct, answering an implicit or explicit question
@@ -180,7 +180,7 @@ Passage-level citability is necessary but not sufficient. Three page- and site-l
 AI search engines prefer recently updated sources for time-sensitive queries. Signal freshness explicitly:
 - Keep `dateModified` (and `datePublished`) accurate in Article/WebPage schema markup
 - Show a visible "Last updated" date near the top of evergreen content
-- Actually refresh stale statistics and examples — a bumped date on unchanged content is a trust risk, not a freshness signal
+- Actually refresh stale statistics and examples - a bumped date on unchanged content is a trust risk, not a freshness signal
 
 ### Structured Data
 

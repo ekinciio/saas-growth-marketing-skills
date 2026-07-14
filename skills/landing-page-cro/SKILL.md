@@ -219,7 +219,7 @@ Analyzes the page and generates a prioritized list of A/B test ideas.
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - Structure the report as: header (title, URL, `**Date:**`) → overall score → per-dimension breakdown → top recommendations → detailed evidence.
@@ -234,7 +234,7 @@ Analyzes the page and generates a prioritized list of A/B test ideas.
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ CRO audit complete — saved to CRO-AUDIT-REPORT.md
+✅ CRO audit complete - saved to CRO-AUDIT-REPORT.md
 
 Score: [X]/100 ([interpretation])
 
@@ -275,10 +275,10 @@ https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=<url>&key=$GOOGLE
 ```
 
 Read these fields from the JSON response:
-- `lighthouseResult.categories.performance.score` — overall performance (0-1)
-- `lighthouseResult.audits['largest-contentful-paint']` — LCP
-- `lighthouseResult.audits['interaction-to-next-paint']` — INP
-- `lighthouseResult.audits['cumulative-layout-shift']` — CLS
+- `lighthouseResult.categories.performance.score` - overall performance (0-1)
+- `lighthouseResult.audits['largest-contentful-paint']` - LCP
+- `lighthouseResult.audits['interaction-to-next-paint']` - INP
+- `lighthouseResult.audits['cumulative-layout-shift']` - CLS
 
 Map them onto Dimension 6 (Page Speed and Mobile Responsiveness) like this:
 - All three CWV pass (LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1) and performance score ≥ 0.9 → 9-10

@@ -22,7 +22,7 @@ guidance before asking for input:
 📝 Review Sentiment Analyzer
 
 What I'll need:
-  Paste your customer reviews below — one per line or separated
+  Paste your customer reviews below - one per line or separated
   by blank lines. Works with any source: app stores, G2, Capterra,
   Yelp, Google, support tickets, survey responses.
 
@@ -192,7 +192,7 @@ Top Themes: UX/UI, Support, Pricing, Performance, Features, Bugs, Onboarding
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - Structure the report as: header (source + date), sentiment distribution,
@@ -208,7 +208,7 @@ Top Themes: UX/UI, Support, Pricing, Performance, Features, Bugs, Onboarding
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Sentiment analysis complete — saved to REVIEW-SENTIMENT-REPORT.md
+✅ Sentiment analysis complete - saved to REVIEW-SENTIMENT-REPORT.md
 
 Reviews analyzed: [N]
 Sentiment: [X]% positive, [X]% negative, [X]% neutral

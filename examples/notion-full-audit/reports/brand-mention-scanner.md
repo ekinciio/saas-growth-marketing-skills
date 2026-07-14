@@ -27,7 +27,7 @@
 ### Mention Overview
 - **Total stories mentioning Notion:** 3,353
 - **Top story points:** 1,952
-- **Average engagement:** High — multiple stories with 300+ points
+- **Average engagement:** High - multiple stories with 300+ points
 
 ### Top 10 HN Stories by Engagement
 
@@ -56,7 +56,7 @@
 ### Key HN Insights
 
 **1. "Alternative to Notion" is the dominant HN narrative**
-8 of the top 20 stories are alternatives to Notion (AppFlowy, AFFiNE, Docmost, Focalboard, Anytype, Eidos). This is both a threat and a compliment — Notion is the benchmark that every new tool competes against.
+8 of the top 20 stories are alternatives to Notion (AppFlowy, AFFiNE, Docmost, Focalboard, Anytype, Eidos). This is both a threat and a compliment - Notion is the benchmark that every new tool competes against.
 
 **2. Technical content performs well**
 Notion's engineering blog posts consistently reach the front page:
@@ -65,8 +65,8 @@ Notion's engineering blog posts consistently reach the front page:
 - "The data model behind Notion's flexibility" (338 points)
 
 **3. Two significant negative stories**
-- "Notion is withholding my company data" (479 pts) — data access/export concern
-- "Notion Desktop is monitoring your audio and network" (430 pts) — privacy concern
+- "Notion is withholding my company data" (479 pts) - data access/export concern
+- "Notion Desktop is monitoring your audio and network" (430 pts) - privacy concern
 Both are high-engagement, indicating HN community sensitivity to privacy/data ownership.
 
 **4. Notion AI generated significant buzz**
@@ -103,10 +103,10 @@ Both are high-engagement, indicating HN community sensitivity to privacy/data ow
 
 | Category | Repos (est.) | Total Stars | Health |
 |----------|-------------|-------------|--------|
-| **Notion Alternatives** | ~50 notable | 200K+ combined | 🔴 Very active — growing |
-| **Notion Ecosystem Tools** | ~500+ | 50K+ combined | 🟢 Healthy — tools built on Notion |
-| **Notion API Integrations** | ~200+ | 20K+ combined | 🟢 Healthy — developer adoption |
-| **Official Notion Repos** | ~10 | 5K+ combined | 🟡 Moderate — could be more active |
+| **Notion Alternatives** | ~50 notable | 200K+ combined | 🔴 Very active - growing |
+| **Notion Ecosystem Tools** | ~500+ | 50K+ combined | 🟢 Healthy - tools built on Notion |
+| **Notion API Integrations** | ~200+ | 20K+ combined | 🟢 Healthy - developer adoption |
+| **Official Notion Repos** | ~10 | 5K+ combined | 🟡 Moderate - could be more active |
 
 ### Key GitHub Insights
 
@@ -114,10 +114,10 @@ Both are high-engagement, indicating HN community sensitivity to privacy/data ow
 The top 5 alternatives alone have 200K+ combined stars. AppFlowy (68K) and AFFiNE (66K) are growing rapidly and are among the most-starred open-source projects in the productivity space.
 
 **2. Notion's official GitHub presence is modest**
-The official SDK (notion-sdk-js) has 5,557 stars — respectable but dwarfed by the ecosystem built around it. More official tooling, examples, and community engagement on GitHub could strengthen developer loyalty.
+The official SDK (notion-sdk-js) has 5,557 stars - respectable but dwarfed by the ecosystem built around it. More official tooling, examples, and community engagement on GitHub could strengthen developer loyalty.
 
 **3. Notion-powered website builders are popular**
-NotionNext (11K stars) and nextjs-notion-starter-kit (7K stars) show that developers use Notion as a CMS — an underappreciated use case that drives stickiness.
+NotionNext (11K stars) and nextjs-notion-starter-kit (7K stars) show that developers use Notion as a CMS - an underappreciated use case that drives stickiness.
 
 **4. Block editor pattern inspired by Notion is now a standard**
 Novel (16K stars) and BlockNote (9K stars) explicitly cite "Notion-style" editing as their design inspiration. Notion has effectively created a UI pattern standard.
@@ -129,7 +129,7 @@ Novel (16K stars) and BlockNote (9K stars) explicitly cite "Notion-style" editin
 ### Mention Overview
 - **r/Notion subreddit:** 250K+ members (very active)
 - **Cross-subreddit mentions:** Frequent on r/productivity, r/SaaS, r/startups, r/selfhosted
-- **Mention sentiment:** Mixed — high satisfaction with caveats
+- **Mention sentiment:** Mixed - high satisfaction with caveats
 
 ### Reddit Sentiment Summary
 
@@ -141,16 +141,16 @@ Novel (16K stars) and BlockNote (9K stars) explicitly cite "Notion-style" editin
 | Negative | 10% | "Slow with large databases," "limited offline," "steep learning curve" |
 
 ### Top Positive Themes on Reddit
-1. **All-in-one consolidation** — Users love replacing multiple tools with Notion
-2. **Template community** — Template sharing is Notion's organic growth engine
-3. **AI features** — Notion 3.0 agents getting positive early reception
-4. **Flexibility** — Power users praise the customization depth
+1. **All-in-one consolidation** - Users love replacing multiple tools with Notion
+2. **Template community** - Template sharing is Notion's organic growth engine
+3. **AI features** - Notion 3.0 agents getting positive early reception
+4. **Flexibility** - Power users praise the customization depth
 
 ### Top Negative Themes on Reddit
-1. **Performance** — Consistently mentioned: slow with large databases
-2. **Learning curve** — "Spent hours setting it up, only to give up later"
-3. **Offline limitations** — Only added basic offline in August 2025
-4. **Privacy concerns** — Some users prefer local-first alternatives (Obsidian, Anytype)
+1. **Performance** - Consistently mentioned: slow with large databases
+2. **Learning curve** - "Spent hours setting it up, only to give up later"
+3. **Offline limitations** - Only added basic offline in August 2025
+4. **Privacy concerns** - Some users prefer local-first alternatives (Obsidian, Anytype)
 
 ---
 
@@ -176,23 +176,23 @@ Novel (16K stars) and BlockNote (9K stars) explicitly cite "Notion-style" editin
 ## Unresponded Opportunities
 
 ### Hacker News
-- **"Notion Desktop is monitoring your audio and network" (430 pts, 2025)** — This is a privacy concern story that likely needs an official response or blog post addressing monitoring practices
-- **"Notion is withholding my company data" (479 pts)** — Data portability and export concerns should be proactively addressed with clear documentation
+- **"Notion Desktop is monitoring your audio and network" (430 pts, 2025)** - This is a privacy concern story that likely needs an official response or blog post addressing monitoring practices
+- **"Notion is withholding my company data" (479 pts)** - Data portability and export concerns should be proactively addressed with clear documentation
 
 ### GitHub
-- **Official SDK engagement** — notion-sdk-js has 59 open issues. More responsive issue triage and community engagement would strengthen developer relations
-- **No official "awesome-notion" repo** — Community-curated lists exist, but an official curated list would help developers discover the ecosystem
+- **Official SDK engagement** - notion-sdk-js has 59 open issues. More responsive issue triage and community engagement would strengthen developer relations
+- **No official "awesome-notion" repo** - Community-curated lists exist, but an official curated list would help developers discover the ecosystem
 
 ### Reddit
-- **"Notion vs [X]" threads** — Many comparison threads lack official or advocate responses with up-to-date information about Notion 3.0 improvements
-- **Performance complaint threads** — Users reporting slowness rarely get responses with specific optimization tips or acknowledgment of improvements
+- **"Notion vs [X]" threads** - Many comparison threads lack official or advocate responses with up-to-date information about Notion 3.0 improvements
+- **Performance complaint threads** - Users reporting slowness rarely get responses with specific optimization tips or acknowledgment of improvements
 
 ---
 
 ## Recommendations
 
 ### 1. Address Privacy Narrative on HN (Critical)
-Two high-engagement negative stories relate to privacy/data concerns. Publish a transparent blog post on Notion's data practices and submit it to HN. The tech community values transparency — silence amplifies suspicion.
+Two high-engagement negative stories relate to privacy/data concerns. Publish a transparent blog post on Notion's data practices and submit it to HN. The tech community values transparency - silence amplifies suspicion.
 
 ### 2. Increase Official GitHub Presence (High Impact)
 - Create an official "awesome-notion" curated repository
@@ -201,7 +201,7 @@ Two high-engagement negative stories relate to privacy/data concerns. Publish a 
 - Engage with the alternative ecosystem constructively (contribute to standards, not competition)
 
 ### 3. Amplify Engineering Blog on HN (High Impact)
-Notion's technical content consistently performs well on HN (Postgres sharding: 471 pts, WASM SQLite: 253 pts). Publish more engineering deep-dives and submit them to HN — this builds developer credibility.
+Notion's technical content consistently performs well on HN (Postgres sharding: 471 pts, WASM SQLite: 253 pts). Publish more engineering deep-dives and submit them to HN - this builds developer credibility.
 
 ### 4. Strengthen Reddit Community Advocacy (Medium Impact)
 - Train/support community advocates to respond to "vs" and "alternative" threads

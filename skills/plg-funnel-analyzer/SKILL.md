@@ -233,7 +233,7 @@ No metrics or data entered during the audit are stored, cached, or transmitted b
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -247,10 +247,10 @@ No metrics or data entered during the audit are stored, cached, or transmitted b
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Funnel audit complete — saved to PLG-FUNNEL-AUDIT-REPORT.md
+✅ Funnel audit complete - saved to PLG-FUNNEL-AUDIT-REPORT.md
 
 Funnel Health: Grade [A-F]
-Biggest Leak: [stage] — [metric] is [value] (benchmark: [benchmark])
+Biggest Leak: [stage] - [metric] is [value] (benchmark: [benchmark])
 
 Assessment:
   🟢 [Best metric]
@@ -273,4 +273,4 @@ NEVER dump the full report in chat. The file is the deliverable.
 
 Accepts user metrics, runs benchmark comparison with traffic light scoring, detects the biggest funnel leak, and generates prioritized recommendations. Includes standalone demo with example data.
 
-Run it directly: `python3 scripts/funnel_analyzer.py metrics.json` (JSON keys: `signup_to_active`, `free_to_paid`, `monthly_churn`, `nrr`, `time_to_value_days`, `payback_months` — all optional), pipe JSON via stdin, or use `--demo` for sample data.
+Run it directly: `python3 scripts/funnel_analyzer.py metrics.json` (JSON keys: `signup_to_active`, `free_to_paid`, `monthly_churn`, `nrr`, `time_to_value_days`, `payback_months` - all optional), pipe JSON via stdin, or use `--demo` for sample data.

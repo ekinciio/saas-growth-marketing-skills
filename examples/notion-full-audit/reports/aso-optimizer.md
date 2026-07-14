@@ -10,7 +10,7 @@
 
 ---
 
-## ASO Health Score: 72/100 — Good
+## ASO Health Score: 72/100 - Good
 
 > Notion's App Store listing has a strong foundation with an excellent rating (4.78) and high review count (79K+). The title is well-optimized with relevant keywords. Key gaps are in description optimization, release notes quality, and iPhone screenshot availability.
 
@@ -42,13 +42,13 @@
 
 ## Score Breakdown
 
-### 1. Title Optimization — 24/30
+### 1. Title Optimization - 24/30
 
 | Criteria | Score | Notes |
 |----------|-------|-------|
-| Brand name present | 5/5 | "Notion" is the first word — correct |
+| Brand name present | 5/5 | "Notion" is the first word - correct |
 | Keywords in title | 7/10 | "Notes, Tasks, AI" covers 3 high-value keywords |
-| Character usage | 7/10 | 25/30 chars used (83%) — 5 chars remaining |
+| Character usage | 7/10 | 25/30 chars used (83%) - 5 chars remaining |
 | Format quality | 5/5 | Clean `Brand: Keyword, Keyword, Keyword` format |
 
 **Current title:** `Notion: Notes, Tasks, AI` (25 chars)
@@ -60,18 +60,18 @@
 - Colon separator is clean and readable
 
 **Weaknesses:**
-- Missing "Workspace" or "Project" — two high-volume keywords in this category
+- Missing "Workspace" or "Project" - two high-volume keywords in this category
 - "AI" alone is vague; "AI Workspace" or "AI Notes" would be more specific
 - 5 unused characters could add another keyword
 
 **Recommended title options:**
-1. `Notion: AI Workspace & Notes` (29 chars) — adds "Workspace"
-2. `Notion: Notes, Tasks, AI Docs` (30 chars) — adds "Docs"
-3. `Notion: Notes, Projects & AI` (29 chars) — adds "Projects"
+1. `Notion: AI Workspace & Notes` (29 chars) - adds "Workspace"
+2. `Notion: Notes, Tasks, AI Docs` (30 chars) - adds "Docs"
+3. `Notion: Notes, Projects & AI` (29 chars) - adds "Projects"
 
 ---
 
-### 2. Description Quality — 16/25
+### 2. Description Quality - 16/25
 
 | Criteria | Score | Notes |
 |----------|-------|-------|
@@ -79,7 +79,7 @@
 | First 3 lines | 4/5 | Opens with clear value prop (visible before "Read More") |
 | Structure/formatting | 3/5 | Needs more bullet points and section headers |
 | Keyword density | 2/4 | Key terms present but not systematically placed |
-| Call-to-action | 2/3 | Implicit CTA — could be stronger |
+| Call-to-action | 2/3 | Implicit CTA - could be stronger |
 
 **First line analysis:**
 > "Notion is an AI-powered all-in-one workspace that helps individuals and teams write notes, manage tasks, organize projects, and collaborate in one place."
@@ -90,7 +90,7 @@
 - Clearly explains what the app does
 
 **Weaknesses:**
-- Opening is functional but not compelling — doesn't lead with a benefit or outcome
+- Opening is functional but not compelling - doesn't lead with a benefit or outcome
 - Needs structured sections (Features, Use Cases, What's New) with bullet points
 - No social proof in description (should include "100M+ users" or "G2 #1")
 - No explicit CTA ("Download free today" or "Get started in seconds")
@@ -98,18 +98,18 @@
 **Recommended first 3 lines:**
 > "Join 100M+ users who replaced 11 tools with one AI workspace."
 >
-> "Notion combines notes, tasks, projects, and AI agents in a single app — trusted by OpenAI, Figma, and 62% of Fortune 100 companies."
+> "Notion combines notes, tasks, projects, and AI agents in a single app - trusted by OpenAI, Figma, and 62% of Fortune 100 companies."
 >
 > "Write faster. Find anything. Automate busywork. All free."
 
 ---
 
-### 3. Ratings Health — 21/25
+### 3. Ratings Health - 21/25
 
 | Criteria | Score | Notes |
 |----------|-------|-------|
-| Average rating | 9/10 | 4.78/5.0 — excellent (above 4.5 threshold) |
-| Rating count | 8/10 | 79,731 ratings — strong social proof |
+| Average rating | 9/10 | 4.78/5.0 - excellent (above 4.5 threshold) |
+| Rating count | 8/10 | 79,731 ratings - strong social proof |
 | Rating velocity | 4/5 | Regular updates suggest active review solicitation |
 
 **Rating Analysis:**
@@ -132,21 +132,21 @@
 
 ---
 
-### 4. Metadata Completeness — 11/20
+### 4. Metadata Completeness - 11/20
 
 | Criteria | Score | Notes |
 |----------|-------|-------|
 | All fields populated | 3/5 | Core fields present; subtitle not confirmed from API |
 | Screenshots | 2/5 | ⚠️ 7 iPad screenshots, 0 iPhone screenshots |
-| Language support | 4/5 | 19 languages — excellent coverage |
-| Release notes quality | 2/5 | "Bug fixes and performance improvements" — generic |
+| Language support | 4/5 | 19 languages - excellent coverage |
+| Release notes quality | 2/5 | "Bug fixes and performance improvements" - generic |
 
 **Critical Issue: No iPhone Screenshots**
 
 The iTunes API returned **0 iPhone screenshots** and **7 iPad screenshots**. This is a significant gap:
 - iPhone accounts for ~85% of iOS app downloads
 - Missing iPhone screenshots means the App Store listing may show no visual preview for the majority of visitors
-- This could be an API reporting issue (screenshots may exist but not be returned) — recommend verifying in App Store Connect
+- This could be an API reporting issue (screenshots may exist but not be returned) - recommend verifying in App Store Connect
 
 **Release Notes Issue:**
 
@@ -161,7 +161,7 @@ This is the single most common ASO mistake. Release notes are indexed by Apple's
 > - Performance improvements for large workspaces
 > - Bug fixes for iOS 18 compatibility
 >
-> Love Notion? Leave us a review — it helps us keep building!
+> Love Notion? Leave us a review - it helps us keep building!
 
 ---
 
@@ -188,11 +188,11 @@ This is the single most common ASO mistake. Release notes are indexed by Apple's
 
 ### Key Competitive Observations
 
-1. **ClickUp mirrors Notion's title strategy** — "Tasks, Chat, Docs, AI" is nearly identical to "Notes, Tasks, AI" but adds "Chat" and "Docs"
-2. **Smartsheet dominates on reviews** — 111K ratings vs. Notion's 79K. More aggressive review solicitation could close this gap
-3. **Notion is the largest app** at 416 MB — significantly larger than competitors. This may cause download hesitation on cellular networks
-4. **Notion is the only app listing "AI" in the title** among the top competitors (ClickUp also does) — early-mover advantage in AI search queries
-5. **Category choice differs** — Notion uses "Productivity" while most competitors use "Business." This affects which category charts it appears on
+1. **ClickUp mirrors Notion's title strategy** - "Tasks, Chat, Docs, AI" is nearly identical to "Notes, Tasks, AI" but adds "Chat" and "Docs"
+2. **Smartsheet dominates on reviews** - 111K ratings vs. Notion's 79K. More aggressive review solicitation could close this gap
+3. **Notion is the largest app** at 416 MB - significantly larger than competitors. This may cause download hesitation on cellular networks
+4. **Notion is the only app listing "AI" in the title** among the top competitors (ClickUp also does) - early-mover advantage in AI search queries
+5. **Category choice differs** - Notion uses "Productivity" while most competitors use "Business." This affects which category charts it appears on
 
 ---
 
@@ -230,13 +230,13 @@ This is the single most common ASO mistake. Release notes are indexed by Apple's
 **Expected impact:** +3-5% install completion rate (fewer download abandons on cellular)
 
 ### 6. Increase Review Solicitation (Medium Impact)
-**Issue:** 79K reviews vs. Smartsheet's 111K — Notion has a larger user base but fewer reviews
+**Issue:** 79K reviews vs. Smartsheet's 111K - Notion has a larger user base but fewer reviews
 **Action:** Implement strategic in-app review prompts (SKStoreReviewController) after positive moments (completing a task, inviting a teammate, using AI successfully)
 **Difficulty:** Medium
 **Expected impact:** +30-50% increase in review velocity, potential rating maintenance above 4.7
 
 ### 7. Maximize Title Character Usage (Low-Medium Impact)
-**Issue:** Using 25/30 characters — 5 characters wasted
+**Issue:** Using 25/30 characters - 5 characters wasted
 **Action:** Add one more keyword: "Notion: Notes, Tasks, AI Docs" (30 chars) or "Notion: AI Workspace & Notes" (29 chars)
 **Difficulty:** Easy
 **Expected impact:** +3-5% keyword visibility for the added term
@@ -247,8 +247,8 @@ This is the single most common ASO mistake. Release notes are indexed by Apple's
 
 1. **Update release notes** with feature-focused copy + keyword placement + review prompt
 2. **Rewrite description first 3 lines** with social proof hook and outcome-driven language
-3. **Add stats to description body** — "100M+ users," "#1 knowledge base on G2"
-4. **Extend title to 30 chars** — add "Docs" or "Workspace" keyword
+3. **Add stats to description body** - "100M+ users," "#1 knowledge base on G2"
+4. **Extend title to 30 chars** - add "Docs" or "Workspace" keyword
 
 ---
 

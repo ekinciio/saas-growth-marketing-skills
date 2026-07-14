@@ -99,7 +99,7 @@ def fetch_app_metadata(app_name: str, country: str = "us") -> dict[str, Any] | N
     matched_name = app.get("trackName", "")
     if matched_name.strip().lower() != query:
         print(
-            f"Matched '{matched_name}' — verify this is the right app",
+            f"Matched '{matched_name}' - verify this is the right app",
             file=sys.stderr,
         )
 

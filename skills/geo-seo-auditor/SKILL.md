@@ -121,10 +121,10 @@ The full audit (`/geo-seo-auditor audit <url>`) follows a 6-step process:
 Runs the complete 6-step audit. This is the most thorough analysis and covers every dimension in the scoring methodology. Typical runtime is 2-4 minutes depending on page complexity.
 
 **How to run:** Execute the bundled scripts in sequence and combine their JSON output:
-1. `python3 scripts/fetch_page.py <url>` — metadata, headings, schema, robots.txt, sitemap, llms.txt discovery
-2. `python3 scripts/citability_scorer.py <url>` — per-block citability scores
-3. `python3 scripts/crawler_checker.py <url>` — AI crawler access (interpret with `references/ai-crawlers.md`)
-4. `python3 scripts/llmstxt_generator.py <url>` — llms.txt validation/generation (interpret with `references/llmstxt-spec.md`)
+1. `python3 scripts/fetch_page.py <url>` - metadata, headings, schema, robots.txt, sitemap, llms.txt discovery
+2. `python3 scripts/citability_scorer.py <url>` - per-block citability scores
+3. `python3 scripts/crawler_checker.py <url>` - AI crawler access (interpret with `references/ai-crawlers.md`)
+4. `python3 scripts/llmstxt_generator.py <url>` - llms.txt validation/generation (interpret with `references/llmstxt-spec.md`)
 
 **Output includes:**
 - Overall GEO Readiness Score
@@ -196,7 +196,7 @@ Checks the site's robots.txt against 21 known AI crawler tokens.
 
 **Status per crawler:** allowed (explicit), allowed (default via `*`), blocked, partially blocked, or not mentioned
 
-**Note:** Google-Extended and Applebot-Extended are training opt-out tokens, not crawlers. Blocking Google-Extended only opts out of Gemini training/grounding — it does NOT affect Google Search, AI Overviews, or AI Mode.
+**Note:** Google-Extended and Applebot-Extended are training opt-out tokens, not crawlers. Blocking Google-Extended only opts out of Gemini training/grounding - it does NOT affect Google Search, AI Overviews, or AI Mode.
 
 **Output includes:**
 - Status table for all crawlers
@@ -207,7 +207,7 @@ Checks the site's robots.txt against 21 known AI crawler tokens.
 
 ### `/geo-seo-auditor llmstxt <url>`
 
-Checks for the presence and validity of an llms.txt file at the site root. llms.txt is a Markdown-format proposal (llmstxt.org) with debated adoption — treat it as a low-cost optimization, not a requirement.
+Checks for the presence and validity of an llms.txt file at the site root. llms.txt is a Markdown-format proposal (llmstxt.org) with debated adoption - treat it as a low-cost optimization, not a requirement.
 
 **How to run:** `python3 scripts/llmstxt_generator.py <url>`. Interpret results with `references/llmstxt-spec.md`.
 
@@ -267,7 +267,7 @@ Generates platform-specific optimization recommendations for each major AI searc
 - Source snippet formatting
 
 **Google AI Overviews:**
-- Googlebot access and snippet controls (nosnippet, data-nosnippet, max-snippet, noindex) — these govern AI Overviews/AI Mode inclusion
+- Googlebot access and snippet controls (nosnippet, data-nosnippet, max-snippet, noindex) - these govern AI Overviews/AI Mode inclusion
 - Google-Extended status (Gemini training/grounding opt-out only; does not affect AI Overviews)
 - Featured snippet optimization
 - Structured data for AI extraction
@@ -321,7 +321,7 @@ export AHREFS_API_KEY="your_ahrefs_api_key"
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it (latest analysis wins).
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -335,7 +335,7 @@ export AHREFS_API_KEY="your_ahrefs_api_key"
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ GEO audit complete — saved to GEO-AUDIT-REPORT.md
+✅ GEO audit complete - saved to GEO-AUDIT-REPORT.md
 
 Score: [X]/100 ([interpretation])
 

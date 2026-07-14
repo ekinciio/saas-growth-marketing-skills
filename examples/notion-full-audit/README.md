@@ -29,22 +29,22 @@ Notion is a $10B+ productivity platform with 100M+ users - one of the most succe
 | 4 | web-app-growth-engine | [View Report](reports/web-app-growth-engine.md) | 42/50 PLG |
 | 5 | saas-landing-builder | [View Report](reports/saas-landing-builder.md) | 9/12 Sections |
 | 6 | aso-optimizer | [View Report](reports/aso-optimizer.md) | 72/100 |
-| 7 | reddit-opportunity-finder | [View Report](reports/reddit-opportunity-finder.md) | — |
+| 7 | reddit-opportunity-finder | [View Report](reports/reddit-opportunity-finder.md) | - |
 | 8 | brand-mention-scanner | [View Report](reports/brand-mention-scanner.md) | 44/50 |
 | 9 | review-sentiment | [View Report](reports/review-sentiment.md) | 4.2/5.0 |
 | 10 | onboarding-optimizer | [View Report](reports/onboarding-optimizer.md) | 80/100 |
-| 11 | growth-strategist | [View Report](reports/growth-strategist.md) | — |
-| 12 | launch-planner | [View Report](reports/launch-planner.md) | — |
+| 11 | growth-strategist | [View Report](reports/growth-strategist.md) | - |
+| 12 | launch-planner | [View Report](reports/launch-planner.md) | - |
 
 ## Key Takeaways
 
-1. **GEO Score 68/100** — Strong brand authority (92/100) but zero structured data and no llms.txt file hold back AI search visibility
-2. **CRO Score 74/100** — Excellent social proof (10/10) and hero clarity, but missing FAQ, trust badges, and urgency mechanics
-3. **ASO Score 72/100** — Great ratings (4.78 stars, 79K reviews) but zero iPhone screenshots and generic release notes
-4. **Onboarding Score 80/100 (B+)** — Best-in-class signup friction (22/100) but weak post-signup guidance ("Notion Paralysis")
-5. **Brand Authority 44/50** — 61K+ mentions across HN, GitHub, Reddit; "Notion alternative" is a defined product category
-6. **PLG Score 42/50** — Best-in-class product-led growth with collaborative and template viral loops
-7. **Review Sentiment 4.2/5.0** — Gap between professional platforms (G2: 4.7) and consumer platforms (Trustpilot: ~3.0)
+1. **GEO Score 68/100** - Strong brand authority (92/100) but zero structured data and no llms.txt file hold back AI search visibility
+2. **CRO Score 74/100** - Excellent social proof (10/10) and hero clarity, but missing FAQ, trust badges, and urgency mechanics
+3. **ASO Score 72/100** - Great ratings (4.78 stars, 79K reviews) but zero iPhone screenshots and generic release notes
+4. **Onboarding Score 80/100 (B+)** - Best-in-class signup friction (22/100) but weak post-signup guidance ("Notion Paralysis")
+5. **Brand Authority 44/50** - 61K+ mentions across HN, GitHub, Reddit; "Notion alternative" is a defined product category
+6. **PLG Score 42/50** - Best-in-class product-led growth with collaborative and template viral loops
+7. **Review Sentiment 4.2/5.0** - Gap between professional platforms (G2: 4.7) and consumer platforms (Trustpilot: ~3.0)
 
 ## How to Run Your Own Audit
 

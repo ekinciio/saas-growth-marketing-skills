@@ -4,11 +4,11 @@ This document lists known AI crawler and control tokens, their operators, and ho
 
 Categories used below:
 
-- **training** — collects content for AI model training
-- **search** — indexes content for AI search/answer products (blocking removes you from those answers)
-- **user-fetch** — fetches a page only when a user explicitly asks an AI assistant to open it
-- **training-control** — a robots.txt opt-out *token*, not a crawler; honored by another bot
-- **other** — miscellaneous (R&D, etc.)
+- **training** - collects content for AI model training
+- **search** - indexes content for AI search/answer products (blocking removes you from those answers)
+- **user-fetch** - fetches a page only when a user explicitly asks an AI assistant to open it
+- **training-control** - a robots.txt opt-out *token*, not a crawler; honored by another bot
+- **other** - miscellaneous (R&D, etc.)
 
 ## Crawler Directory
 
@@ -126,7 +126,7 @@ Allow: /
 
 - **User-Agent token:** `Google-Extended`
 - **Category:** training-control
-- **Purpose:** A robots.txt opt-out *token*, not a separate crawler — it is honored by Googlebot. Blocking it opts your content out of Gemini model **training and grounding**.
+- **Purpose:** A robots.txt opt-out *token*, not a separate crawler - it is honored by Googlebot. Blocking it opts your content out of Gemini model **training and grounding**.
 - **What it does NOT do:** Google-Extended does **not** affect Google Search inclusion, AI Overviews, or AI Mode. Inclusion in AI Overviews/AI Mode is governed by normal Googlebot access plus snippet controls (`nosnippet`, `data-nosnippet`, `max-snippet`, `noindex`).
 
 ```
@@ -169,7 +169,7 @@ Allow: /
 
 - **User-Agent token:** `bingbot`
 - **Category:** search
-- **Purpose:** Bing's main search crawler, which also powers Microsoft Copilot answers. **Blocking bingbot removes you from both Bing Search and Copilot visibility** — there is no separate Copilot-only crawler to allow.
+- **Purpose:** Bing's main search crawler, which also powers Microsoft Copilot answers. **Blocking bingbot removes you from both Bing Search and Copilot visibility** - there is no separate Copilot-only crawler to allow.
 
 ```
 User-agent: bingbot
@@ -208,7 +208,7 @@ Allow: /
 
 - **User-Agent token:** `Applebot-Extended`
 - **Category:** training-control
-- **Purpose:** An opt-out *token*, not a crawler — it does not crawl; the standard `Applebot` does. Blocking Applebot-Extended opts your content out of Apple Intelligence / foundation model training while keeping Applebot crawling for Siri and Spotlight.
+- **Purpose:** An opt-out *token*, not a crawler - it does not crawl; the standard `Applebot` does. Blocking Applebot-Extended opts your content out of Apple Intelligence / foundation model training while keeping Applebot crawling for Siri and Spotlight.
 
 ```
 # Opt out of Apple AI training only:
@@ -237,7 +237,7 @@ Allow: /
 - **User-Agent token:** `Bytespider`
 - **Full User-Agent String:** `Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko; compatible; Bytespider; spider-feedback@bytedance.com)`
 - **Category:** training
-- **Purpose:** Model training for ByteDance AI products. Widely reported to have **poor robots.txt compliance** — robots.txt alone may not stop it; consider server-level blocking if you need to exclude it.
+- **Purpose:** Model training for ByteDance AI products. Widely reported to have **poor robots.txt compliance** - robots.txt alone may not stop it; consider server-level blocking if you need to exclude it.
 
 ```
 User-agent: Bytespider

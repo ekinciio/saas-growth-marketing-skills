@@ -9,9 +9,9 @@
 
 ---
 
-## Section Completeness: 9/12 — Good
+## Section Completeness: 9/12 - Good
 
-> Notion's homepage covers 9 of 12 recommended landing page sections. The three missing sections — Problem Statement, How It Works, and FAQ — represent meaningful conversion opportunities. The sections that are present are executed at a high level, particularly Hero, Social Proof, and Testimonials.
+> Notion's homepage covers 9 of 12 recommended landing page sections. The three missing sections - Problem Statement, How It Works, and FAQ - represent meaningful conversion opportunities. The sections that are present are executed at a high level, particularly Hero, Social Proof, and Testimonials.
 
 ---
 
@@ -19,8 +19,8 @@
 
 | # | Section | Status | Score | Notes |
 |---|---------|--------|-------|-------|
-| 1 | Hero | ✅ Present | 9/10 | Excellent — clear value prop, dual CTAs, hero video |
-| 2 | Social Proof Bar | ✅ Present | 10/10 | Best-in-class — logos, stats, G2 rankings |
+| 1 | Hero | ✅ Present | 9/10 | Excellent - clear value prop, dual CTAs, hero video |
+| 2 | Social Proof Bar | ✅ Present | 10/10 | Best-in-class - logos, stats, G2 rankings |
 | 3 | Problem Statement | ❌ Missing | 0/10 | No explicit pain articulation |
 | 4 | Solution Overview | ✅ Present | 7/10 | Implicit through features, not a standalone section |
 | 5 | Feature Grid | ✅ Present | 8/10 | 4 bento cards (Agents, Search, Notes, Workflows) |
@@ -36,7 +36,7 @@
 
 ## Section-by-Section Analysis
 
-### 1. Hero — 9/10 ✅
+### 1. Hero - 9/10 ✅
 
 **What's there:**
 - **H1:** "One workspace. Zero busywork." (5 words, benefit-driven, memorable)
@@ -46,41 +46,41 @@
 - **Hero media:** Video/image with desktop (2560x1600) and mobile (1600x1600) variants
 
 **Strengths:**
-- Headline passes the 5-second test — value is immediately clear
+- Headline passes the 5-second test - value is immediately clear
 - "Get Notion free" is excellent CTA copy (product name + "free" in 3 words)
 - Dual CTAs correctly segment self-serve vs. enterprise visitors
 - Hero image/video adds visual engagement
 
 **Improvements:**
-- Add a single social proof stat above the fold (e.g., "Trusted by 100M+ users") — currently logos appear just below the fold
+- Add a single social proof stat above the fold (e.g., "Trusted by 100M+ users") - currently logos appear just below the fold
 - Consider adding "No credit card required" subtext under the primary CTA
 
-**Ordering:** ✅ Correct — Hero is Section 1
+**Ordering:** ✅ Correct - Hero is Section 1
 
 ---
 
-### 2. Social Proof Bar — 10/10 ✅
+### 2. Social Proof Bar - 10/10 ✅
 
 **What's there:**
 - **Customer logos:** Figma, OpenAI, Ramp, Cursor, Vercel, NVIDIA, Volvo, Perplexity AI
 - **Stats:** 100M+ users, 62% of Fortune 100, 50%+ of YC companies, 1.4M+ community
 - **Awards:** G2 #1 in 3 categories (knowledge base, AI search, AI writing)
-- **Press:** Forbes — "Your AI everything app"
+- **Press:** Forbes - "Your AI everything app"
 
 **Strengths:**
 - Multiple forms of proof (logos, stats, rankings, press) reinforcing from every angle
 - Mix of tech-native (OpenAI, Cursor, Vercel) and enterprise (NVIDIA, Volvo, Toyota) logos signals broad appeal
-- G2 rankings are specific and verifiable — not generic "trusted by thousands"
+- G2 rankings are specific and verifiable - not generic "trusted by thousands"
 - Stats appear at multiple scroll points, reinforcing trust throughout the page
 
 **Improvements:**
-- None critical — this is best-in-class execution
+- None critical - this is best-in-class execution
 
-**Ordering:** ✅ Correct — Social Proof Bar appears as Section 2, immediately after Hero
+**Ordering:** ✅ Correct - Social Proof Bar appears as Section 2, immediately after Hero
 
 ---
 
-### 3. Problem Statement — 0/10 ❌ MISSING
+### 3. Problem Statement - 0/10 ❌ MISSING
 
 **What should be here:**
 A section that articulates the pain your audience feels *before* showing the solution. Example:
@@ -88,7 +88,7 @@ A section that articulates the pain your audience feels *before* showing the sol
 > "Your team uses 11 different tools. Information is scattered. Context is lost. Meetings waste time catching everyone up. And you're paying $192/user/month for the privilege."
 
 **Why it matters:**
-Problem-first messaging creates emotional resonance. Visitors who feel understood are 2-3x more likely to engage with the solution. Notion's homepage jumps directly from "One workspace. Zero busywork" to product features — the "busywork" is assumed, not articulated.
+Problem-first messaging creates emotional resonance. Visitors who feel understood are 2-3x more likely to engage with the solution. Notion's homepage jumps directly from "One workspace. Zero busywork" to product features - the "busywork" is assumed, not articulated.
 
 **Recommendation:**
 Add a 2-3 sentence problem statement section between the Social Proof Bar and the Feature Grid. Use specific pain points: tool sprawl, context switching, knowledge silos, meeting overload.
@@ -101,7 +101,7 @@ Add a 2-3 sentence problem statement section between the Social Proof Bar and th
 
 ---
 
-### 4. Solution Overview — 7/10 ✅ (Implicit)
+### 4. Solution Overview - 7/10 ✅ (Implicit)
 
 **What's there:**
 - "Introducing Notion 3.0" carousel showcasing the AI workspace concept
@@ -125,46 +125,46 @@ Reframe the section header from "Introducing Notion 3.0" to something problem-so
 
 ---
 
-### 5. Feature Grid — 8/10 ✅
+### 5. Feature Grid - 8/10 ✅
 
 **What's there:**
 Four bento-card features:
-1. **Custom Agents** — "Automate repetitive tasks"
-2. **Enterprise Search** — "One search for everything"
-3. **AI Meeting Notes** — "Perfect notes, every time"
-4. **Flexible Workflows** — "Manage any project, big or small"
+1. **Custom Agents** - "Automate repetitive tasks"
+2. **Enterprise Search** - "One search for everything"
+3. **AI Meeting Notes** - "Perfect notes, every time"
+4. **Flexible Workflows** - "Manage any project, big or small"
 
 Each card has a CTA: "Learn more →" or "Try it →"
 
 **Strengths:**
-- Bento-card layout is visually scannable — visitors can absorb all 4 features in seconds
+- Bento-card layout is visually scannable - visitors can absorb all 4 features in seconds
 - Each card has a clear, concise benefit tagline
 - Individual CTAs per feature allow self-directed exploration
 - Feature selection highlights AI-native capabilities (Agents, Search, Notes)
 
 **Weaknesses:**
-- Taglines are very short — no supporting detail. "One search for everything" doesn't explain *what* it searches or *why* that matters
-- CTAs are generic ("Learn more →") — should be action-specific ("Search across all your apps →")
+- Taglines are very short - no supporting detail. "One search for everything" doesn't explain *what* it searches or *why* that matters
+- CTAs are generic ("Learn more →") - should be action-specific ("Search across all your apps →")
 - No visual icons or illustrations visible in the static HTML to differentiate cards
 
 **Recommendation:**
 Add 1-2 sentences under each tagline: "Enterprise Search connects to Slack, Google Drive, and 50+ apps. Find any answer in seconds, not hours." This adds specificity and citability.
 
-**Ordering:** ✅ Correct — Feature Grid appears after Solution Overview
+**Ordering:** ✅ Correct - Feature Grid appears after Solution Overview
 
 ---
 
-### 6. How It Works — 0/10 ❌ MISSING
+### 6. How It Works - 0/10 ❌ MISSING
 
 **What should be here:**
 A simple 3-step section that shows visitors exactly how to get started:
 
-> **Step 1: Sign up free** — Create your workspace in 20 seconds with Google, Apple, or email.
-> **Step 2: Choose a template** — Pick from 10,000+ templates for your team's workflow.
-> **Step 3: Invite your team** — Share your workspace and start collaborating instantly.
+> **Step 1: Sign up free** - Create your workspace in 20 seconds with Google, Apple, or email.
+> **Step 2: Choose a template** - Pick from 10,000+ templates for your team's workflow.
+> **Step 3: Invite your team** - Share your workspace and start collaborating instantly.
 
 **Why it matters:**
-"How It Works" sections reduce perceived complexity — especially important for Notion, where the #1 user complaint is the steep learning curve. A 3-step breakdown makes the product feel accessible rather than overwhelming.
+"How It Works" sections reduce perceived complexity - especially important for Notion, where the #1 user complaint is the steep learning curve. A 3-step breakdown makes the product feel accessible rather than overwhelming.
 
 **Recommendation:**
 Add a "How It Works" section between the Feature Grid and Testimonials. Keep it to exactly 3 steps with icons/numbers. Each step should be 1 sentence max.
@@ -173,7 +173,7 @@ Add a "How It Works" section between the Feature Grid and Testimonials. Keep it 
 
 ---
 
-### 7. Testimonials / Case Studies — 10/10 ✅
+### 7. Testimonials / Case Studies - 10/10 ✅
 
 **What's there:**
 Seven named company testimonials with direct quotes:
@@ -194,14 +194,14 @@ Case study links available for deeper reading.
 - Case study links provide depth for visitors who want more
 
 **Improvements:**
-- Add individual names and titles (e.g., "Sarah Chen, VP of Engineering at Ramp") — named individuals are 22% more credible than company-only attribution
+- Add individual names and titles (e.g., "Sarah Chen, VP of Engineering at Ramp") - named individuals are 22% more credible than company-only attribution
 - Add quantified results to more testimonials (Toyota's "3x" model should be replicated)
 
-**Ordering:** ✅ Correct — Testimonials appear mid-page after features
+**Ordering:** ✅ Correct - Testimonials appear mid-page after features
 
 ---
 
-### 8. Pricing — 4/10 ⚠️ Partial
+### 8. Pricing - 4/10 ⚠️ Partial
 
 **What's there:**
 - **Tool consolidation calculator:** Shows cost savings from replacing 11 individual tools with Notion
@@ -216,11 +216,11 @@ Case study links available for deeper reading.
 - Social proof (customer logos)
 
 **Strengths:**
-- The consolidation calculator is a smart, unique approach — shows ROI rather than cost
+- The consolidation calculator is a smart, unique approach - shows ROI rather than cost
 - Pricing page itself is well-structured with clear tier differentiation
 
 **Weaknesses:**
-- No pricing information on the homepage — visitors must navigate away to discover it
+- No pricing information on the homepage - visitors must navigate away to discover it
 - "See pricing plans →" is a low-contrast link, not a prominent CTA
 - Missing "no credit card required" reassurance
 - Tool consolidation calculator lists individual tool costs but doesn't show Notion's actual price alongside them
@@ -228,19 +228,19 @@ Case study links available for deeper reading.
 **Recommendation:**
 Add a pricing anchor on the homepage: "Free forever. Paid plans from $10/seat/mo." near the consolidation calculator or final CTA. This addresses the #1 question visitors have without requiring a page exit.
 
-**Ordering:** ⚠️ Pricing section is indirect (calculator) — should include at least a pricing anchor
+**Ordering:** ⚠️ Pricing section is indirect (calculator) - should include at least a pricing anchor
 
 ---
 
-### 9. FAQ — 0/10 ❌ MISSING
+### 9. FAQ - 0/10 ❌ MISSING
 
 **What should be here:**
 5-7 frequently asked questions addressing common objections:
 - "Is Notion free?" → Yes, forever. Paid plans from $10/seat/mo.
-- "Can I import from other tools?" → Yes — Confluence, Asana, Trello, Evernote, and more.
+- "Can I import from other tools?" → Yes - Confluence, Asana, Trello, Evernote, and more.
 - "Is my data secure?" → SOC 2 Type II, GDPR, CCPA compliant. 99.9% uptime.
 - "How does Notion compare to [Confluence/Asana/etc.]?" → One platform vs. many tools.
-- "Can I try Notion AI?" → Yes — free trial of AI features included on all plans.
+- "Can I try Notion AI?" → Yes - free trial of AI features included on all plans.
 
 **Why it matters:**
 FAQs serve three purposes: (1) answer objections at the decision point, (2) reduce support ticket volume by 20-30%, (3) boost SEO with question-rich content that AI engines can cite.
@@ -252,7 +252,7 @@ Add an accordion FAQ section between the Final CTA and Footer. Use 5-7 questions
 
 ---
 
-### 10. Integrations / Compatibility — 6/10 ✅ (Weak)
+### 10. Integrations / Compatibility - 6/10 ✅ (Weak)
 
 **What's there:**
 - "Integrations" link in primary navigation → /integrations page
@@ -272,15 +272,15 @@ Add an accordion FAQ section between the Final CTA and Footer. Use 5-7 questions
 **Recommendation:**
 Add a horizontal integration logo strip (8-12 logos) with a "See all integrations →" link. Place it near the "More productivity. Fewer tools" section to reinforce the consolidation narrative.
 
-**Ordering:** ⚠️ Not present as a standalone section — should be Section 10
+**Ordering:** ⚠️ Not present as a standalone section - should be Section 10
 
 ---
 
-### 11. Final CTA — 8/10 ✅
+### 11. Final CTA - 8/10 ✅
 
 **What's there:**
-- **"Let Notion AI handle the busywork."** + "Try for free." — section near bottom
-- **"Get started on Notion"** — with app download CTAs (Mac, Mail, Calendar)
+- **"Let Notion AI handle the busywork."** + "Try for free." - section near bottom
+- **"Get started on Notion"** - with app download CTAs (Mac, Mail, Calendar)
 - **Download buttons:** Mac app, Notion Mail, Notion Calendar
 
 **Strengths:**
@@ -297,11 +297,11 @@ Add a horizontal integration logo strip (8-12 logos) with a "See all integration
 **Recommendation:**
 Simplify to one primary CTA ("Get Notion free") with a single social proof stat ("Join 100M+ users") and "No credit card required" subtext. Move download links to a separate section or the footer.
 
-**Ordering:** ✅ Correct — Final CTA is near the bottom, before Footer
+**Ordering:** ✅ Correct - Final CTA is near the bottom, before Footer
 
 ---
 
-### 12. Footer — 8/10 ✅
+### 12. Footer - 8/10 ✅
 
 **What's there:**
 - **Company:** About us, Careers, Security, Status, Terms & Privacy
@@ -321,12 +321,12 @@ Simplify to one primary CTA ("Get Notion free") with a single social proof stat 
 **Weaknesses:**
 - No trust badges (SOC 2, GDPR) in footer
 - No email newsletter signup
-- Status page link goes to external domain (notion-status.com) — could be integrated
+- Status page link goes to external domain (notion-status.com) - could be integrated
 
 **Recommendation:**
 Add security certification badges (SOC 2, ISO 27001) and a "System Status: All Systems Operational ✅" live indicator in the footer.
 
-**Ordering:** ✅ Correct — Footer is the final element
+**Ordering:** ✅ Correct - Footer is the final element
 
 ---
 
@@ -349,7 +349,7 @@ Add security certification badges (SOC 2, ISO 27001) and a "System Status: All S
 | 11 | Final CTA | Final CTA | ✅ |
 | 12 | Footer | Footer | ✅ |
 
-**Verdict:** The first 2 and last 2 sections are correctly ordered. The middle is where the page deviates from the framework — primarily due to missing Problem Statement, How It Works, and FAQ sections. The page also repeats stats/social proof in 3 separate locations (effective for reinforcement but adds length).
+**Verdict:** The first 2 and last 2 sections are correctly ordered. The middle is where the page deviates from the framework - primarily due to missing Problem Statement, How It Works, and FAQ sections. The page also repeats stats/social proof in 3 separate locations (effective for reinforcement but adds length).
 
 ---
 
@@ -357,27 +357,27 @@ Add security certification badges (SOC 2, ISO 27001) and a "System Status: All S
 
 ### 1. Add a Problem Statement section (Section 3)
 **Why:** Without articulating the pain, the solution feels less urgent. "One workspace. Zero busywork" implies the problem but doesn't name it. A 3-sentence problem block creates emotional resonance and sets up the features as the answer.
-**Impact:** High — estimated +15-20% engagement with feature sections
+**Impact:** High - estimated +15-20% engagement with feature sections
 **Difficulty:** Easy (copywriting only)
 
 ### 2. Add a "How It Works" 3-step section (Section 6)
 **Why:** Notion's #1 user complaint is complexity. A "Sign up → Choose a template → Invite your team" 3-step section makes it feel effortless. Reduces perceived barrier to entry.
-**Impact:** High — estimated +10-15% signup conversion from homepage
+**Impact:** High - estimated +10-15% signup conversion from homepage
 **Difficulty:** Easy (copy + 3 icons)
 
 ### 3. Add FAQ section to homepage (Section 9)
 **Why:** 18-question FAQ exists on /pricing but not on the homepage. Moving 5-7 key questions to the homepage captures visitors who won't navigate to /pricing. Addresses objections at the decision point.
-**Impact:** High — estimated -20% bounce rate from unanswered questions
+**Impact:** High - estimated -20% bounce rate from unanswered questions
 **Difficulty:** Easy (content exists, just needs placement)
 
 ### 4. Add integration logo grid (Section 10)
 **Why:** Integration compatibility is a top-3 consideration for enterprise buyers. A visual logo strip (Slack, Google, Jira, GitHub, Salesforce, etc.) instantly communicates ecosystem fit without requiring a click-through.
-**Impact:** Medium — especially for enterprise segment
+**Impact:** Medium - especially for enterprise segment
 **Difficulty:** Easy (logos + layout)
 
 ### 5. Add pricing anchor on homepage (Section 8)
 **Why:** "Is it free?" and "How much does it cost?" are universal visitor questions. A simple "Free forever. Plans from $10/seat/mo." on the homepage answers both without requiring navigation to /pricing.
-**Impact:** Medium — reduces price-related drop-off
+**Impact:** Medium - reduces price-related drop-off
 **Difficulty:** Easy (one line of copy)
 
 ---

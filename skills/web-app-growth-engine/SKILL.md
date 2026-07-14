@@ -174,10 +174,10 @@ https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=<url>&key=$GOOGLE
 ```
 
 Read these fields from the JSON response and cite them in the audit:
-- `lighthouseResult.categories.performance.score` — overall performance (0-1)
-- `lighthouseResult.audits['largest-contentful-paint']` — LCP (good: ≤ 2.5s)
-- `lighthouseResult.audits['interaction-to-next-paint']` — INP (good: ≤ 200ms)
-- `lighthouseResult.audits['cumulative-layout-shift']` — CLS (good: ≤ 0.1)
+- `lighthouseResult.categories.performance.score` - overall performance (0-1)
+- `lighthouseResult.audits['largest-contentful-paint']` - LCP (good: ≤ 2.5s)
+- `lighthouseResult.audits['interaction-to-next-paint']` - INP (good: ≤ 200ms)
+- `lighthouseResult.audits['cumulative-layout-shift']` - CLS (good: ≤ 0.1)
 
 ```bash
 export GOOGLE_API_KEY="your_google_api_key"
@@ -254,7 +254,7 @@ The audit follows a structured approach based on the pirate metrics framework (A
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - Structure the report as: header (title, URL, `**Date:**`) → friction score and benchmark → form analysis → authentication and trust findings → recommendations.
@@ -269,7 +269,7 @@ The audit follows a structured approach based on the pirate metrics framework (A
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Growth audit complete — saved to WEB-GROWTH-AUDIT-REPORT.md
+✅ Growth audit complete - saved to WEB-GROWTH-AUDIT-REPORT.md
 
 Signup Friction Score: [X] ([interpretation])
 

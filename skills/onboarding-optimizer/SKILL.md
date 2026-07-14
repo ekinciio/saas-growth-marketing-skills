@@ -43,7 +43,7 @@ What you'll get:
   → Prioritized improvements with estimated activation lift
   → Saved to ONBOARDING-AUDIT-REPORT.md
 
-Let's start — what's your product type?
+Let's start - what's your product type?
 """
 
 ### Demo Mode
@@ -181,7 +181,7 @@ Generate a customized onboarding improvement checklist based on the current flow
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
@@ -195,7 +195,7 @@ Generate a customized onboarding improvement checklist based on the current flow
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Onboarding audit complete — saved to ONBOARDING-AUDIT-REPORT.md
+✅ Onboarding audit complete - saved to ONBOARDING-AUDIT-REPORT.md
 
 Score: [X]/100 (Grade: [A-F])
 Recommended Pattern: [pattern name]
