@@ -23,11 +23,13 @@ TEMP_DIR=$(mktemp -d)
 
 echo ""
 echo -e "${CYAN}${BOLD}"
-echo "  ____    _    ____ ____     ____                   _   _     "
-echo " / ___|  / \  |  _ / ___|   / ___|_ __ _____      _| |_| |__  "
-echo " \___ \ / _ \ | |_\___ \  | |  _| '__/ _ \ \ /\ / / __| '_ \ "
-echo "  ___) / ___ \|  _|___) | | |_| | | | (_) \ V  V /| |_| | | |"
-echo " |____/_/   \_|_| |____/   \____|_|  \___/ \_/\_/  \__|_| |_|"
+cat <<'BANNER'
+ ____              ____     ____                   _   _
+/ ___|  __ _  __ _/ ___|   / ___|_ __ _____      _| |_| |__
+\___ \ / _` |/ _` \___ \  | |  _| '__/ _ \ \ /\ / / __| '_ \
+ ___) | (_| | (_| |___) | | |_| | | | (_) \ V  V /| |_| | | |
+|____/ \__,_|\__,_|____/   \____|_|  \___/ \_/\_/  \__|_| |_|
+BANNER
 echo ""
 echo -e "  Marketing Skills${NC}"
 echo ""
@@ -47,7 +49,7 @@ fi
 echo -e "  ${GREEN}git${NC} - found"
 
 if ! command -v python3 &> /dev/null; then
-    echo -e "${RED}Error: python3 is not installed. Please install Python 3.8+ first.${NC}"
+    echo -e "${RED}Error: python3 is not installed. Please install Python 3.9+ first.${NC}"
     exit 1
 fi
 
@@ -87,6 +89,7 @@ SKILL_COUNT=0
 for skill_dir in "$TEMP_DIR/$REPO_NAME/skills"/*/; do
     if [ -d "$skill_dir" ]; then
         skill_name=$(basename "$skill_dir")
+        rm -rf "$SKILLS_DIR/$skill_name"
         cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
         echo -e "  ${GREEN}+${NC} $skill_name"
         SKILL_COUNT=$((SKILL_COUNT + 1))
@@ -179,10 +182,10 @@ echo -e "  ${CYAN}Text Analysis${NC} (give text, get insights):"
 echo -e "    /review-sentiment analyze"
 echo -e "    /onboarding-optimizer audit"
 echo ""
-echo -e "  ${CYAN}Agents${NC} (combine multiple skills):"
-echo -e "    /growth-strategist    Full growth audit + 90-day plan"
-echo -e "    /launch-planner       Product launch playbook"
-echo -e "    /metrics-analyst      SaaS health scorecard"
+echo -e "  ${CYAN}Agents${NC} (combine multiple skills - say \"use the <name> agent\"):"
+echo -e "    growth-strategist     Full growth audit + 90-day plan"
+echo -e "    launch-planner        Product launch playbook"
+echo -e "    metrics-analyst       SaaS health scorecard"
 echo ""
 echo "---------------------------------------------------"
 echo ""
