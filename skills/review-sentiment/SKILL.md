@@ -9,6 +9,10 @@ description: >
   or wants to understand customer sentiment from reviews.
 ---
 
+# Review Sentiment Analyzer
+
+Analyze customer reviews to extract sentiment, identify themes, surface feature requests and complaints, and generate actionable summaries. Works with reviews from any source - app stores, Google, Yelp, G2, Capterra, or any text-based feedback.
+
 ## First Run
 
 When a user runs `/review-sentiment analyze`, ALWAYS display this
@@ -49,7 +53,7 @@ If the user types "demo", use these 10 sample reviews:
 "App crashes every time I try to export a PDF. Very frustrating."
 "Onboarding was smooth and the docs are great."
 "The automation features saved us hours every week."
-"Can't believe there's still no dark mode in 2026."
+"Can't believe there's still no dark mode."
 "Best tool I've found for small team project management."
 "Billing is confusing. Got charged twice last month."
 "Fast, reliable, and the API is well documented."
@@ -57,10 +61,6 @@ If the user types "demo", use these 10 sample reviews:
 
 Save the demo report as `REVIEW-SENTIMENT-REPORT-DEMO.md`.
 After showing the summary, ask: "Want to analyze your own reviews now?"
-
-# Review Sentiment Analyzer
-
-Analyze customer reviews to extract sentiment, identify themes, surface feature requests and complaints, and generate actionable summaries. Works with reviews from any source - app stores, Google, Yelp, G2, Capterra, or any text-based feedback.
 
 ## Commands
 
@@ -171,14 +171,14 @@ This has been broken for weeks."
 set up in under 10 minutes."
 
 Output:
-- Review 1: Positive (0.92) - Themes: UX/UI, Performance
-- Review 2: Negative (0.95) - Themes: Support
-- Review 3: Neutral (0.55) - Themes: Pricing, Features
-- Review 4: Negative (0.90) - Themes: Bugs, Performance
-- Review 5: Positive (0.88) - Themes: Onboarding
+- Review 1: Positive (0.82) - Themes: UX/UI
+- Review 2: Negative (0.74) - Themes: Support
+- Review 3: Positive (0.74) - Themes: Pricing
+- Review 4: Negative (0.87) - Themes: Performance, Features, Bugs
+- Review 5: Positive (0.78) - Themes: Onboarding
 
-Aggregate: 40% Positive, 40% Negative, 20% Neutral
-Top Themes: Support, Pricing, UX/UI, Bugs, Onboarding
+Aggregate: 60% Positive, 40% Negative, 0% Neutral
+Top Themes: UX/UI, Support, Pricing, Performance, Features, Bugs, Onboarding
 ```
 
 ## Limitations
@@ -195,7 +195,8 @@ Top Themes: Support, Pricing, UX/UI, Bugs, Onboarding
 - NEVER ask "should I save this?" — just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
+- Structure the report as: header (source + date), sentiment distribution,
+  per-review breakdown, theme analysis, feature requests, recommended actions.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -229,3 +230,22 @@ NEVER dump the full report in chat. The file is the deliverable.
 ## Scripts
 
 - `scripts/sentiment_analyzer.py` - Sentiment analysis engine with keyword-based classification
+
+**Run:**
+```bash
+# Analyze a file of reviews (one per line; blank lines skipped)
+python3 scripts/sentiment_analyzer.py reviews.txt
+
+# Read reviews from stdin
+cat reviews.txt | python3 scripts/sentiment_analyzer.py -
+
+# Optional star ratings: prefix a line with "rating|", e.g. "5|Great app"
+# (rating 1-5 is blended into the sentiment score as a prior)
+python3 scripts/sentiment_analyzer.py rated_reviews.txt
+
+# JSON output
+python3 scripts/sentiment_analyzer.py reviews.txt --json
+
+# Built-in demo on 10 sample reviews
+python3 scripts/sentiment_analyzer.py --demo
+```
