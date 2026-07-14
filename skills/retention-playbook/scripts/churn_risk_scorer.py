@@ -19,11 +19,18 @@ Usage:
         "has_billing_issues": True,
         "seat_count_change": -2,
         "has_exported_data": False,
+        "has_visited_cancellation_page": False,
+        "has_downgrade_inquiry": True,
         "nps_score": 6,
     }
 
     result = score_churn_risk(customer)
     print(result)
+
+Command line:
+    python3 churn_risk_scorer.py --demo            # built-in sample customers
+    python3 churn_risk_scorer.py customers.json    # a customer dict or list of dicts
+    cat customers.json | python3 churn_risk_scorer.py
 """
 
 from typing import Any, Optional
@@ -34,8 +41,10 @@ def score_churn_risk(customer: dict[str, Any]) -> dict[str, Any]:
     Calculate churn risk score from customer behavior data.
 
     Args:
-        customer: Dictionary containing customer behavior signals.
-            Required keys:
+        customer: Dictionary containing customer behavior signals. All keys
+            are optional - missing keys default to safe (no-signal) values,
+            so partial data never raises and never inflates the score.
+            Recognized keys:
                 - login_frequency_last_30d (int): Logins in the last 30 days.
                 - login_frequency_prev_30d (int): Logins in the prior 30 days.
                 - features_used_last_30d (int): Distinct features used last 30 days.
@@ -46,7 +55,10 @@ def score_churn_risk(customer: dict[str, Any]) -> dict[str, Any]:
                 - has_billing_issues (bool): Whether there are active billing issues.
                 - seat_count_change (int): Change in seat count (negative means reduction).
                 - has_exported_data (bool): Whether the customer exported data recently.
-            Optional keys:
+                - has_visited_cancellation_page (bool): Whether the customer visited
+                  the cancellation/account-closure page (CRITICAL signal).
+                - has_downgrade_inquiry (bool): Whether the customer inquired about
+                  downgrading or reducing their plan (CRITICAL signal).
                 - nps_score (int or None): Most recent NPS score (0-10).
 
     Returns:
@@ -59,22 +71,24 @@ def score_churn_risk(customer: dict[str, Any]) -> dict[str, Any]:
     """
     score = 0
     signals: list[tuple[int, str]] = []
+    critical_signal_fired = False
 
     # Login frequency decline
-    prev_logins = customer["login_frequency_prev_30d"]
-    curr_logins = customer["login_frequency_last_30d"]
+    prev_logins = customer.get("login_frequency_prev_30d", 0)
+    curr_logins = customer.get("login_frequency_last_30d", 0)
+    login_decline_points = 0
     if prev_logins > 0:
         login_decline = (prev_logins - curr_logins) / prev_logins
         if login_decline > 0.5:
-            score += 25
+            login_decline_points = 25
             signals.append((25, f"Login frequency declined {login_decline:.0%} in 30 days"))
-    elif curr_logins == 0:
-        score += 25
+    elif "login_frequency_last_30d" in customer and curr_logins == 0:
+        login_decline_points = 25
         signals.append((25, "No logins in the last 30 days (and none in prior period)"))
 
     # Feature abandonment
-    prev_features = customer["features_used_prev_30d"]
-    curr_features = customer["features_used_last_30d"]
+    prev_features = customer.get("features_used_prev_30d", 0)
+    curr_features = customer.get("features_used_last_30d", 0)
     if prev_features > 0:
         feature_decline = (prev_features - curr_features) / prev_features
         if feature_decline > 0.3:
@@ -82,54 +96,74 @@ def score_churn_risk(customer: dict[str, Any]) -> dict[str, Any]:
             signals.append((20, f"Feature usage declined {feature_decline:.0%} in 30 days"))
 
     # Days since last login
-    days_since_login = customer["last_login_days_ago"]
+    days_since_login = customer.get("last_login_days_ago", 0)
+    recency_points = 0
     if days_since_login > 14:
-        score += 20
+        recency_points = 20
         signals.append((20, f"Last login was {days_since_login} days ago (>14 days)"))
     elif days_since_login > 7:
-        score += 10
+        recency_points = 10
         signals.append((10, f"Last login was {days_since_login} days ago (7-14 days)"))
 
+    # Login decline and login recency both measure dormancy - cap their
+    # combined contribution so the same behavior is not double-counted.
+    score += min(login_decline_points + recency_points, 35)
+
     # Billing issues
-    if customer["has_billing_issues"]:
+    if customer.get("has_billing_issues", False):
         score += 15
         signals.append((15, "Active billing issues detected"))
 
     # Seat count reduction
-    seat_change = customer["seat_count_change"]
+    seat_change = customer.get("seat_count_change", 0)
     if seat_change < 0:
         score += 15
         signals.append((15, f"Seat count reduced by {abs(seat_change)}"))
 
-    # Data export
-    if customer["has_exported_data"]:
+    # Data export (CRITICAL signal)
+    if customer.get("has_exported_data", False):
         score += 20
+        critical_signal_fired = True
         signals.append((20, "Customer recently exported data"))
 
+    # Cancellation page visit (CRITICAL signal)
+    if customer.get("has_visited_cancellation_page", False):
+        score += 30
+        critical_signal_fired = True
+        signals.append((30, "Visited the cancellation page"))
+
+    # Downgrade inquiry (CRITICAL signal)
+    if customer.get("has_downgrade_inquiry", False):
+        score += 25
+        critical_signal_fired = True
+        signals.append((25, "Inquired about downgrading their plan"))
+
     # Contract renewal approaching
-    renewal_days = customer["contract_renewal_days"]
+    renewal_days = customer.get("contract_renewal_days", 999)
     if renewal_days < 30:
         score += 10
         signals.append((10, f"Contract renewal in {renewal_days} days"))
 
-    # NPS score
+    # NPS score (standard bands: 0-6 detractor, 7-8 passive, 9-10 promoter)
     nps_score: Optional[int] = customer.get("nps_score")
     if nps_score is not None:
-        if nps_score < 5:
+        if nps_score <= 6:
             score += 20
-            signals.append((20, f"NPS score is {nps_score} (detractor, below 5)"))
-        elif nps_score < 7:
+            signals.append((20, f"NPS score is {nps_score} (detractor, 0-6)"))
+        elif nps_score <= 8:
             score += 10
-            signals.append((10, f"NPS score is {nps_score} (passive, below 7)"))
+            signals.append((10, f"NPS score is {nps_score} (passive, 7-8)"))
 
-    # Support ticket activity
-    tickets = customer["support_tickets_last_90d"]
-    if tickets == 0:
-        score += 5
-        signals.append((5, "Zero support tickets in 90 days (silent customer)"))
-    elif tickets > 5:
-        score -= 5
-        signals.append((-5, f"{tickets} support tickets in 90 days (actively engaged)"))
+    # Support ticket activity. Silence only matters when usage is low -
+    # a busy customer with zero tickets is simply self-sufficient.
+    tickets = customer.get("support_tickets_last_90d")
+    if tickets is not None:
+        if tickets == 0 and curr_logins <= 5:
+            score += 5
+            signals.append((5, "Zero support tickets in 90 days with low usage (silent customer)"))
+        elif tickets > 5:
+            score -= 5
+            signals.append((-5, f"{tickets} support tickets in 90 days (actively engaged)"))
 
     # Clamp score to 0-100
     score = max(0, min(100, score))
@@ -144,9 +178,14 @@ def score_churn_risk(customer: dict[str, Any]) -> dict[str, Any]:
     else:
         risk_level = "CRITICAL"
 
+    # Any CRITICAL-severity signal floors the risk level at MEDIUM
+    # (matches the combination rules in references/churn-signals.md).
+    if critical_signal_fired and risk_level == "LOW":
+        risk_level = "MEDIUM"
+
     # Sort signals by weight descending
     signals.sort(key=lambda s: s[0], reverse=True)
-    top_signals = [desc for _, desc in signals if _ > 0]
+    top_signals = [desc for weight, desc in signals if weight > 0]
 
     # Determine recommended actions based on risk level
     recommended_actions = _get_recommendations(risk_level, signals, customer)
@@ -216,7 +255,8 @@ def main() -> None:
     print("Churn Risk Scorer - Demo")
     print("=" * 60)
 
-    # Example: High-risk customer
+    # Example: High-risk customer (detractor NPS 5 adds +20, downgrade
+    # inquiry adds +25)
     high_risk_customer = {
         "login_frequency_last_30d": 2,
         "login_frequency_prev_30d": 20,
@@ -228,10 +268,12 @@ def main() -> None:
         "has_billing_issues": True,
         "seat_count_change": -3,
         "has_exported_data": False,
-        "nps_score": 4,
+        "has_visited_cancellation_page": False,
+        "has_downgrade_inquiry": True,
+        "nps_score": 5,
     }
 
-    print("\nCustomer A - Declining engagement with billing issues")
+    print("\nCustomer A - Declining engagement, billing issues, downgrade inquiry")
     print("-" * 60)
     result = score_churn_risk(high_risk_customer)
     _print_result(result)
@@ -248,6 +290,8 @@ def main() -> None:
         "has_billing_issues": False,
         "seat_count_change": 2,
         "has_exported_data": False,
+        "has_visited_cancellation_page": False,
+        "has_downgrade_inquiry": False,
         "nps_score": 9,
     }
 
@@ -256,7 +300,7 @@ def main() -> None:
     result = score_churn_risk(low_risk_customer)
     _print_result(result)
 
-    # Example: Medium-risk customer
+    # Example: Medium-risk customer (passive NPS 7 adds +10)
     medium_risk_customer = {
         "login_frequency_last_30d": 10,
         "login_frequency_prev_30d": 15,
@@ -268,12 +312,37 @@ def main() -> None:
         "has_billing_issues": False,
         "seat_count_change": 0,
         "has_exported_data": True,
-        "nps_score": 6,
+        "has_visited_cancellation_page": False,
+        "has_downgrade_inquiry": False,
+        "nps_score": 7,
     }
 
     print("\nCustomer C - Some warning signs")
     print("-" * 60)
     result = score_churn_risk(medium_risk_customer)
+    _print_result(result)
+
+    # Example: Otherwise healthy customer who visited the cancellation page.
+    # The CRITICAL signal floors the risk level at MEDIUM.
+    cancellation_visitor = {
+        "login_frequency_last_30d": 18,
+        "login_frequency_prev_30d": 19,
+        "features_used_last_30d": 6,
+        "features_used_prev_30d": 6,
+        "support_tickets_last_90d": 2,
+        "last_login_days_ago": 2,
+        "contract_renewal_days": 90,
+        "has_billing_issues": False,
+        "seat_count_change": 0,
+        "has_exported_data": False,
+        "has_visited_cancellation_page": True,
+        "has_downgrade_inquiry": False,
+        "nps_score": 9,
+    }
+
+    print("\nCustomer D - Healthy usage but visited the cancellation page")
+    print("-" * 60)
+    result = score_churn_risk(cancellation_visitor)
     _print_result(result)
 
 
@@ -291,5 +360,47 @@ def _print_result(result: dict[str, Any]) -> None:
     print()
 
 
+def _cli() -> None:
+    """Command-line entry point: JSON file, stdin, or --demo."""
+    import argparse
+    import json
+    import sys
+
+    parser = argparse.ArgumentParser(
+        description="Churn risk scorer",
+        epilog="Pass a JSON file containing one customer dict or a list of "
+               "customer dicts (see module docstring for recognized keys).",
+    )
+    parser.add_argument(
+        "input", nargs="?",
+        help="Path to a JSON file with customer data (or '-' for stdin)",
+    )
+    parser.add_argument(
+        "--demo", action="store_true", help="Run with built-in sample customers"
+    )
+    args = parser.parse_args()
+
+    if args.demo or (args.input is None and sys.stdin.isatty()):
+        main()
+        return
+
+    if args.input is None or args.input == "-":
+        payload = json.load(sys.stdin)
+    else:
+        with open(args.input, "r", encoding="utf-8") as fh:
+            payload = json.load(fh)
+
+    customers = payload if isinstance(payload, list) else [payload]
+
+    print("=" * 60)
+    print("Churn Risk Scorer")
+    print("=" * 60)
+    for idx, customer in enumerate(customers, 1):
+        label = customer.get("name") or customer.get("customer_id") or f"Customer {idx}"
+        print(f"\n{label}")
+        print("-" * 60)
+        _print_result(score_churn_risk(customer))
+
+
 if __name__ == "__main__":
-    main()
+    _cli()

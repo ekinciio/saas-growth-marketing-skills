@@ -152,9 +152,11 @@ The aha moment is the specific action or experience that makes a user understand
 |-------|------------------|-------------|
 | Freemium (unlimited free tier) | 2-3% | 5%+ |
 | Free trial (14-day, no card) | 8-12% | 18%+ |
-| Free trial (14-day, card required) | 25-40% | 50%+ |
+| Free trial (14-day, card required) | 45-50% | 55%+ |
 | Reverse trial (start paid, downgrade to free) | 15-20% | 30%+ |
 | Usage-based free tier | 4-6% | 10%+ |
+
+Note: no-card / opt-in trial conversion is strongly bimodal - products cluster either well below the ~8-12% median or well above it (20%+), depending on trial design and buyer intent, so compare against products with a similar motion. Sources: ChartMogul SaaS Conversion Report, ProductLed, Benchmarkit 2025.
 
 ## Expansion Revenue Patterns
 
@@ -176,4 +178,4 @@ Expansion revenue comes from existing customers paying more over time. Strong PL
 | Growth stage ($5M-$50M ARR) | 25-35% |
 | Scale stage ($50M+ ARR) | 35-50% |
 
-Companies with NRR above 120% are typically in the top quartile of PLG performance and can sustain growth even with moderate new customer acquisition.
+Companies with NRR above 120% are now considered best-in-class (not merely top-quartile) among PLG performers and can sustain growth even with moderate new customer acquisition.

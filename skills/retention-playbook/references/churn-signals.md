@@ -77,7 +77,7 @@ These signals reflect how the customer interacts with your company outside the p
 ### Declining NPS or CSAT Scores
 
 - **What to track:** Changes in NPS or CSAT responses over time
-- **Warning threshold:** NPS score below 7 (passive or detractor) or a drop of 3+ points
+- **Warning threshold:** NPS score of 6 or below = detractor; 7-8 = passive; also flag a drop of 3+ points
 - **Severity:** HIGH
 - **Detection method:** Survey response tracking
 - **Response:** Close-the-loop call to address specific feedback; escalate detractors
@@ -191,12 +191,21 @@ These signals represent deliberate actions that often precede a cancellation dec
 | Seat reduction | Behavioral | HIGH | +15 |
 | Integration removal | Behavioral | HIGH | +15 |
 | Feature abandonment (>30%) | Usage | MEDIUM-HIGH | +20 |
-| NPS detractor (<7) | Engagement | HIGH | +10 to +20 |
+| NPS detractor (≤6) / passive (7-8) | Engagement | HIGH | +20 / +10 |
 | Reduced session duration | Usage | MEDIUM | +10 |
 | No email engagement | Engagement | MEDIUM | +10 |
 | Contract renewal <30d | Account | MEDIUM | +10 |
 | Zero support tickets + low use | Engagement | LOW-MEDIUM | +5 |
 | No community participation | Engagement | LOW | +5 |
+
+The automated scorer in `scripts/churn_risk_scorer.py` covers: cancellation
+page visit, data export, downgrade inquiry, declining logins (plus login
+recency, with the combined dormancy contribution capped at +35), feature
+abandonment, billing issues, seat reduction, NPS detractor/passive, contract
+renewal <30d, and zero-tickets-with-low-usage. Not covered (track manually or
+via your CRM/analytics stack): skipped onboarding, integration removal,
+reduced session duration, no email engagement, budget/stakeholder changes,
+invoice disputes, competitor research, and community participation.
 
 ## Signal Combination Rules
 
