@@ -42,10 +42,10 @@ GIVE ME TEXT — I'LL ANALYZE:
   /review-sentiment analyze          Sentiment + theme extraction
   /onboarding-optimizer audit        Onboarding flow scoring
 
-AGENTS (combine multiple skills):
-  /growth-strategist                 Full growth audit → 90-day plan
-  /launch-planner                    Product launch playbook
-  /metrics-analyst                   SaaS health scorecard
+AGENTS (combine multiple skills — say "use the <name> agent"):
+  growth-strategist                  Full growth audit → 90-day plan
+  launch-planner                     Product launch playbook
+  metrics-analyst                    SaaS health scorecard
 
 ─────────────────────────────────────
 Every skill auto-saves a report file (.md). No extra steps needed.

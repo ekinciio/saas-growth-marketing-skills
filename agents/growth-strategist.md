@@ -3,7 +3,9 @@ name: growth-strategist
 description: >
   Senior growth strategist agent that combines multiple skills to create
   comprehensive growth plans. Orchestrates geo-seo-auditor, aso-optimizer,
-  landing-page-cro, and other growth skills for holistic analysis.
+  landing-page-cro, and other growth skills for holistic analysis. Use when
+  the user asks for a full growth audit, an overall growth strategy, a
+  90-day growth plan, or wants several growth dimensions analyzed together.
 model: inherit
 tools: Read, Write, Bash
 skills:

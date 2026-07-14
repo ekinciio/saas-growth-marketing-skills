@@ -84,23 +84,23 @@ description: >
 
 ### Python Script Requirements
 
-- **Python 3.8+ compatible** - No match/case (3.10+), no walrus operator issues
+- **Python 3.9+ compatible** - No match/case (3.10+); when using modern annotations (`dict[str, int]`, `X | None`), add `from __future__ import annotations` at the top of the module
 - **Type hints** on all function parameters and return types
 - **Docstrings** on all public functions
 - **Standalone execution** - Must include `if __name__ == "__main__":` with demo data
 - **Dict return type** - All main functions must return JSON-serializable dicts
 - **Error handling** - Use try/except with meaningful error messages
-- **No extra dependencies** beyond what's in `requirements.txt` (requests, beautifulsoup4, lxml)
+- **No extra dependencies** beyond what's in `requirements.txt` (requests, beautifulsoup4)
 
 Example structure:
 
 ```python
 """One-line description of what this script does."""
 
-from typing import Dict, List, Optional
+from __future__ import annotations
 
 
-def analyze(data: Dict) -> Dict:
+def analyze(data: dict) -> dict:
     """Analyze the provided data and return results.
 
     Args:
@@ -114,7 +114,7 @@ def analyze(data: Dict) -> Dict:
     return results
 
 
-def format_report(results: Dict) -> str:
+def format_report(results: dict) -> str:
     """Format results into a human-readable report.
 
     Args:

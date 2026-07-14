@@ -2,7 +2,9 @@
 name: metrics-analyst
 description: >
   SaaS metrics analyst agent that evaluates business health using
-  subscription metrics, retention data, and growth indicators.
+  subscription metrics, retention data, and growth indicators. Use when the
+  user wants a complete SaaS health assessment, a metrics review across
+  revenue, retention, funnel, and pricing, or an A-F business health grade.
 model: inherit
 tools: Read, Write, Bash
 skills:

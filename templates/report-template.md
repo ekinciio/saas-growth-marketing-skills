@@ -63,6 +63,6 @@ by any skill MUST follow this structure.
 
 ## Usage
 
-All skills reference this template when generating reports. The structure
-ensures consistency across all 15 skills while allowing each skill to
+All skills follow this structure when generating reports. The structure
+ensures consistency across all skills while allowing each skill to
 customize the "Full Analysis" section for its specific dimensions.
