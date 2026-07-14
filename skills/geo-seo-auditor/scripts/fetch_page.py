@@ -8,6 +8,7 @@ structured data, robots.txt rules, and sitemap availability.
 import json
 import re
 import sys
+import time
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 
@@ -25,8 +26,11 @@ except ImportError:
 DEFAULT_TIMEOUT = 15
 USER_AGENT = (
     "Mozilla/5.0 (compatible; GEOSEOAuditor/1.0; "
-    "+https://github.com/geo-seo-auditor)"
+    "+https://github.com/ekinciio/saas-growth-marketing-skills)"
 )
+
+# Delay between sequential requests to the same site (politeness)
+REQUEST_DELAY_SECONDS = 1
 
 
 def fetch_html(url: str, timeout: int = DEFAULT_TIMEOUT) -> Tuple[str, int]:
@@ -134,15 +138,25 @@ def detect_schema_markup(soup: BeautifulSoup) -> List[Dict[str, Any]]:
         A list of parsed JSON-LD objects found on the page.
     """
     schemas: List[Dict[str, Any]] = []
+
+    def collect(data: Any) -> None:
+        """Flatten lists and @graph wrappers so each schema is counted."""
+        if isinstance(data, list):
+            for item in data:
+                collect(item)
+        elif isinstance(data, dict):
+            graph = data.get("@graph")
+            if isinstance(graph, list):
+                for item in graph:
+                    collect(item)
+            else:
+                schemas.append(data)
+
     script_tags = soup.find_all("script", attrs={"type": "application/ld+json"})
     for script in script_tags:
         if script.string:
             try:
-                data = json.loads(script.string)
-                if isinstance(data, list):
-                    schemas.extend(data)
-                else:
-                    schemas.append(data)
+                collect(json.loads(script.string))
             except (json.JSONDecodeError, TypeError):
                 continue
     return schemas
@@ -170,25 +184,63 @@ def fetch_robots_txt(url: str, timeout: int = DEFAULT_TIMEOUT) -> Optional[str]:
         return None
 
 
-def check_sitemap(url: str, timeout: int = DEFAULT_TIMEOUT) -> Dict[str, Any]:
-    """Check for sitemap.xml availability.
+def check_sitemap(
+    url: str,
+    timeout: int = DEFAULT_TIMEOUT,
+    robots_txt: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Check for sitemap availability.
+
+    Checks robots.txt 'Sitemap:' declarations first, then probes the
+    conventional /sitemap.xml and /sitemap_index.xml locations. Uses
+    HEAD with a GET fallback for servers that reject HEAD (e.g. 405).
 
     Args:
         url: Any URL on the target site.
         timeout: Request timeout in seconds.
+        robots_txt: Optional robots.txt content to scan for Sitemap: lines.
 
     Returns:
         Dictionary with 'exists' (bool) and 'url' (str) keys.
     """
     parsed = urlparse(url)
-    sitemap_url = f"{parsed.scheme}://{parsed.netloc}/sitemap.xml"
-    try:
-        headers = {"User-Agent": USER_AGENT}
-        response = requests.head(sitemap_url, headers=headers, timeout=timeout, allow_redirects=True)
-        exists = response.status_code == 200
-        return {"exists": exists, "url": sitemap_url}
-    except requests.RequestException:
-        return {"exists": False, "url": sitemap_url}
+    base = f"{parsed.scheme}://{parsed.netloc}"
+    headers = {"User-Agent": USER_AGENT}
+
+    # 1. Sitemap declarations in robots.txt are authoritative
+    if robots_txt:
+        for line in robots_txt.splitlines():
+            stripped = line.strip()
+            if stripped.lower().startswith("sitemap:"):
+                declared = stripped.split(":", 1)[1].strip()
+                if declared:
+                    return {"exists": True, "url": declared}
+
+    # 2. Probe conventional locations
+    def url_exists(candidate: str) -> bool:
+        try:
+            response = requests.head(
+                candidate, headers=headers, timeout=timeout, allow_redirects=True
+            )
+            if response.status_code == 200:
+                return True
+            if response.status_code in (403, 405, 501):
+                # Server rejects HEAD; retry with GET
+                response = requests.get(
+                    candidate, headers=headers, timeout=timeout, allow_redirects=True
+                )
+                return response.status_code == 200
+            return False
+        except requests.RequestException:
+            return False
+
+    candidates = [f"{base}/sitemap.xml", f"{base}/sitemap_index.xml"]
+    for candidate in candidates:
+        if url_exists(candidate):
+            return {"exists": True, "url": candidate}
+        time.sleep(REQUEST_DELAY_SECONDS)
+
+    return {"exists": False, "url": candidates[0]}
 
 
 def check_llmstxt(url: str, timeout: int = DEFAULT_TIMEOUT) -> Dict[str, Any]:
@@ -289,18 +341,23 @@ def fetch_page(url: str, timeout: int = DEFAULT_TIMEOUT) -> Dict[str, Any]:
     except Exception as e:
         result["errors"].append(f"Word count failed: {str(e)}")
 
-    # Fetch supplementary files
+    # Fetch supplementary files (with politeness delays between requests)
     try:
+        time.sleep(REQUEST_DELAY_SECONDS)
         result["robots_txt"] = fetch_robots_txt(url, timeout=timeout)
     except Exception as e:
         result["errors"].append(f"robots.txt fetch failed: {str(e)}")
 
     try:
-        result["sitemap"] = check_sitemap(url, timeout=timeout)
+        time.sleep(REQUEST_DELAY_SECONDS)
+        result["sitemap"] = check_sitemap(
+            url, timeout=timeout, robots_txt=result.get("robots_txt")
+        )
     except Exception as e:
         result["errors"].append(f"Sitemap check failed: {str(e)}")
 
     try:
+        time.sleep(REQUEST_DELAY_SECONDS)
         result["llmstxt"] = check_llmstxt(url, timeout=timeout)
     except Exception as e:
         result["errors"].append(f"llms.txt check failed: {str(e)}")

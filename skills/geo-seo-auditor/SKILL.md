@@ -4,13 +4,18 @@ description: >
   Audit websites for AI search engine visibility (GEO - Generative Engine Optimization).
   Analyzes citability score, AI crawler access, llms.txt compliance, brand authority signals,
   and platform-specific optimization for ChatGPT, Claude, Perplexity, and Google AI Overviews.
-  Use when the user mentions GEO, AI SEO, AI search visibility, citability, llms.txt,
-  AI crawler, or wants to optimize content for AI-powered search engines.
+  Use when the user mentions GEO, AI SEO, generative engine optimization, AI search visibility,
+  citability, llms.txt, AI crawler, robots.txt, AI Overviews, ChatGPT search, wants to
+  get cited by AI, or wants to optimize content for AI-powered search engines.
 ---
+
+# GEO SEO Auditor
+
+Comprehensive audit tool for Generative Engine Optimization (GEO) and traditional SEO. Evaluates how well a website is positioned to be cited by AI-powered search engines including ChatGPT, Claude, Perplexity, and Google AI Overviews.
 
 ## First Run
 
-When a user runs any geo-seo-auditor command for the first time, display
+When a user runs any geo-seo-auditor command, display
 this intro before starting execution:
 
 """
@@ -21,7 +26,7 @@ What I'll do:
 
 What you'll get:
   → AI visibility score (0-100)
-  → AI crawler access status (14 crawlers checked)
+  → AI crawler access status (21 crawler tokens checked)
   → Citability analysis of key content blocks
   → Top 5 prioritized fixes
 
@@ -32,10 +37,6 @@ Starting...
 """
 
 Then proceed immediately. Do not wait for user confirmation.
-
-# GEO SEO Auditor
-
-Comprehensive audit tool for Generative Engine Optimization (GEO) and traditional SEO. Evaluates how well a website is positioned to be cited by AI-powered search engines including ChatGPT, Claude, Perplexity, and Google AI Overviews.
 
 ## Commands
 
@@ -75,10 +76,11 @@ The full audit (`/geo-seo-auditor audit <url>`) follows a 6-step process:
 - Assess backlink profile strength indicators
 
 ### Step 4: Platform Analysis
-- ChatGPT: GPTBot access, content structure for citation
-- Claude: ClaudeBot access, passage clarity and factual density
-- Perplexity: PerplexityBot access, source attribution readiness
-- Google AI Overviews: Google-Extended status, featured snippet optimization
+- ChatGPT: GPTBot/OAI-SearchBot/ChatGPT-User access, content structure for citation
+- Claude: ClaudeBot/Claude-SearchBot/Claude-User access, passage clarity and factual density
+- Perplexity: PerplexityBot/Perplexity-User access, source attribution readiness
+- Google AI Overviews: Googlebot access + snippet controls (Google-Extended only governs Gemini training/grounding, not AI Overviews)
+- Bing Copilot: bingbot access (powers both Bing Search and Copilot answers)
 - Generate platform-specific optimization recommendations
 
 ### Step 5: Scoring
@@ -118,6 +120,12 @@ The full audit (`/geo-seo-auditor audit <url>`) follows a 6-step process:
 
 Runs the complete 6-step audit. This is the most thorough analysis and covers every dimension in the scoring methodology. Typical runtime is 2-4 minutes depending on page complexity.
 
+**How to run:** Execute the bundled scripts in sequence and combine their JSON output:
+1. `python3 scripts/fetch_page.py <url>` — metadata, headings, schema, robots.txt, sitemap, llms.txt discovery
+2. `python3 scripts/citability_scorer.py <url>` — per-block citability scores
+3. `python3 scripts/crawler_checker.py <url>` — AI crawler access (interpret with `references/ai-crawlers.md`)
+4. `python3 scripts/llmstxt_generator.py <url>` — llms.txt validation/generation (interpret with `references/llmstxt-spec.md`)
+
 **Output includes:**
 - Overall GEO Readiness Score
 - Dimension-by-dimension breakdown
@@ -130,6 +138,8 @@ Runs the complete 6-step audit. This is the most thorough analysis and covers ev
 **Report:** Save output to `GEO-AUDIT-REPORT.md`
 
 ### `/geo-seo-auditor quick <url>`
+
+**How to run:** `python3 scripts/fetch_page.py <url>` plus `python3 scripts/crawler_checker.py <url>`, then estimate the score from their output.
 
 A rapid 60-second snapshot that covers the essentials:
 - Overall GEO Readiness Score (estimated)
@@ -145,6 +155,8 @@ Use this when you need a fast overview before diving deeper.
 ### `/geo-seo-auditor citability <url>`
 
 Deep-dive into content citability. Analyzes every content block on the page and scores each one for AI citation readiness.
+
+**How to run:** `python3 scripts/citability_scorer.py <url>` (also accepts a local HTML file path). Interpret scores and write rewrite suggestions using `references/citability-guide.md`.
 
 **Scoring criteria per block (0-100):**
 - Structure clarity (headers, lists, definitions): 25 points
@@ -163,25 +175,28 @@ Deep-dive into content citability. Analyzes every content block on the page and 
 
 ### `/geo-seo-auditor crawlers <url>`
 
-Checks the site's robots.txt against 14+ known AI crawlers.
+Checks the site's robots.txt against 21 known AI crawler tokens.
 
-**Crawlers checked:**
-- GPTBot (OpenAI - ChatGPT training)
-- OAI-SearchBot (OpenAI - ChatGPT search)
-- ClaudeBot (Anthropic - Claude)
-- PerplexityBot (Perplexity AI)
-- Google-Extended (Google AI/Gemini)
-- Bytespider (TikTok/ByteDance)
+**How to run:** `python3 scripts/crawler_checker.py <url>` (bare domains like `example.com` work; also accepts a local robots.txt file path). Interpret results with `references/ai-crawlers.md`.
+
+**Tokens checked:**
+- GPTBot, OAI-SearchBot, ChatGPT-User (OpenAI)
+- ClaudeBot, Claude-SearchBot, Claude-User (Anthropic)
+- PerplexityBot, Perplexity-User (Perplexity)
+- Google-Extended, GoogleOther, Google-CloudVertexBot (Google)
+- bingbot (Microsoft - Bing Search + Copilot)
+- meta-externalagent, meta-externalfetcher (Meta)
+- Applebot-Extended (Apple)
+- Amazonbot (Amazon)
+- Bytespider (ByteDance)
 - CCBot (Common Crawl)
-- Amazonbot (Amazon/Alexa)
-- FacebookBot (Meta)
-- Applebot-Extended (Apple Intelligence)
-- Cohere-AI (Cohere)
-- Diffbot (Diffbot)
-- Timpibot (Timpi search)
-- Webz.io (Webz data platform)
+- DuckAssistBot (DuckDuckGo)
+- MistralAI-User (Mistral)
+- cohere-training-data-crawler (Cohere)
 
-**Status per crawler:** allowed, blocked, or not_mentioned
+**Status per crawler:** allowed (explicit), allowed (default via `*`), blocked, partially blocked, or not mentioned
+
+**Note:** Google-Extended and Applebot-Extended are training opt-out tokens, not crawlers. Blocking Google-Extended only opts out of Gemini training/grounding — it does NOT affect Google Search, AI Overviews, or AI Mode.
 
 **Output includes:**
 - Status table for all crawlers
@@ -192,17 +207,18 @@ Checks the site's robots.txt against 14+ known AI crawlers.
 
 ### `/geo-seo-auditor llmstxt <url>`
 
-Checks for the presence and validity of an llms.txt file at the site root.
+Checks for the presence and validity of an llms.txt file at the site root. llms.txt is a Markdown-format proposal (llmstxt.org) with debated adoption — treat it as a low-cost optimization, not a requirement.
+
+**How to run:** `python3 scripts/llmstxt_generator.py <url>`. Interpret results with `references/llmstxt-spec.md`.
 
 **If llms.txt exists:**
-- Validates format against the specification
-- Checks required and optional fields
-- Identifies missing or malformed entries
+- Validates the Markdown format: required H1 title, recommended blockquote summary, H2 sections with `- [title](url)` link lists, Optional-section semantics
+- Flags malformed link entries and unreasonable length
 - Suggests improvements
 
 **If llms.txt is missing:**
-- Generates a recommended llms.txt based on site structure
-- Explains the benefits of adding one
+- Generates a recommended llms.txt (H1 + blockquote summary + link-list sections) based on site structure
+- Explains the benefits and the adoption caveats
 - Provides implementation instructions
 
 **Report:** Save output to `GEO-LLMSTXT-REPORT.md`
@@ -231,41 +247,55 @@ Scans for brand authority signals across platforms commonly indexed by AI engine
 
 Generates platform-specific optimization recommendations for each major AI search engine.
 
+**How to run:** `python3 scripts/crawler_checker.py <url>` for the access portion, then apply the platform guidance in `references/ai-crawlers.md`.
+
 **Platforms covered:**
 
 **ChatGPT:**
-- GPTBot and OAI-SearchBot crawler access
+- GPTBot (training), OAI-SearchBot (search), and ChatGPT-User (user fetches) crawler access
 - Content structure preferences
 - Citation format optimization
 
 **Claude:**
-- ClaudeBot crawler access
+- ClaudeBot (training), Claude-SearchBot (search), and Claude-User (user fetches) crawler access
 - Passage clarity and factual density
 - Source attribution readiness
 
 **Perplexity:**
-- PerplexityBot crawler access
+- PerplexityBot (search) and Perplexity-User (user fetches) crawler access
 - Inline citation optimization
 - Source snippet formatting
 
 **Google AI Overviews:**
-- Google-Extended crawler status
+- Googlebot access and snippet controls (nosnippet, data-nosnippet, max-snippet, noindex) — these govern AI Overviews/AI Mode inclusion
+- Google-Extended status (Gemini training/grounding opt-out only; does not affect AI Overviews)
 - Featured snippet optimization
 - Structured data for AI extraction
 
+**Bing Copilot:**
+- bingbot crawler access (one crawler powers both Bing Search and Copilot answers; blocking it removes Copilot visibility)
+- Bing Webmaster Tools indexing status
+- Clear headings and answer-style passages for Copilot citation
+
 **Report:** Save output to `GEO-PLATFORMS-REPORT.md`
 
-## API Integrations (Optional)
+## API Integrations (Optional, Model-Driven)
 
 This skill works out of the box by fetching public web pages. However, some analysis dimensions (page speed, backlinks, search performance) cannot be measured from a simple HTML fetch alone.
 
-If the user provides their own API keys, use them to enrich the audit with real performance and search data.
+None of the bundled scripts call these APIs. This is **model-driven enrichment**: when these environment variables are set, Claude should call the APIs directly (e.g. via `curl`) using the endpoints documented below and merge the results into the audit.
 
 | Environment Variable | Service | What It Unlocks |
 |---------------------|---------|-----------------|
-| `GOOGLE_API_KEY` | Google PageSpeed Insights API | Real Core Web Vitals scores (LCP, FID, CLS), mobile/desktop performance data |
-| `GOOGLE_SEARCH_CONSOLE_JSON` | Google Search Console API | Actual search impressions, clicks, CTR, average position for the audited URL |
+| `GOOGLE_API_KEY` | Google PageSpeed Insights API | Real Core Web Vitals scores (LCP, INP, CLS), mobile/desktop performance data |
+| `GOOGLE_SEARCH_CONSOLE_JSON` | Google Search Console API | Actual search impressions, clicks, CTR, average position for the audited URL (requires OAuth/service-account flow) |
 | `AHREFS_API_KEY` | Ahrefs API | Backlink count, referring domains, Domain Rating, organic keyword data |
+
+**PageSpeed Insights endpoint** (works with a plain API key):
+```bash
+curl -s "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=<url>&key=$GOOGLE_API_KEY&strategy=mobile"
+```
+Read Core Web Vitals from `loadingExperience.metrics` (field data: `LARGEST_CONTENTFUL_PAINT_MS`, `INTERACTION_TO_NEXT_PAINT`, `CUMULATIVE_LAYOUT_SHIFT_SCORE`) and the Lighthouse performance score from `lighthouseResult.categories.performance.score`. Note: FID was retired in March 2024; INP is the responsiveness metric.
 
 **How to set up:**
 ```bash
@@ -280,8 +310,8 @@ export AHREFS_API_KEY="your_ahrefs_api_key"
 ```
 
 **Behavior:**
-- If API keys are set → Enrich the audit with real performance and search data
-- If not set → Use HTML-only analysis (current default behavior, no change)
+- If API keys are set → Claude calls the APIs above and enriches the audit with real performance and search data
+- If not set → Use HTML-only analysis (default behavior, no change)
 - Each integration is independent - you can set one without the others
 
 **When data is limited:** If the audit cannot measure page speed accurately or lacks backlink data, inform the user which API keys would enrich the results. Example:
@@ -294,7 +324,6 @@ export AHREFS_API_KEY="your_ahrefs_api_key"
 - NEVER ask "should I save this?" — just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it (latest analysis wins).
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -334,7 +363,7 @@ The Python scripts in the `scripts/` directory require the following packages:
 Install with: `pip install requests beautifulsoup4 lxml`
 
 ### Rate Limiting
-When auditing multiple pages, allow at least 2 seconds between requests to avoid being rate-limited by the target server. The scripts include built-in delays for multi-page operations.
+When auditing multiple pages, allow at least 2 seconds between requests to avoid being rate-limited by the target server. `fetch_page.py` and `llmstxt_generator.py` include a built-in 1-second delay between their sequential requests to the same site.
 
 ### Data Privacy
 This tool only reads publicly available information. It does not store, cache, or transmit any data from audited websites beyond the current session.

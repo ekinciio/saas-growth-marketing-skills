@@ -2,10 +2,12 @@
 crawler_checker.py - Check AI crawler access via robots.txt.
 
 Parses a site's robots.txt file and determines the access status
-for 14+ known AI crawlers. Reports whether each crawler is allowed,
-blocked, or not mentioned, and generates recommendations.
+for 21 known AI crawler tokens. Reports whether each crawler is
+explicitly allowed, allowed by default (wildcard), blocked, or
+partially blocked, and generates recommendations.
 """
 
+import os
 import re
 import sys
 from dataclasses import dataclass, field
@@ -22,112 +24,180 @@ except ImportError:
     sys.exit(1)
 
 
-# Known AI crawlers with metadata
+# Known AI crawler tokens with metadata
 AI_CRAWLERS = [
     {
         "user_agent": "GPTBot",
         "platform": "OpenAI",
-        "purpose": "GPT model training data collection",
+        "purpose": "Model training",
         "category": "training",
         "priority": "high",
     },
     {
         "user_agent": "OAI-SearchBot",
         "platform": "OpenAI",
-        "purpose": "ChatGPT real-time web search",
+        "purpose": "ChatGPT search indexing",
         "category": "search",
+        "priority": "high",
+    },
+    {
+        "user_agent": "ChatGPT-User",
+        "platform": "OpenAI",
+        "purpose": "User-initiated fetches / GPT Actions",
+        "category": "user-fetch",
         "priority": "high",
     },
     {
         "user_agent": "ClaudeBot",
         "platform": "Anthropic",
-        "purpose": "Claude AI training and web features",
+        "purpose": "Model training",
         "category": "training",
         "priority": "high",
     },
     {
-        "user_agent": "PerplexityBot",
-        "platform": "Perplexity AI",
-        "purpose": "Perplexity search and answer engine",
+        "user_agent": "Claude-SearchBot",
+        "platform": "Anthropic",
+        "purpose": "Claude search indexing",
         "category": "search",
         "priority": "high",
+    },
+    {
+        "user_agent": "Claude-User",
+        "platform": "Anthropic",
+        "purpose": "User-initiated fetches",
+        "category": "user-fetch",
+        "priority": "medium",
+    },
+    {
+        "user_agent": "PerplexityBot",
+        "platform": "Perplexity",
+        "purpose": "Search indexing (not training)",
+        "category": "search",
+        "priority": "high",
+    },
+    {
+        "user_agent": "Perplexity-User",
+        "platform": "Perplexity",
+        "purpose": "User-initiated fetches",
+        "category": "user-fetch",
+        "priority": "medium",
     },
     {
         "user_agent": "Google-Extended",
         "platform": "Google",
-        "purpose": "Gemini AI and AI Overviews",
+        "purpose": (
+            "Gemini training + grounding opt-out token (not a crawler; "
+            "does NOT govern AI Overviews or Search inclusion)"
+        ),
+        "category": "training-control",
+        "priority": "high",
+    },
+    {
+        "user_agent": "GoogleOther",
+        "platform": "Google",
+        "purpose": "R&D crawls",
+        "category": "other",
+        "priority": "low",
+    },
+    {
+        "user_agent": "Google-CloudVertexBot",
+        "platform": "Google",
+        "purpose": "Vertex AI site ingestion",
+        "category": "training",
+        "priority": "medium",
+    },
+    {
+        "user_agent": "bingbot",
+        "platform": "Microsoft",
+        "purpose": "Bing Search + Copilot answers (blocking removes Copilot visibility)",
         "category": "search",
         "priority": "high",
     },
     {
+        "user_agent": "meta-externalagent",
+        "platform": "Meta",
+        "purpose": "AI training + indexing (replaces FacebookBot)",
+        "category": "training",
+        "priority": "medium",
+    },
+    {
+        "user_agent": "meta-externalfetcher",
+        "platform": "Meta",
+        "purpose": "User-initiated link fetches",
+        "category": "user-fetch",
+        "priority": "low",
+    },
+    {
+        "user_agent": "Applebot-Extended",
+        "platform": "Apple",
+        "purpose": (
+            "Apple Intelligence training opt-out token "
+            "(doesn't crawl; Applebot does the crawling)"
+        ),
+        "category": "training-control",
+        "priority": "medium",
+    },
+    {
+        "user_agent": "Amazonbot",
+        "platform": "Amazon",
+        "purpose": "Alexa/AI answers",
+        "category": "search",
+        "priority": "medium",
+    },
+    {
         "user_agent": "Bytespider",
-        "platform": "ByteDance/TikTok",
-        "purpose": "AI model training and content indexing",
+        "platform": "ByteDance",
+        "purpose": "Model training (poor robots.txt compliance)",
         "category": "training",
         "priority": "medium",
     },
     {
         "user_agent": "CCBot",
         "platform": "Common Crawl",
-        "purpose": "Open web archive for AI training datasets",
+        "purpose": "Open corpus widely used for AI training",
         "category": "training",
         "priority": "medium",
     },
     {
-        "user_agent": "Amazonbot",
-        "platform": "Amazon",
-        "purpose": "Alexa AI answers and Amazon search",
+        "user_agent": "DuckAssistBot",
+        "platform": "DuckDuckGo",
+        "purpose": "DuckAssist AI answers",
         "category": "search",
         "priority": "medium",
     },
     {
-        "user_agent": "FacebookBot",
-        "platform": "Meta",
-        "purpose": "Meta AI features and link previews",
-        "category": "training",
+        "user_agent": "MistralAI-User",
+        "platform": "Mistral",
+        "purpose": "Le Chat citation fetches",
+        "category": "user-fetch",
         "priority": "medium",
     },
     {
-        "user_agent": "Applebot-Extended",
-        "platform": "Apple",
-        "purpose": "Apple Intelligence and Siri AI features",
-        "category": "search",
-        "priority": "medium",
-    },
-    {
-        "user_agent": "cohere-ai",
+        "user_agent": "cohere-training-data-crawler",
         "platform": "Cohere",
-        "purpose": "Enterprise AI model training",
-        "category": "training",
-        "priority": "low",
-    },
-    {
-        "user_agent": "Diffbot",
-        "platform": "Diffbot",
-        "purpose": "AI knowledge graph construction",
-        "category": "training",
-        "priority": "low",
-    },
-    {
-        "user_agent": "Timpibot",
-        "platform": "Timpi",
-        "purpose": "Decentralized search indexing",
-        "category": "search",
-        "priority": "low",
-    },
-    {
-        "user_agent": "webzio-extended",
-        "platform": "Webz.io",
-        "purpose": "Web data platform for AI companies",
+        "purpose": "Model training",
         "category": "training",
         "priority": "low",
     },
 ]
 
+# Path keywords that suggest an internal/administrative area rather
+# than public content. Wildcard disallows on such paths should not
+# count against AI crawler access.
+INTERNAL_PATH_KEYWORDS = [
+    "admin", "api", "internal", "login", "logout", "signin", "signup",
+    "register", "account", "auth", "cart", "checkout", "basket",
+    "private", "wp-admin", "wp-login", "wp-json", "cgi-bin", "tmp",
+    "cache", "staging", "dev", "test", "search", "ajax", "session",
+    "token", "dashboard", "preview", "draft", "plugins", "includes",
+    "assets", "static", "media", "uploads", "feed", "trackback",
+    "xmlrpc", "settings", "config",
+]
+
 
 @dataclass
 class RobotsRule:
-    """A single robots.txt rule for a user-agent."""
+    """A single robots.txt rule group for a user-agent."""
 
     user_agent: str
     allows: List[str] = field(default_factory=list)
@@ -213,66 +283,104 @@ def parse_robots_txt(content: str) -> List[RobotsRule]:
     return rules
 
 
-def check_crawler_status(
-    rules: List[RobotsRule], crawler_agent: str
-) -> str:
-    """Determine the access status for a specific crawler.
-
-    Checks both crawler-specific rules and wildcard (*) rules.
-    Crawler-specific rules take precedence over wildcard rules.
+def merge_rules_for_agent(rules: List[RobotsRule], agent: str) -> Optional[RobotsRule]:
+    """Merge all rule groups naming the same user-agent (RFC 9309).
 
     Args:
         rules: Parsed robots.txt rules.
-        crawler_agent: The user-agent string to check.
+        agent: The user-agent token to merge rules for.
 
     Returns:
-        One of: 'allowed', 'blocked', 'partially_blocked', 'not_mentioned'.
+        A single merged RobotsRule, or None if no group names the agent.
     """
-    # Find rules specific to this crawler
-    specific_rules = [
-        r for r in rules
-        if r.user_agent.lower() == crawler_agent.lower()
-    ]
+    matching = [r for r in rules if r.user_agent.lower() == agent.lower()]
+    if not matching:
+        return None
+    merged = RobotsRule(user_agent=agent)
+    for rule in matching:
+        merged.allows.extend(rule.allows)
+        merged.disallows.extend(rule.disallows)
+    return merged
 
-    # Find wildcard rules
-    wildcard_rules = [r for r in rules if r.user_agent == "*"]
 
-    # Specific rules take precedence
-    if specific_rules:
-        rule = specific_rules[0]
-        has_root_disallow = "/" in rule.disallows
-        has_root_allow = "/" in rule.allows
-        has_any_disallow = bool(rule.disallows) and any(d for d in rule.disallows)
-        has_any_allow = bool(rule.allows)
+def is_root_block(path: str) -> bool:
+    """Return True if a disallow path blocks the whole site."""
+    return path in ("/", "/*", "*")
 
-        if has_root_disallow and not has_root_allow:
-            return "blocked"
-        elif has_root_allow:
-            if has_any_disallow and len(rule.disallows) > 0:
-                non_empty_disallows = [d for d in rule.disallows if d]
-                if non_empty_disallows:
-                    return "partially_blocked"
-            return "allowed"
-        elif has_any_disallow:
-            non_empty = [d for d in rule.disallows if d]
-            if non_empty:
-                return "partially_blocked"
-            return "allowed"
-        else:
-            # Empty disallow means allowed
-            return "allowed"
 
-    # Fall back to wildcard rules
-    if wildcard_rules:
-        rule = wildcard_rules[0]
-        has_root_disallow = "/" in rule.disallows
-        if has_root_disallow:
-            return "blocked"
-        non_empty_disallows = [d for d in rule.disallows if d]
-        if non_empty_disallows:
-            return "partially_blocked"
+def is_internal_path(path: str) -> bool:
+    """Heuristic: does a disallow path look like an internal/admin area?
 
-    return "not_mentioned"
+    Wildcard disallows on admin/api/internal-style paths are normal
+    hygiene and should not downgrade a crawler's access status.
+    """
+    cleaned = path.replace("*", "").replace("$", "").lower()
+    segments = [s for s in re.split(r"[/\-_.?=&]+", cleaned) if s]
+    return any(seg in INTERNAL_PATH_KEYWORDS for seg in segments)
+
+
+def evaluate_rule(rule: RobotsRule) -> Tuple[str, List[str]]:
+    """Evaluate a merged rule group into an access status.
+
+    Args:
+        rule: A merged RobotsRule for one user-agent.
+
+    Returns:
+        Tuple of (status, content_path_disallows) where status is one
+        of 'allowed', 'blocked', 'partially_blocked', and the list
+        contains disallow paths that plausibly cover public content.
+    """
+    non_empty_disallows = [d for d in rule.disallows if d]
+    has_root_disallow = any(is_root_block(d) for d in non_empty_disallows)
+    has_root_allow = "/" in rule.allows
+
+    if has_root_disallow and not has_root_allow:
+        return "blocked", []
+
+    # Split remaining disallows into internal-style vs content paths
+    scoped = [d for d in non_empty_disallows if not is_root_block(d)]
+    content_paths = [d for d in scoped if not is_internal_path(d)]
+
+    if content_paths:
+        return "partially_blocked", content_paths
+
+    # Only internal-style disallows (or none): effectively allowed
+    return "allowed", []
+
+
+def check_crawler_status(
+    rules: List[RobotsRule], crawler_agent: str
+) -> Tuple[str, List[str]]:
+    """Determine the access status for a specific crawler.
+
+    Checks crawler-specific rule groups first; if none exist, falls
+    back to the wildcard (*) group. Rules from multiple groups naming
+    the same agent are merged per RFC 9309.
+
+    Args:
+        rules: Parsed robots.txt rules.
+        crawler_agent: The user-agent token to check.
+
+    Returns:
+        Tuple of (status, blocked_content_paths). Status is one of:
+        'allowed' (explicit group), 'allowed_via_wildcard' (no explicit
+        group, wildcard permits root), 'blocked', 'partially_blocked',
+        or 'not_mentioned' (no explicit group and no wildcard group).
+    """
+    specific = merge_rules_for_agent(rules, crawler_agent)
+    if specific is not None:
+        return evaluate_rule(specific)
+
+    wildcard = merge_rules_for_agent(rules, "*")
+    if wildcard is not None:
+        status, paths = evaluate_rule(wildcard)
+        if status == "allowed":
+            # Root is reachable by default; keep the default-allow
+            # distinct from an explicit allow in the output.
+            return "allowed_via_wildcard", paths
+        return status, paths
+
+    return "not_mentioned", []
 
 
 def check_all_crawlers(
@@ -295,6 +403,7 @@ def check_all_crawlers(
         "crawler_status": {},
         "summary": {
             "allowed": 0,
+            "allowed_via_wildcard": 0,
             "blocked": 0,
             "partially_blocked": 0,
             "not_mentioned": 0,
@@ -304,12 +413,14 @@ def check_all_crawlers(
 
     if robots_content is None:
         result["recommendations"].append(
-            "No robots.txt found. Create a robots.txt file to control AI crawler access. "
-            "Without one, all crawlers are allowed by default."
+            "No robots.txt found. Without one, all crawlers are allowed by "
+            "default. Create a robots.txt file if you want explicit control "
+            "over AI crawler access."
         )
         for crawler in AI_CRAWLERS:
             result["crawler_status"][crawler["user_agent"]] = {
                 "status": "not_mentioned",
+                "blocked_paths": [],
                 "platform": crawler["platform"],
                 "purpose": crawler["purpose"],
                 "category": crawler["category"],
@@ -321,9 +432,10 @@ def check_all_crawlers(
     rules = parse_robots_txt(robots_content)
 
     for crawler in AI_CRAWLERS:
-        status = check_crawler_status(rules, crawler["user_agent"])
+        status, blocked_paths = check_crawler_status(rules, crawler["user_agent"])
         result["crawler_status"][crawler["user_agent"]] = {
             "status": status,
+            "blocked_paths": blocked_paths,
             "platform": crawler["platform"],
             "purpose": crawler["purpose"],
             "category": crawler["category"],
@@ -338,7 +450,7 @@ def check_all_crawlers(
 
 
 def generate_recommendations(
-    crawler_status: Dict[str, Dict[str, str]],
+    crawler_status: Dict[str, Dict[str, Any]],
 ) -> List[str]:
     """Generate actionable recommendations based on crawler status.
 
@@ -350,26 +462,49 @@ def generate_recommendations(
     """
     recommendations: List[str] = []
 
-    # Check high-priority search crawlers
+    def status_of(agent: str) -> str:
+        return crawler_status.get(agent, {}).get("status", "not_mentioned")
+
+    # Check high-priority search/answer crawlers
     high_priority_search = [
         ("OAI-SearchBot", "ChatGPT search results"),
+        ("Claude-SearchBot", "Claude search results"),
         ("PerplexityBot", "Perplexity search results"),
-        ("Google-Extended", "Google AI Overviews"),
+        ("bingbot", "Bing Search and Copilot answers"),
     ]
 
     for agent, description in high_priority_search:
-        info = crawler_status.get(agent, {})
-        status = info.get("status", "not_mentioned")
+        status = status_of(agent)
         if status == "blocked":
             recommendations.append(
                 f"CRITICAL: {agent} is blocked. Your content will not appear in {description}. "
                 f"Consider allowing this crawler for AI search visibility."
             )
-        elif status == "not_mentioned":
+        elif status == "partially_blocked":
+            paths = crawler_status.get(agent, {}).get("blocked_paths", [])
+            path_note = f" (blocked paths: {', '.join(paths[:5])})" if paths else ""
             recommendations.append(
-                f"Consider explicitly allowing {agent} in robots.txt to ensure "
-                f"visibility in {description}."
+                f"{agent} is blocked from some content paths{path_note}. "
+                f"Verify these exclusions are intentional; they limit visibility in {description}."
             )
+
+    # Google AI Overviews / Google-Extended guidance
+    google_ext_status = status_of("Google-Extended")
+    if google_ext_status == "blocked":
+        recommendations.append(
+            "Google-Extended is blocked. Note: this only opts your content out of "
+            "Gemini model training and grounding. It does NOT affect Google Search, "
+            "AI Overviews, or AI Mode. To appear in AI Overviews, keep Googlebot "
+            "allowed and avoid restrictive snippet controls (nosnippet, data-nosnippet, "
+            "max-snippet, noindex)."
+        )
+    else:
+        recommendations.append(
+            "AI Overviews inclusion is governed by normal Googlebot access plus "
+            "snippet controls, not by Google-Extended. To appear in AI Overviews, "
+            "keep Googlebot allowed and avoid restrictive snippet controls "
+            "(nosnippet, data-nosnippet, max-snippet, noindex)."
+        )
 
     # Check training crawlers
     high_priority_training = [
@@ -378,44 +513,53 @@ def generate_recommendations(
     ]
 
     for agent, description in high_priority_training:
-        info = crawler_status.get(agent, {})
-        status = info.get("status", "not_mentioned")
+        status = status_of(agent)
         if status == "blocked":
             recommendations.append(
                 f"{agent} is blocked. Your content will not be included in {description}. "
                 f"This is acceptable if you do not want AI models trained on your content."
             )
-        elif status == "not_mentioned":
-            recommendations.append(
-                f"Consider explicitly setting a policy for {agent} (allow or disallow) "
-                f"to control inclusion in {description}."
-            )
+
+    # User-initiated fetchers: blocking these breaks link opening in chats
+    user_fetchers = ["ChatGPT-User", "Claude-User", "Perplexity-User", "MistralAI-User"]
+    blocked_fetchers = [a for a in user_fetchers if status_of(a) == "blocked"]
+    if blocked_fetchers:
+        recommendations.append(
+            f"User-initiated fetchers blocked: {', '.join(blocked_fetchers)}. "
+            f"These fetch pages when a user explicitly asks an AI assistant to open "
+            f"a link, so blocking them degrades the experience of users who already "
+            f"know about your site."
+        )
 
     # General recommendations
-    blocked_count = sum(
-        1 for info in crawler_status.values()
-        if info.get("status") == "blocked"
-    )
-    not_mentioned_count = sum(
-        1 for info in crawler_status.values()
-        if info.get("status") == "not_mentioned"
-    )
+    statuses = [info.get("status") for info in crawler_status.values()]
+    blocked_count = sum(1 for s in statuses if s == "blocked")
+    wildcard_count = sum(1 for s in statuses if s == "allowed_via_wildcard")
 
-    if blocked_count == len(crawler_status):
+    if blocked_count == len(crawler_status) and crawler_status:
         recommendations.append(
             "All AI crawlers are blocked. Your site will have minimal AI search visibility. "
             "Consider allowing at least the search-facing crawlers (OAI-SearchBot, "
-            "PerplexityBot, Google-Extended)."
+            "Claude-SearchBot, PerplexityBot, bingbot)."
         )
 
-    if not_mentioned_count > len(crawler_status) // 2:
+    if wildcard_count > len(crawler_status) // 2:
         recommendations.append(
-            "Most AI crawlers are not explicitly mentioned in robots.txt. "
-            "Add explicit allow/disallow rules for each AI crawler to have "
-            "clear control over your AI search presence."
+            "Most AI crawlers are allowed via the wildcard (*) rules rather than "
+            "explicit groups. This is fine for visibility; add explicit per-crawler "
+            "rules only if you want different policies for specific bots."
         )
 
     return recommendations
+
+
+STATUS_DISPLAY = {
+    "allowed": "Allowed",
+    "allowed_via_wildcard": "Allowed (default)",
+    "blocked": "Blocked",
+    "partially_blocked": "Partially Blocked",
+    "not_mentioned": "Not Mentioned",
+}
 
 
 def format_report(results: Dict[str, Any]) -> str:
@@ -435,20 +579,23 @@ def format_report(results: Dict[str, Any]) -> str:
 
     summary = results["summary"]
     lines.append(f"\nSummary:")
-    lines.append(f"  Allowed: {summary.get('allowed', 0)}")
+    lines.append(f"  Allowed (explicit): {summary.get('allowed', 0)}")
+    lines.append(f"  Allowed (default via *): {summary.get('allowed_via_wildcard', 0)}")
     lines.append(f"  Blocked: {summary.get('blocked', 0)}")
     lines.append(f"  Partially blocked: {summary.get('partially_blocked', 0)}")
     lines.append(f"  Not mentioned: {summary.get('not_mentioned', 0)}")
 
     # Status table
-    lines.append(f"\n{'Crawler':<22} {'Platform':<18} {'Status':<18} {'Category':<10}")
-    lines.append("-" * 70)
+    lines.append(f"\n{'Crawler':<30} {'Platform':<14} {'Status':<20} {'Category':<16}")
+    lines.append("-" * 82)
 
     for agent, info in results["crawler_status"].items():
-        status_display = info["status"].replace("_", " ").title()
+        status_display = STATUS_DISPLAY.get(info["status"], info["status"])
         lines.append(
-            f"{agent:<22} {info['platform']:<18} {status_display:<18} {info['category']:<10}"
+            f"{agent:<30} {info['platform']:<14} {status_display:<20} {info['category']:<16}"
         )
+        if info.get("blocked_paths"):
+            lines.append(f"{'':<30} blocked paths: {', '.join(info['blocked_paths'][:5])}")
 
     # Recommendations
     recs = results.get("recommendations", [])
@@ -466,21 +613,17 @@ if __name__ == "__main__":
     if len(sys.argv) >= 2:
         source = sys.argv[1]
 
-        if source.startswith(("http://", "https://")):
-            # Fetch robots.txt from URL
+        if os.path.exists(source):
+            # Read from file
+            with open(source, "r", encoding="utf-8") as f:
+                robots_content = f.read()
+            print(f"Reading robots.txt from file: {source}\n")
+        else:
+            # Treat as URL; prepend https:// if no scheme given
             if not source.startswith(("http://", "https://")):
                 source = f"https://{source}"
             print(f"Fetching robots.txt from: {source}\n")
             robots_content = fetch_robots_txt(source)
-        else:
-            # Read from file
-            try:
-                with open(source, "r", encoding="utf-8") as f:
-                    robots_content = f.read()
-                print(f"Reading robots.txt from file: {source}\n")
-            except FileNotFoundError:
-                print(f"File not found: {source}", file=sys.stderr)
-                sys.exit(1)
     else:
         # Sample robots.txt for demonstration
         robots_content = """
