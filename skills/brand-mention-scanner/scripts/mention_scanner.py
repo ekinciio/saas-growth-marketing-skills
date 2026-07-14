@@ -6,24 +6,31 @@ Scans Reddit, Hacker News, and GitHub for brand or product mentions.
 Aggregates results across platforms, classifies sentiment, and generates
 a comprehensive mention report.
 
-All APIs are public and require no authentication.
+Hacker News and GitHub work without authentication. Reddit requires
+OAuth credentials (REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET) for full
+data; without them the scanner falls back to Reddit's public RSS feed,
+which returns no upvote or comment counts. Set GITHUB_TOKEN for a
+higher GitHub search rate limit. Per-platform failures are recorded in
+the report's errors list and surfaced in the formatted output.
 
 Usage:
-    python mention_scanner.py <brand_name> [--platforms reddit,hn,github] [--time week]
+    python3 mention_scanner.py <brand_name> [--platforms reddit,hn,github] [--time week]
 
 Example:
-    python mention_scanner.py "vercel"
-    python mention_scanner.py "supabase" --platforms reddit,hn
+    python3 mention_scanner.py "vercel"
+    python3 mention_scanner.py "supabase" --platforms reddit,hn
 """
 
 import json
+import os
 import re
 import sys
 import time as time_module
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field, asdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from html import unescape
 from typing import Optional
-from urllib.parse import quote_plus
 
 try:
     import requests
@@ -34,10 +41,27 @@ except ImportError:
 
 
 # Configuration
-USER_AGENT = "saas-growth-skills/1.0 (by /u/ekinciio)"
+USER_AGENT = "script:saas-growth-skills:1.0 (by /u/ekinciio)"
 RATE_LIMIT_SECONDS = 2
 
-# Sentiment keywords
+REDDIT_TOKEN_URL = "https://www.reddit.com/api/v1/access_token"
+REDDIT_OAUTH_SEARCH_URL = "https://oauth.reddit.com/search"
+REDDIT_PUBLIC_SEARCH_URL = "https://www.reddit.com/search.json"
+REDDIT_RSS_SEARCH_URL = "https://www.reddit.com/search.rss"
+
+ATOM_NS = {"atom": "http://www.w3.org/2005/Atom"}
+
+# --time filter mapped to a lookback window in seconds ("all" = no limit)
+TIME_FILTER_SECONDS: dict[str, int] = {
+    "hour": 3600,
+    "day": 86400,
+    "week": 604800,
+    "month": 2592000,
+    "year": 31536000,
+}
+
+# Sentiment keywords (matched at word boundaries; entries act as prefixes,
+# e.g. "recommend" also matches "recommendation")
 POSITIVE_KEYWORDS: list[str] = [
     "love", "great", "best", "amazing", "awesome", "excellent",
     "fantastic", "wonderful", "brilliant", "impressive", "perfect",
@@ -103,6 +127,44 @@ class ScanReport:
     errors: list = field(default_factory=list)
 
 
+def request_with_retry(
+    method: str,
+    url: str,
+    timeout: int = 15,
+    **kwargs,
+) -> "requests.Response":
+    """Issue an HTTP request, retrying once on 429 (honoring Retry-After).
+
+    Args:
+        method: HTTP method ("GET" or "POST").
+        url: Request URL.
+        timeout: Request timeout in seconds.
+        **kwargs: Extra arguments passed to requests.request.
+
+    Returns:
+        The final requests.Response (may still be an error response).
+    """
+    response = requests.request(method, url, timeout=timeout, **kwargs)
+    if response.status_code == 429:
+        retry_after = response.headers.get("Retry-After")
+        try:
+            delay = min(max(float(retry_after), 1.0), 60.0)
+        except (TypeError, ValueError):
+            delay = 5.0
+        print(f"  Rate limited (429), retrying in {delay:.0f}s...")
+        time_module.sleep(delay)
+        response = requests.request(method, url, timeout=timeout, **kwargs)
+    return response
+
+
+def time_filter_cutoff(time_filter: str) -> Optional[datetime]:
+    """Return the UTC datetime cutoff for a --time filter, or None for 'all'."""
+    seconds = TIME_FILTER_SECONDS.get(time_filter)
+    if seconds is None:
+        return None
+    return datetime.now(timezone.utc) - timedelta(seconds=seconds)
+
+
 def classify_sentiment(text: str) -> str:
     """Classify the sentiment of a text snippet.
 
@@ -127,9 +189,16 @@ def classify_sentiment(text: str) -> str:
         if re.search(pattern, text_lower):
             return "question"
 
-    # Count positive and negative signals
-    positive_count = sum(1 for kw in POSITIVE_KEYWORDS if kw in text_lower)
-    negative_count = sum(1 for kw in NEGATIVE_KEYWORDS if kw in text_lower)
+    # Count positive and negative signals (word-boundary matches so
+    # e.g. "bug" does not match inside "debug")
+    positive_count = sum(
+        1 for kw in POSITIVE_KEYWORDS
+        if re.search(r"\b" + re.escape(kw), text_lower)
+    )
+    negative_count = sum(
+        1 for kw in NEGATIVE_KEYWORDS
+        if re.search(r"\b" + re.escape(kw), text_lower)
+    )
 
     if positive_count > negative_count and positive_count > 0:
         return "positive"
@@ -139,18 +208,109 @@ def classify_sentiment(text: str) -> str:
     return "neutral"
 
 
-def scan_reddit(brand_name: str, time_filter: str = "month") -> list[Mention]:
+def get_reddit_oauth_token(errors: list) -> Optional[str]:
+    """Fetch an application-only OAuth token if credentials are set.
+
+    Reads REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET from the environment
+    and exchanges them for a bearer token via the client_credentials grant.
+
+    Args:
+        errors: Error list to append failures to.
+
+    Returns:
+        Bearer token string, or None when credentials are missing or invalid.
+    """
+    client_id = os.environ.get("REDDIT_CLIENT_ID")
+    client_secret = os.environ.get("REDDIT_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        return None
+    try:
+        response = request_with_retry(
+            "POST",
+            REDDIT_TOKEN_URL,
+            auth=(client_id, client_secret),
+            data={"grant_type": "client_credentials"},
+            headers={"User-Agent": USER_AGENT},
+        )
+        response.raise_for_status()
+        token = response.json().get("access_token")
+        if not token:
+            raise ValueError("no access_token in response")
+        return token
+    except (requests.RequestException, ValueError) as e:
+        errors.append(
+            f"reddit: OAuth token request failed - {e} "
+            f"(check REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET)"
+        )
+        return None
+
+
+def parse_reddit_rss_entries(xml_text: str) -> list[dict]:
+    """Parse a Reddit search Atom feed into simple entry dicts.
+
+    The RSS feed carries title, URL, author, subreddit, and timestamp but
+    NOT upvote or comment counts.
+
+    Args:
+        xml_text: Raw Atom XML from the search.rss endpoint.
+
+    Returns:
+        List of entry dicts with title, url, author, created_at, and text.
+    """
+    entries = []
+    root = ET.fromstring(xml_text)
+    for entry in root.findall("atom:entry", ATOM_NS):
+        entry_id = entry.findtext("atom:id", default="", namespaces=ATOM_NS)
+        if not entry_id.startswith("t3_"):
+            continue  # keep posts only (skip subreddit/user entries)
+
+        link = entry.find("atom:link", ATOM_NS)
+        url = link.get("href", "") if link is not None else ""
+        author = entry.findtext(
+            "atom:author/atom:name", default="", namespaces=ATOM_NS
+        )
+        published = (
+            entry.findtext("atom:published", default="", namespaces=ATOM_NS)
+            or entry.findtext("atom:updated", default="", namespaces=ATOM_NS)
+        )
+        content_html = entry.findtext(
+            "atom:content", default="", namespaces=ATOM_NS
+        ) or ""
+        body = unescape(re.sub(r"<[^>]+>", " ", content_html))
+        body = re.sub(r"\s+", " ", body).strip()
+
+        entries.append({
+            "title": entry.findtext("atom:title", default="", namespaces=ATOM_NS),
+            "url": url,
+            "author": author.replace("/u/", "") or "[unknown]",
+            "created_at": published,
+            "text": body,
+        })
+    return entries
+
+
+def scan_reddit(
+    brand_name: str,
+    time_filter: str = "month",
+    errors: Optional[list] = None,
+) -> list[Mention]:
     """Scan Reddit for brand mentions.
+
+    Access strategy: OAuth API (if REDDIT_CLIENT_ID/SECRET are set) ->
+    public JSON API (usually blocked with 403) -> public RSS feed
+    (no upvote/comment data). Failures are appended to `errors`.
 
     Args:
         brand_name: The brand name to search for.
         time_filter: Time range (hour, day, week, month, year, all).
+        errors: Error list to append per-platform failures to.
 
     Returns:
         List of Mention objects from Reddit.
     """
+    if errors is None:
+        errors = []
     mentions = []
-    url = "https://www.reddit.com/search.json"
     params = {
         "q": f'"{brand_name}"',
         "sort": "new",
@@ -163,167 +323,270 @@ def scan_reddit(brand_name: str, time_filter: str = "month") -> list[Mention]:
         "Accept": "application/json",
     }
 
-    try:
-        response = requests.get(url, params=params, headers=headers, timeout=15)
-        response.raise_for_status()
-        data = response.json()
-    except requests.RequestException as e:
-        print(f"Reddit scan error: {e}")
+    data = None
+
+    # 1) OAuth API (preferred - full data)
+    token = get_reddit_oauth_token(errors)
+    if token:
+        oauth_headers = dict(headers)
+        oauth_headers["Authorization"] = f"bearer {token}"
+        try:
+            response = request_with_retry(
+                "GET", REDDIT_OAUTH_SEARCH_URL,
+                params=params, headers=oauth_headers,
+            )
+            response.raise_for_status()
+            data = response.json()
+        except (requests.RequestException, ValueError) as e:
+            errors.append(f"reddit: OAuth search failed - {e}")
+
+    # 2) Public JSON API (blocked with 403 in most environments)
+    if data is None:
+        try:
+            response = request_with_retry(
+                "GET", REDDIT_PUBLIC_SEARCH_URL,
+                params=params, headers=headers,
+            )
+            response.raise_for_status()
+            data = response.json()
+        except (requests.RequestException, ValueError) as e:
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            if status == 403:
+                errors.append(
+                    "reddit: public JSON API blocked (403) - set "
+                    "REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET for OAuth access; "
+                    "trying RSS fallback"
+                )
+            else:
+                errors.append(
+                    f"reddit: JSON search failed - {e}; trying RSS fallback"
+                )
+
+    if data is not None:
+        children = data.get("data", {}).get("children", [])
+
+        for child in children:
+            post = child.get("data", {})
+            title = post.get("title", "")
+            selftext = post.get("selftext", "")
+            combined_text = f"{title} {selftext}"
+            text_preview = selftext[:150] + "..." if len(selftext) > 150 else selftext
+
+            created_utc = post.get("created_utc", 0)
+            created_str = ""
+            if created_utc:
+                created_str = datetime.fromtimestamp(
+                    created_utc, tz=timezone.utc
+                ).isoformat()
+
+            mention = Mention(
+                platform="reddit",
+                title=title,
+                url=f"https://www.reddit.com{post.get('permalink', '')}",
+                author=post.get("author", "[deleted]"),
+                score=post.get("score", 0),
+                num_comments=post.get("num_comments", 0),
+                created_at=created_str,
+                text_preview=text_preview,
+                sentiment=classify_sentiment(combined_text),
+            )
+            mentions.append(mention)
+
         return mentions
 
-    children = data.get("data", {}).get("children", [])
+    # 3) RSS/Atom feed fallback (no auth, limited data)
+    try:
+        response = request_with_retry(
+            "GET", REDDIT_RSS_SEARCH_URL,
+            params=params, headers={"User-Agent": USER_AGENT},
+        )
+        response.raise_for_status()
+        entries = parse_reddit_rss_entries(response.text)
+    except (requests.RequestException, ET.ParseError) as e:
+        errors.append(f"reddit: RSS fallback failed - {e}")
+        return mentions
 
-    for child in children:
-        post = child.get("data", {})
-        title = post.get("title", "")
-        selftext = post.get("selftext", "")
-        combined_text = f"{title} {selftext}"
-        text_preview = selftext[:150] + "..." if len(selftext) > 150 else selftext
-
-        created_utc = post.get("created_utc", 0)
-        created_str = ""
-        if created_utc:
-            created_str = datetime.fromtimestamp(
-                created_utc, tz=timezone.utc
-            ).isoformat()
-
+    for entry in entries:
+        text = entry["text"]
+        text_preview = text[:150] + "..." if len(text) > 150 else text
         mention = Mention(
             platform="reddit",
-            title=title,
-            url=f"https://www.reddit.com{post.get('permalink', '')}",
-            author=post.get("author", "[deleted]"),
-            score=post.get("score", 0),
-            num_comments=post.get("num_comments", 0),
-            created_at=created_str,
+            title=entry["title"],
+            url=entry["url"],
+            author=entry["author"],
+            score=0,
+            num_comments=0,
+            created_at=entry["created_at"],
             text_preview=text_preview,
-            sentiment=classify_sentiment(combined_text),
+            sentiment=classify_sentiment(f"{entry['title']} {text}"),
         )
         mentions.append(mention)
+
+    if mentions:
+        errors.append(
+            "reddit: used RSS fallback - upvote/comment counts unavailable "
+            "(recorded as 0); set REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET "
+            "for full data"
+        )
 
     return mentions
 
 
-def scan_hacker_news(brand_name: str) -> list[Mention]:
+def scan_hacker_news(
+    brand_name: str,
+    time_filter: str = "month",
+    errors: Optional[list] = None,
+) -> list[Mention]:
     """Scan Hacker News for brand mentions using the Algolia API.
 
-    Searches both stories and comments endpoints.
+    Searches both stories and comments endpoints, restricted to the
+    --time window via numericFilters on created_at_i.
 
     Args:
         brand_name: The brand name to search for.
+        time_filter: Time range (hour, day, week, month, year, all).
+        errors: Error list to append per-platform failures to.
 
     Returns:
         List of Mention objects from Hacker News.
     """
+    if errors is None:
+        errors = []
     mentions = []
 
-    # Search stories
-    stories_url = "https://hn.algolia.com/api/v1/search"
-    params = {
-        "query": f'"{brand_name}"',
-        "tags": "story",
-        "hitsPerPage": 30,
-    }
+    cutoff = time_filter_cutoff(time_filter)
+    if cutoff is not None:
+        # Recency-filtered search sorted by date
+        base_url = "https://hn.algolia.com/api/v1/search_by_date"
+        numeric_filters = f"created_at_i>{int(cutoff.timestamp())}"
+    else:
+        # No time window: relevance-ranked search
+        base_url = "https://hn.algolia.com/api/v1/search"
+        numeric_filters = None
 
-    try:
-        response = requests.get(stories_url, params=params, timeout=15)
+    def hn_search(tags: str, hits_per_page: int) -> dict:
+        params = {
+            "query": f'"{brand_name}"',
+            "tags": tags,
+            "hitsPerPage": hits_per_page,
+        }
+        if numeric_filters:
+            params["numericFilters"] = numeric_filters
+        response = request_with_retry("GET", base_url, params=params)
         response.raise_for_status()
-        data = response.json()
-    except requests.RequestException as e:
-        print(f"HN stories scan error: {e}")
-        return mentions
+        return response.json()
 
-    for hit in data.get("hits", []):
-        title = hit.get("title", "")
-        story_text = hit.get("story_text") or ""
-        combined_text = f"{title} {story_text}"
+    # Search stories
+    try:
+        data = hn_search("story", 30)
+        for hit in data.get("hits", []):
+            title = hit.get("title", "")
+            story_text = hit.get("story_text") or ""
+            combined_text = f"{title} {story_text}"
 
-        hn_url = f"https://news.ycombinator.com/item?id={hit.get('objectID', '')}"
+            hn_url = f"https://news.ycombinator.com/item?id={hit.get('objectID', '')}"
 
-        mention = Mention(
-            platform="hn",
-            title=title,
-            url=hit.get("url") or hn_url,
-            author=hit.get("author", "unknown"),
-            score=hit.get("points", 0) or 0,
-            num_comments=hit.get("num_comments", 0) or 0,
-            created_at=hit.get("created_at", ""),
-            text_preview=story_text[:150] + "..." if len(story_text) > 150 else story_text,
-            sentiment=classify_sentiment(combined_text),
-        )
-        mentions.append(mention)
+            mention = Mention(
+                platform="hn",
+                title=title,
+                url=hit.get("url") or hn_url,
+                author=hit.get("author", "unknown"),
+                score=hit.get("points", 0) or 0,
+                num_comments=hit.get("num_comments", 0) or 0,
+                created_at=hit.get("created_at", ""),
+                text_preview=story_text[:150] + "..." if len(story_text) > 150 else story_text,
+                sentiment=classify_sentiment(combined_text),
+            )
+            mentions.append(mention)
+    except (requests.RequestException, ValueError) as e:
+        errors.append(f"hn: story search failed - {e}")
 
     time_module.sleep(RATE_LIMIT_SECONDS)
 
     # Search comments
-    comments_url = "https://hn.algolia.com/api/v1/search"
-    comment_params = {
-        "query": f'"{brand_name}"',
-        "tags": "comment",
-        "hitsPerPage": 20,
-    }
-
     try:
-        response = requests.get(comments_url, params=comment_params, timeout=15)
-        response.raise_for_status()
-        data = response.json()
-    except requests.RequestException as e:
-        print(f"HN comments scan error: {e}")
-        return mentions
+        data = hn_search("comment", 20)
+        for hit in data.get("hits", []):
+            comment_text = hit.get("comment_text", "")
+            # Strip HTML tags for clean text
+            clean_text = re.sub(r"<[^>]+>", "", comment_text)
+            text_preview = clean_text[:150] + "..." if len(clean_text) > 150 else clean_text
 
-    for hit in data.get("hits", []):
-        comment_text = hit.get("comment_text", "")
-        # Strip HTML tags for clean text
-        clean_text = re.sub(r"<[^>]+>", "", comment_text)
-        text_preview = clean_text[:150] + "..." if len(clean_text) > 150 else clean_text
+            # Link directly to the comment itself
+            hn_url = f"https://news.ycombinator.com/item?id={hit.get('objectID', '')}"
 
-        story_id = hit.get("story_id", hit.get("objectID", ""))
-        hn_url = f"https://news.ycombinator.com/item?id={story_id}"
-
-        mention = Mention(
-            platform="hn",
-            title=f"Comment on: {hit.get('story_title', 'Unknown thread')}",
-            url=hn_url,
-            author=hit.get("author", "unknown"),
-            score=hit.get("points", 0) or 0,
-            num_comments=0,
-            created_at=hit.get("created_at", ""),
-            text_preview=text_preview,
-            sentiment=classify_sentiment(clean_text),
-            mention_type="comment",
-        )
-        mentions.append(mention)
+            mention = Mention(
+                platform="hn",
+                title=f"Comment on: {hit.get('story_title', 'Unknown thread')}",
+                url=hn_url,
+                author=hit.get("author", "unknown"),
+                score=hit.get("points", 0) or 0,
+                num_comments=0,
+                created_at=hit.get("created_at", ""),
+                text_preview=text_preview,
+                sentiment=classify_sentiment(clean_text),
+                mention_type="comment",
+            )
+            mentions.append(mention)
+    except (requests.RequestException, ValueError) as e:
+        errors.append(f"hn: comment search failed - {e}")
 
     return mentions
 
 
-def scan_github(brand_name: str) -> list[Mention]:
+def scan_github(
+    brand_name: str,
+    time_filter: str = "month",
+    errors: Optional[list] = None,
+) -> list[Mention]:
     """Scan GitHub for repositories related to the brand.
+
+    Uses GITHUB_TOKEN from the environment when set (30 search requests/min
+    instead of 10). The --time filter is applied with a pushed:> qualifier.
 
     Args:
         brand_name: The brand name to search for.
+        time_filter: Time range (hour, day, week, month, year, all).
+        errors: Error list to append per-platform failures to.
 
     Returns:
         List of Mention objects from GitHub.
     """
+    if errors is None:
+        errors = []
     mentions = []
     url = "https://api.github.com/search/repositories"
+
+    query = brand_name
+    cutoff = time_filter_cutoff(time_filter)
+    if cutoff is not None:
+        query = f"{brand_name} pushed:>{cutoff.strftime('%Y-%m-%d')}"
+
     params = {
-        "q": brand_name,
+        "q": query,
         "sort": "stars",
         "order": "desc",
         "per_page": 30,
     }
     headers = {
-        "Accept": "application/vnd.github.v3+json",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
         "User-Agent": USER_AGENT,
     }
+    github_token = os.environ.get("GITHUB_TOKEN")
+    if github_token:
+        headers["Authorization"] = f"Bearer {github_token}"
 
     try:
-        response = requests.get(url, params=params, headers=headers, timeout=15)
+        response = request_with_retry("GET", url, params=params, headers=headers)
         response.raise_for_status()
         data = response.json()
-    except requests.RequestException as e:
-        print(f"GitHub scan error: {e}")
+    except (requests.RequestException, ValueError) as e:
+        status = getattr(getattr(e, "response", None), "status_code", None)
+        hint = ""
+        if status in (403, 429) and not github_token:
+            hint = " (set GITHUB_TOKEN for a higher search rate limit)"
+        errors.append(f"github: search failed - {e}{hint}")
         return mentions
 
     for repo in data.get("items", []):
@@ -399,7 +662,13 @@ def find_opportunities(mentions: list[Mention]) -> list[dict]:
         elif mention.sentiment == "comparison":
             is_opportunity = True
             reason = "Brand comparison - opportunity to highlight strengths"
-        elif mention.num_comments == 0 and mention.score > 0:
+        elif (
+            mention.num_comments == 0
+            and mention.score > 0
+            and mention.mention_type != "repository"
+        ):
+            # Repositories are excluded: their num_comments field holds
+            # open_issues_count, not discussion comments
             is_opportunity = True
             reason = "Engaged post with no comments - opportunity to respond"
 
@@ -505,10 +774,11 @@ def scan_brand(
     Args:
         brand_name: The brand or product name to search for.
         platforms: List of platforms to scan (default: all three).
-        time_filter: Time range for Reddit results.
+        time_filter: Time range applied to all platforms.
 
     Returns:
-        ScanReport with aggregated results.
+        ScanReport with aggregated results. Per-platform failures are
+        recorded in ScanReport.errors - never silently dropped.
     """
     if platforms is None:
         platforms = ["reddit", "hn", "github"]
@@ -524,7 +794,7 @@ def scan_brand(
     # Scan Reddit
     if "reddit" in platforms:
         print("  Scanning Reddit...")
-        reddit_mentions = scan_reddit(brand_name, time_filter)
+        reddit_mentions = scan_reddit(brand_name, time_filter, report.errors)
         all_mentions.extend(reddit_mentions)
         platform_counts["reddit"] = len(reddit_mentions)
         time_module.sleep(RATE_LIMIT_SECONDS)
@@ -532,7 +802,7 @@ def scan_brand(
     # Scan Hacker News
     if "hn" in platforms:
         print("  Scanning Hacker News...")
-        hn_mentions = scan_hacker_news(brand_name)
+        hn_mentions = scan_hacker_news(brand_name, time_filter, report.errors)
         all_mentions.extend(hn_mentions)
         platform_counts["hn"] = len(hn_mentions)
         time_module.sleep(RATE_LIMIT_SECONDS)
@@ -540,7 +810,7 @@ def scan_brand(
     # Scan GitHub
     if "github" in platforms:
         print("  Scanning GitHub...")
-        github_mentions = scan_github(brand_name)
+        github_mentions = scan_github(brand_name, time_filter, report.errors)
         all_mentions.extend(github_mentions)
         platform_counts["github"] = len(github_mentions)
 
@@ -588,11 +858,25 @@ def format_report(report: ScanReport) -> str:
         "--- Platform Breakdown ---",
     ]
 
+    # Group errors by platform prefix ("reddit: ...", "hn: ...", ...)
+    platform_errors: dict[str, list[str]] = {}
+    for err in report.errors:
+        key = err.split(":", 1)[0].strip().lower()
+        platform_errors.setdefault(key, []).append(err)
+
     for platform, count in report.platform_breakdown.items():
         platform_name = {"reddit": "Reddit", "hn": "Hacker News", "github": "GitHub"}.get(
             platform, platform
         )
-        lines.append(f"  {platform_name}: {count} mentions")
+        if count == 0 and platform in platform_errors:
+            detail = platform_errors[platform][0].split(":", 1)[-1].strip()
+            lines.append(f"  {platform_name}: FAILED - {detail}")
+        elif platform in platform_errors:
+            lines.append(
+                f"  {platform_name}: {count} mentions (degraded - see Errors below)"
+            )
+        else:
+            lines.append(f"  {platform_name}: {count} mentions")
 
     lines.extend(["", "--- Sentiment Summary ---"])
     sentiment = report.sentiment_summary
@@ -631,6 +915,11 @@ def format_report(report: ScanReport) -> str:
     for i, rec in enumerate(report.recommendations, 1):
         lines.append(f"  {i}. {rec}")
 
+    if report.errors:
+        lines.extend(["", "--- Errors ---"])
+        for error in report.errors:
+            lines.append(f"  ! {error}")
+
     lines.append("=" * 70)
     return "\n".join(lines)
 
@@ -658,8 +947,12 @@ def main() -> None:
         type=str,
         default="month",
         choices=["hour", "day", "week", "month", "year", "all"],
-        help="Time filter for Reddit results (default: month)",
+        help="Time filter applied to all platforms (default: month)",
     )
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
 
     args = parser.parse_args()
 
@@ -680,25 +973,8 @@ def main() -> None:
 
     # Also output JSON for programmatic use
     print("\n--- JSON Output ---")
-    print(json.dumps(asdict(report) if hasattr(report, "__dataclass_fields__") else {
-        "brand_name": report.brand_name,
-        "scan_date": report.scan_date,
-        "total_mentions": report.total_mentions,
-        "platform_breakdown": report.platform_breakdown,
-        "sentiment_summary": report.sentiment_summary,
-        "top_mentions": report.top_mentions,
-        "opportunities": report.opportunities,
-        "recommendations": report.recommendations,
-        "errors": report.errors,
-    }, indent=2))
+    print(json.dumps(asdict(report), indent=2))
 
 
 if __name__ == "__main__":
-    # If no arguments provided, run demo
-    if len(sys.argv) < 2:
-        print("Running demo scan for: vercel")
-        print()
-        report = scan_brand(brand_name="vercel")
-        print(format_report(report))
-    else:
-        main()
+    main()

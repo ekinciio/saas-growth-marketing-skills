@@ -6,12 +6,30 @@ Complete API reference for all platforms supported by the brand mention scanner,
 
 ### 1. Reddit
 
-**API Endpoint:**
+**API Endpoints:**
+
+OAuth search (primary; requires credentials):
+```
+https://oauth.reddit.com/search?q="BRAND"&sort=new&limit=50
+Authorization: bearer <token>
+```
+Token exchange (client_credentials grant, HTTP basic auth with client ID/secret):
+```
+POST https://www.reddit.com/api/v1/access_token
+grant_type=client_credentials
+```
+
+Public JSON search (blocked - returns 403 for all user agents; kept for reference):
 ```
 https://www.reddit.com/search.json?q="BRAND"&sort=new&limit=50
 ```
 
-**Parameters:**
+RSS/Atom search (no auth; works, but no upvote/comment counts):
+```
+https://www.reddit.com/search.rss?q="BRAND"&sort=new&type=link
+```
+
+**Parameters** (shared by all three endpoints):
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
 | q | string | Search query (wrap in quotes for exact match) | Required |
@@ -22,9 +40,10 @@ https://www.reddit.com/search.json?q="BRAND"&sort=new&limit=50
 | type | string | Result type: link, comment, sr | link |
 
 **Rate Limits:**
-- Unauthenticated: ~1 request per 2 seconds
-- Authenticated (OAuth): 60 requests per minute
-- User-Agent header is required
+- Unauthenticated JSON API: blocked (403) - Reddit closed unauthenticated API access
+- OAuth (free tier): 100 queries per minute per client ID, averaged over a 10-minute window
+- RSS feed: unauthenticated but aggressively rate limited - expect 429 on rapid successive requests
+- User-Agent header is required (format: `script:app-name:version (by /u/username)`)
 
 **Response Format Example:**
 ```json
@@ -49,7 +68,7 @@ https://www.reddit.com/search.json?q="BRAND"&sort=new&limit=50
 }
 ```
 
-**Auth Requirements:** None for basic search. User-Agent header required.
+**Auth Requirements:** OAuth credentials (`REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET`) for the API. New API access requires approval via Reddit's developer request form (Responsible Builder Policy, support.reddithelp.com); apps created earlier at reddit.com/prefs/apps keep working. The RSS feed needs no auth but returns limited data.
 
 ---
 
@@ -142,9 +161,11 @@ https://api.github.com/search/repositories?q=BRAND
 
 **Required Headers:**
 ```
-Accept: application/vnd.github.v3+json
+Accept: application/vnd.github+json
+X-GitHub-Api-Version: 2022-11-28
 User-Agent: saas-growth-skills/1.0
 ```
+Add `Authorization: Bearer <GITHUB_TOKEN>` for the higher authenticated rate limit.
 
 **Response Format Example:**
 ```json
@@ -182,7 +203,7 @@ https://api.producthunt.com/v2/api/graphql
 **Notes:**
 - GraphQL API
 - Requires OAuth2 authentication (developer token)
-- Rate limit: 450 requests per 15 minutes
+- Rate limit: complexity-based - each query costs points depending on how much data it requests, against a per-window budget (check current limits in the ProductHunt API docs)
 - Good for tracking product launches and competitor activity
 - Useful for identifying early-stage competitors
 
@@ -195,7 +216,7 @@ https://api.stackexchange.com/2.3/search?intitle=BRAND&site=stackoverflow
 
 **Notes:**
 - REST API with JSON responses
-- Rate limit: 300 requests per day (unauthenticated), 10,000 (authenticated)
+- Rate limit: 300 requests per day without a key; 10,000 per day with a free registered API key (no user OAuth needed)
 - Good for developer tools and technical products
 - Questions and answers format provides rich context
 
@@ -224,15 +245,14 @@ https://dev.to/api/articles?tag=BRAND
 
 **API Endpoint:**
 ```
-https://api.twitter.com/2/tweets/search/recent?query=BRAND
+https://api.x.com/2/tweets/search/recent?query=BRAND
 ```
 
 **Notes:**
-- Requires authentication (Bearer token)
-- Basic access: 10,000 tweets per month
-- Pro access required for full archive search
-- Real-time monitoring possible with streaming API
-- Significant cost for comprehensive monitoring
+- Requires authentication (Bearer token); no free tier
+- The free and legacy subscription tiers have been discontinued; as of 2026, new developers are on pay-per-use pricing
+- Full-archive search and streaming are restricted to higher-priced access
+- Expect significant, usage-based cost for any brand monitoring volume - budget before committing to this platform
 
 ## Platform Selection Guide
 

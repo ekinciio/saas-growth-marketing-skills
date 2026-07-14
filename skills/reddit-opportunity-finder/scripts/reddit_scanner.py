@@ -6,24 +6,32 @@ Searches Reddit for high-intent threads matching specified keywords,
 scores them by opportunity value (recency, engagement, intent signals),
 and returns sorted results for SaaS growth teams.
 
-Uses Reddit's public JSON API (no authentication required).
+Reddit access strategy (tried in order):
+    1. OAuth API - set REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET (full data,
+       100 queries/min averaged over a 10-minute window on the free tier)
+    2. Public JSON API - tried once, but blocked with 403 in most
+       environments since Reddit closed unauthenticated API access
+    3. Public RSS/Atom search feed - no auth required, but returns no
+       upvote or comment counts (results are marked as limited data)
 
 Usage:
-    python reddit_scanner.py <keywords> [--subreddit SUBREDDIT] [--time day|week|month] [--min-upvotes N]
+    python3 reddit_scanner.py <keywords> [--subreddit SUBREDDIT] [--time day|week|month] [--min-upvotes N]
 
 Example:
-    python reddit_scanner.py "best review management tool"
-    python reddit_scanner.py "code review automation" --subreddit SaaS --time week
+    python3 reddit_scanner.py "best review management tool"
+    python3 reddit_scanner.py "code review automation" --subreddit SaaS --time week
 """
 
 import json
+import os
 import re
 import sys
 import time as time_module
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
+from html import unescape
 from typing import Optional
-from urllib.parse import quote_plus
 
 try:
     import requests
@@ -34,9 +42,22 @@ except ImportError:
 
 
 # Reddit API configuration
-REDDIT_SEARCH_URL = "https://www.reddit.com/search.json"
-USER_AGENT = "saas-growth-skills/1.0 (by /u/ekinciio)"
+REDDIT_TOKEN_URL = "https://www.reddit.com/api/v1/access_token"
+REDDIT_OAUTH_SEARCH_URL = "https://oauth.reddit.com/search"
+REDDIT_PUBLIC_SEARCH_URL = "https://www.reddit.com/search.json"
+REDDIT_RSS_SEARCH_URL = "https://www.reddit.com/search.rss"
+USER_AGENT = "script:saas-growth-skills:1.0 (by /u/ekinciio)"
 RATE_LIMIT_SECONDS = 2
+
+ATOM_NS = {"atom": "http://www.w3.org/2005/Atom"}
+
+RSS_LIMITED_DATA_NOTE = "limited data - RSS fallback (no upvote/comment counts)"
+
+ACCESS_METHOD_LABELS = {
+    "oauth": "Reddit OAuth API (full data)",
+    "json": "Reddit public JSON API (full data)",
+    "rss": "Reddit RSS fallback (limited data - no upvote/comment counts)",
+}
 
 # Known good subreddits for SaaS opportunities
 GOOD_SUBREDDITS: set[str] = {
@@ -47,21 +68,21 @@ GOOD_SUBREDDITS: set[str] = {
     "nocode", "lowcode", "indiehackers",
 }
 
-# Intent signal patterns (questions and recommendation requests)
-INTENT_PATTERNS: list[str] = [
-    r"\?",
-    r"\bbest\b",
-    r"\brecommend",
-    r"\blooking\s+for\b",
-    r"\bsuggestion",
-    r"\balternative",
-    r"\bwhat\s+(do\s+you|should\s+I)\s+use",
-    r"\bwhich\s+(tool|software|platform|app|service)",
-    r"\bany(one|body)\s+(use|know|recommend)",
-    r"\bhelp\s+me\s+(find|choose|pick)",
-    r"\bvs\b",
-    r"\bcompar",
-]
+# Intent signal patterns mapped to human-readable signal names
+INTENT_PATTERNS: dict[str, str] = {
+    r"\?": "Question format",
+    r"\bbest\b": "Best-of query",
+    r"\brecommend": "Recommendation request",
+    r"\blooking\s+for\b": "Active search",
+    r"\bsuggestion": "Suggestion request",
+    r"\balternative": "Alternative search",
+    r"\bwhat\s+(do\s+you|should\s+I)\s+use": "Tool selection question",
+    r"\bwhich\s+(tool|software|platform|app|service)": "Product comparison",
+    r"\bany(one|body)\s+(use|know|recommend)": "Community recommendation",
+    r"\bhelp\s+me\s+(find|choose|pick)": "Decision help request",
+    r"\bvs\b": "Direct comparison",
+    r"\bcompar": "Comparison query",
+}
 
 
 @dataclass
@@ -79,6 +100,7 @@ class RedditThread:
     age_hours: float = 0.0
     opportunity_score: int = 0
     intent_signals: list = field(default_factory=list)
+    data_note: str = ""
 
 
 @dataclass
@@ -90,37 +112,247 @@ class ScanResult:
     opportunities: list = field(default_factory=list)
     top_subreddits: list = field(default_factory=list)
     scan_timestamp: str = ""
+    access_method: str = ""
     errors: list = field(default_factory=list)
 
 
-def make_reddit_request(
+def request_with_retry(
+    method: str,
     url: str,
-    params: dict,
     timeout: int = 15,
-) -> Optional[dict]:
-    """Make a rate-limited request to Reddit's JSON API.
+    **kwargs,
+) -> "requests.Response":
+    """Issue an HTTP request, retrying once on 429 (honoring Retry-After).
 
     Args:
-        url: The API endpoint URL.
-        params: Query parameters.
+        method: HTTP method ("GET" or "POST").
+        url: Request URL.
         timeout: Request timeout in seconds.
+        **kwargs: Extra arguments passed to requests.request.
 
     Returns:
-        JSON response dict or None on failure.
+        The final requests.Response (may still be an error response).
     """
-    headers = {
-        "User-Agent": USER_AGENT,
-        "Accept": "application/json",
-    }
+    response = requests.request(method, url, timeout=timeout, **kwargs)
+    if response.status_code == 429:
+        retry_after = response.headers.get("Retry-After")
+        try:
+            delay = min(max(float(retry_after), 1.0), 60.0)
+        except (TypeError, ValueError):
+            delay = 5.0
+        print(f"  Rate limited (429), retrying in {delay:.0f}s...")
+        time_module.sleep(delay)
+        response = requests.request(method, url, timeout=timeout, **kwargs)
+    return response
+
+
+def get_reddit_oauth_token(errors: list) -> Optional[str]:
+    """Fetch an application-only OAuth token if credentials are set.
+
+    Reads REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET from the environment
+    and exchanges them for a bearer token via the client_credentials grant.
+
+    Args:
+        errors: Error list to append failures to.
+
+    Returns:
+        Bearer token string, or None when credentials are missing or invalid.
+    """
+    client_id = os.environ.get("REDDIT_CLIENT_ID")
+    client_secret = os.environ.get("REDDIT_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        return None
     try:
-        response = requests.get(
-            url, params=params, headers=headers, timeout=timeout
+        response = request_with_retry(
+            "POST",
+            REDDIT_TOKEN_URL,
+            auth=(client_id, client_secret),
+            data={"grant_type": "client_credentials"},
+            headers={"User-Agent": USER_AGENT},
         )
         response.raise_for_status()
-        return response.json()
-    except requests.RequestException as e:
-        print(f"Reddit API error: {e}")
+        token = response.json().get("access_token")
+        if not token:
+            raise ValueError("no access_token in response")
+        return token
+    except (requests.RequestException, ValueError) as e:
+        errors.append(
+            f"Reddit OAuth token request failed: {e} "
+            f"(check REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET)"
+        )
         return None
+
+
+def iso_to_epoch(timestamp: str) -> float:
+    """Convert an ISO 8601 timestamp string to a Unix epoch float."""
+    if not timestamp:
+        return 0.0
+    try:
+        return datetime.fromisoformat(timestamp.replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return 0.0
+
+
+def parse_reddit_json_posts(data: dict) -> list[dict]:
+    """Normalize a Reddit JSON API search response into post dicts.
+
+    Args:
+        data: Parsed JSON response from the search endpoint.
+
+    Returns:
+        List of normalized post dicts.
+    """
+    posts = []
+    for child in data.get("data", {}).get("children", []):
+        post = child.get("data", {})
+        posts.append({
+            "title": post.get("title", ""),
+            "subreddit": post.get("subreddit", ""),
+            "author": post.get("author", "[deleted]"),
+            "url": f"https://www.reddit.com{post.get('permalink', '')}",
+            "score": post.get("score", 0),
+            "num_comments": post.get("num_comments", 0),
+            "created_utc": post.get("created_utc", 0),
+            "selftext": post.get("selftext", ""),
+        })
+    return posts
+
+
+def parse_reddit_rss_posts(xml_text: str) -> list[dict]:
+    """Parse a Reddit search Atom feed into normalized post dicts.
+
+    The RSS feed carries title, URL, author, subreddit, and timestamp but
+    NOT upvote or comment counts, so score and num_comments are None.
+
+    Args:
+        xml_text: Raw Atom XML from the search.rss endpoint.
+
+    Returns:
+        List of normalized post dicts (score/num_comments set to None).
+    """
+    posts = []
+    root = ET.fromstring(xml_text)
+    for entry in root.findall("atom:entry", ATOM_NS):
+        entry_id = entry.findtext("atom:id", default="", namespaces=ATOM_NS)
+        if not entry_id.startswith("t3_"):
+            continue  # keep posts only (skip subreddit/user entries)
+
+        link = entry.find("atom:link", ATOM_NS)
+        url = link.get("href", "") if link is not None else ""
+        category = entry.find("atom:category", ATOM_NS)
+        subreddit = category.get("term", "") if category is not None else ""
+        author = entry.findtext(
+            "atom:author/atom:name", default="", namespaces=ATOM_NS
+        )
+        published = (
+            entry.findtext("atom:published", default="", namespaces=ATOM_NS)
+            or entry.findtext("atom:updated", default="", namespaces=ATOM_NS)
+        )
+        content_html = entry.findtext(
+            "atom:content", default="", namespaces=ATOM_NS
+        ) or ""
+        body = unescape(re.sub(r"<[^>]+>", " ", content_html))
+        body = re.sub(r"\s+", " ", body).strip()
+
+        posts.append({
+            "title": entry.findtext("atom:title", default="", namespaces=ATOM_NS),
+            "subreddit": subreddit,
+            "author": author.replace("/u/", "") or "[unknown]",
+            "url": url,
+            "score": None,
+            "num_comments": None,
+            "created_utc": iso_to_epoch(published),
+            "selftext": body,
+        })
+    return posts
+
+
+def fetch_reddit_posts(
+    query: str,
+    time_filter: str,
+    limit: int,
+    state: dict,
+    errors: list,
+) -> Optional[list[dict]]:
+    """Fetch Reddit posts for a query using the tiered access strategy.
+
+    Order: OAuth API (if credentials set) -> public JSON API (tried once,
+    usually 403) -> public RSS feed (limited data).
+
+    Args:
+        query: Search query string.
+        time_filter: Time range filter (hour, day, week, month, year, all).
+        limit: Maximum results to request.
+        state: Mutable dict shared across keywords with keys
+            "token" (OAuth bearer or None), "mode" (resolved access method),
+            and "json_blocked" (True once the public JSON API returned 403).
+        errors: Error list to append failures to.
+
+    Returns:
+        List of normalized post dicts, or None if every method failed.
+    """
+    params = {
+        "q": query,
+        "sort": "new",
+        "limit": limit,
+        "t": time_filter,
+        "type": "link",
+    }
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+
+    # 1) OAuth API (preferred - full data)
+    if state.get("token"):
+        oauth_headers = dict(headers)
+        oauth_headers["Authorization"] = f"bearer {state['token']}"
+        try:
+            response = request_with_retry(
+                "GET", REDDIT_OAUTH_SEARCH_URL,
+                params=params, headers=oauth_headers,
+            )
+            response.raise_for_status()
+            state["mode"] = "oauth"
+            return parse_reddit_json_posts(response.json())
+        except (requests.RequestException, ValueError) as e:
+            errors.append(f"Reddit OAuth search failed for '{query}': {e}")
+
+    # 2) Public JSON API (tried once; blocked with 403 in most environments)
+    if not state.get("json_blocked"):
+        try:
+            response = request_with_retry(
+                "GET", REDDIT_PUBLIC_SEARCH_URL,
+                params=params, headers=headers,
+            )
+            response.raise_for_status()
+            state["mode"] = "json"
+            return parse_reddit_json_posts(response.json())
+        except (requests.RequestException, ValueError) as e:
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            if status == 403:
+                state["json_blocked"] = True
+                msg = (
+                    "Reddit public JSON API blocked (403). Set REDDIT_CLIENT_ID "
+                    "and REDDIT_CLIENT_SECRET for OAuth access. Falling back to "
+                    "the RSS feed (no upvote/comment data)."
+                )
+                print(f"  ! {msg}")
+                if msg not in errors:
+                    errors.append(msg)
+            else:
+                errors.append(f"Reddit JSON search failed for '{query}': {e}")
+
+    # 3) RSS/Atom feed fallback (no auth, limited data)
+    try:
+        response = request_with_retry(
+            "GET", REDDIT_RSS_SEARCH_URL,
+            params=params, headers={"User-Agent": USER_AGENT},
+        )
+        response.raise_for_status()
+        state["mode"] = "rss"
+        return parse_reddit_rss_posts(response.text)
+    except (requests.RequestException, ET.ParseError) as e:
+        errors.append(f"Reddit RSS fallback failed for '{query}': {e}")
+
+    return None
 
 
 def calculate_age_hours(created_utc: float) -> float:
@@ -149,22 +381,7 @@ def detect_intent_signals(title: str, selftext: str) -> list[str]:
     combined_text = f"{title} {selftext}".lower()
     signals = []
 
-    signal_names = {
-        r"\?": "Question format",
-        r"\bbest\b": "Best-of query",
-        r"\brecommend": "Recommendation request",
-        r"\blooking\s+for\b": "Active search",
-        r"\bsuggestion": "Suggestion request",
-        r"\balternative": "Alternative search",
-        r"\bwhat\s+(do\s+you|should\s+I)\s+use": "Tool selection question",
-        r"\bwhich\s+(tool|software|platform|app|service)": "Product comparison",
-        r"\bany(one|body)\s+(use|know|recommend)": "Community recommendation",
-        r"\bhelp\s+me\s+(find|choose|pick)": "Decision help request",
-        r"\bvs\b": "Direct comparison",
-        r"\bcompar": "Comparison query",
-    }
-
-    for pattern, name in signal_names.items():
+    for pattern, name in INTENT_PATTERNS.items():
         if re.search(pattern, combined_text):
             signals.append(name)
 
@@ -180,6 +397,9 @@ def calculate_opportunity_score(thread: RedditThread) -> int:
         - Comments >20: +15, >5: +10
         - Question/recommendation format: +20
         - Known good subreddit: +15
+
+    Note: threads fetched via the RSS fallback have unknown upvote and
+    comment counts (stored as 0), so their engagement components score 0.
 
     Args:
         thread: The Reddit thread to score.
@@ -239,7 +459,8 @@ def search_reddit(
         limit: Maximum results per keyword search.
 
     Returns:
-        ScanResult with scored and sorted opportunities.
+        ScanResult with scored and sorted opportunities. Failures are
+        recorded in ScanResult.errors - never silently dropped.
     """
     combined_keyword = " OR ".join(keywords)
     result = ScanResult(
@@ -250,49 +471,49 @@ def search_reddit(
     all_threads: list[RedditThread] = []
     subreddit_counts: dict[str, int] = {}
 
-    for keyword in keywords:
+    # Resolve OAuth once; access mode is shared across keywords
+    state = {
+        "token": get_reddit_oauth_token(result.errors),
+        "mode": None,
+        "json_blocked": False,
+    }
+
+    for i, keyword in enumerate(keywords):
         # Build search query
         query = keyword
         if subreddit:
             query = f"{keyword} subreddit:{subreddit}"
 
-        params = {
-            "q": query,
-            "sort": "new",
-            "limit": limit,
-            "t": time_filter,
-            "type": "link",
-        }
+        posts = fetch_reddit_posts(query, time_filter, limit, state, result.errors)
 
-        data = make_reddit_request(REDDIT_SEARCH_URL, params)
+        if posts is None:
+            result.errors.append(
+                f"All Reddit access methods failed for keyword: {keyword}"
+            )
+            posts = []
 
-        if data is None:
-            result.errors.append(f"Failed to search for keyword: {keyword}")
-            continue
-
-        # Parse results
-        children = data.get("data", {}).get("children", [])
-
-        for child in children:
-            post = child.get("data", {})
-
-            # Skip if below minimum upvotes
-            if post.get("score", 0) < min_upvotes:
+        for post in posts:
+            # Skip if below minimum upvotes (RSS results have unknown
+            # scores, so the filter is not applied to them)
+            if post["score"] is not None and post["score"] < min_upvotes:
                 continue
 
             # Create thread object
-            selftext = post.get("selftext", "")
+            selftext = post["selftext"]
             selftext_preview = selftext[:200] + "..." if len(selftext) > 200 else selftext
 
             thread = RedditThread(
-                title=post.get("title", ""),
-                subreddit=post.get("subreddit", ""),
-                author=post.get("author", "[deleted]"),
-                url=f"https://www.reddit.com{post.get('permalink', '')}",
-                score=post.get("score", 0),
-                num_comments=post.get("num_comments", 0),
-                created_utc=post.get("created_utc", 0),
+                title=post["title"],
+                subreddit=post["subreddit"],
+                author=post["author"],
+                url=post["url"],
+                score=post["score"] if post["score"] is not None else 0,
+                num_comments=(
+                    post["num_comments"] if post["num_comments"] is not None else 0
+                ),
+                created_utc=post["created_utc"],
                 selftext_preview=selftext_preview,
+                data_note=RSS_LIMITED_DATA_NOTE if post["score"] is None else "",
             )
 
             # Calculate age
@@ -310,8 +531,8 @@ def search_reddit(
             sub = thread.subreddit.lower()
             subreddit_counts[sub] = subreddit_counts.get(sub, 0) + 1
 
-        # Rate limiting between requests
-        if len(keywords) > 1:
+        # Rate limiting between keyword requests (not after the last one)
+        if i < len(keywords) - 1:
             time_module.sleep(RATE_LIMIT_SECONDS)
 
     # Deduplicate by URL
@@ -327,6 +548,7 @@ def search_reddit(
 
     result.total_found = len(unique_threads)
     result.opportunities = [asdict(t) for t in unique_threads]
+    result.access_method = state["mode"] or ""
 
     # Top subreddits
     sorted_subs = sorted(subreddit_counts.items(), key=lambda x: x[1], reverse=True)
@@ -354,8 +576,19 @@ def format_report(result: ScanResult) -> str:
         f"Keywords: {result.keyword}",
         f"Scan time: {result.scan_timestamp}",
         f"Total threads found: {result.total_found}",
-        "",
     ]
+
+    if result.access_method:
+        label = ACCESS_METHOD_LABELS.get(result.access_method, result.access_method)
+        lines.append(f"Data source: {label}")
+
+    if result.total_found == 0 and result.errors:
+        lines.append("")
+        lines.append("!!! SCAN FAILED - no results retrieved. See Errors below.")
+    elif result.errors:
+        lines.append(f"Warnings/errors during scan: {len(result.errors)} (see Errors below)")
+
+    lines.append("")
 
     if result.top_subreddits:
         lines.append("--- Top Subreddits ---")
@@ -381,6 +614,9 @@ def format_report(result: ScanResult) -> str:
 
         if opp["intent_signals"]:
             lines.append(f"  Intent: {', '.join(opp['intent_signals'])}")
+
+        if opp["data_note"]:
+            lines.append(f"  Note: {opp['data_note']}")
 
         lines.append("")
 
@@ -425,6 +661,10 @@ def main() -> None:
         help="Minimum upvote threshold (default: 0)",
     )
 
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     args = parser.parse_args()
 
     # Parse comma-separated keywords
@@ -449,26 +689,8 @@ def main() -> None:
 
     # Also output JSON for programmatic use
     print("\n--- JSON Output ---")
-    output = asdict(result) if hasattr(result, "__dataclass_fields__") else {
-        "keyword": result.keyword,
-        "total_found": result.total_found,
-        "opportunities": result.opportunities,
-        "top_subreddits": result.top_subreddits,
-        "scan_timestamp": result.scan_timestamp,
-        "errors": result.errors,
-    }
-    print(json.dumps(output, indent=2))
+    print(json.dumps(asdict(result), indent=2))
 
 
 if __name__ == "__main__":
-    # If no arguments provided, run demo
-    if len(sys.argv) < 2:
-        print("Running demo scan: 'best review management tool'")
-        print()
-        result = search_reddit(
-            keywords=["best review management tool"],
-            time_filter="week",
-        )
-        print(format_report(result))
-    else:
-        main()
+    main()

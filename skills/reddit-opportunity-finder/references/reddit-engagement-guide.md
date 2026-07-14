@@ -212,6 +212,6 @@ Happy to answer any specific questions about the differences.
 
 ### Monitoring Approach
 - Check target subreddits daily for new opportunities
-- Set up RSS feeds for keyword searches
-- Use Reddit's JSON API for automated monitoring
+- Set up RSS feeds for keyword searches - the primary automation option (`https://www.reddit.com/search.rss?q=<keywords>&sort=new`, no auth needed)
+- Reddit's JSON API can be used for richer automated monitoring, but it now requires approved OAuth credentials (unauthenticated access returns 403)
 - Track your mentions and responses for sentiment patterns

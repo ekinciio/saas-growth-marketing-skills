@@ -8,10 +8,13 @@ description: >
   or wants to find where their product is being talked about online.
 ---
 
-## First Run
+# Brand Mention Scanner
 
-When a user runs `/brand-mention-scanner scan <brand>` for the first time,
-display this intro before starting:
+A multi-platform brand monitoring skill that scans Reddit, Hacker News, and GitHub for mentions of your brand or product. Identifies where you are being discussed, analyzes sentiment context, and surfaces unresponded opportunities.
+
+## Intro Banner
+
+When starting a scan, display this intro before fetching:
 
 """
 🔍 Brand Mention Scanner
@@ -25,7 +28,7 @@ What you'll get:
   → Top mentions sorted by engagement
   → Unresponded opportunities
 
-Note: 3 platforms scanned sequentially. Takes ~90 seconds total.
+Note: 3 platforms scanned sequentially. Takes ~15-30 seconds total.
       Rate limits apply (see SKILL.md for optional API keys).
 
 Output: Saved to BRAND-MENTIONS-REPORT.md
@@ -34,10 +37,6 @@ Scanning...
 """
 
 Then proceed immediately.
-
-# Brand Mention Scanner
-
-A multi-platform brand monitoring skill that scans Reddit, Hacker News, and GitHub for mentions of your brand or product. Identifies where you are being discussed, analyzes sentiment context, and surfaces unresponded opportunities.
 
 ## Commands
 
@@ -133,26 +132,41 @@ Generates a comprehensive mention report suitable for sharing with stakeholders.
 
 **Report:** Save output to `BRAND-MENTIONS-FULL-REPORT.md`
 
+## Workflow
+
+When executing any scan command:
+
+1. **Run the scanner script** (paths relative to this skill's directory):
+   ```bash
+   python3 scripts/mention_scanner.py "<brand>" --platforms reddit,hn,github --time month
+   ```
+   Adjust `--platforms` for single-platform commands and `--time` for the requested window.
+
+2. **Check the report's `Errors` section before summarizing.** Platform failures are printed as `FAILED` lines in the platform breakdown and listed under Errors - never present a failed platform as "0 mentions". If Reddit ran in RSS-fallback mode, say that upvote/comment counts are unavailable and that `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` restore full data. If Reddit failed entirely, fall back to WebSearch (e.g. `site:reddit.com "<brand>"`) for that platform.
+
+3. **Consult `references/platform-search-urls.md`** when adding new platforms, debugging API errors, or answering questions about endpoints and rate limits.
+
 ## Platform APIs
 
-All three platform APIs are public and require no authentication.
+Hacker News and GitHub are public and need no authentication. Reddit no longer allows unauthenticated API access - the scanner uses OAuth when credentials are set and falls back to Reddit's public RSS feed otherwise.
 
 ### 1. Reddit
-- **Endpoint:** `https://www.reddit.com/search.json?q="BRAND"&sort=new&limit=50`
-- **Rate limit:** 1 request per 2 seconds
-- **Auth:** None required (User-Agent header required)
-- **Returns:** Posts matching the brand name
+- **Primary endpoint (OAuth):** `https://oauth.reddit.com/search?q="BRAND"&sort=new&limit=50` with a bearer token from `https://www.reddit.com/api/v1/access_token` (client_credentials grant)
+- **Fallback endpoint:** `https://www.reddit.com/search.rss?q="BRAND"&sort=new` (Atom feed; no upvote/comment counts)
+- **Rate limit:** OAuth free tier: 100 queries/min per client ID (averaged over a 10-minute window). Unauthenticated JSON: blocked (403)
+- **Auth:** `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` for OAuth; none for RSS (User-Agent header always required)
+- **Returns:** Posts matching the brand name (RSS: title/URL/date/subreddit only)
 
 ### 2. Hacker News (Algolia API)
-- **Endpoint:** `https://hn.algolia.com/api/v1/search?query="BRAND"&tags=story`
+- **Endpoint:** `https://hn.algolia.com/api/v1/search_by_date?query="BRAND"&tags=story&numericFilters=created_at_i>CUTOFF`
 - **Rate limit:** Generous (10,000 requests/hour)
 - **Auth:** None required
-- **Returns:** Stories and comments matching the brand name
+- **Returns:** Stories and comments matching the brand name within the time window
 
 ### 3. GitHub
-- **Endpoint:** `https://api.github.com/search/repositories?q=BRAND`
-- **Rate limit:** 10 requests/minute (unauthenticated)
-- **Auth:** None required (Accept header recommended)
+- **Endpoint:** `https://api.github.com/search/repositories?q=BRAND+pushed:>YYYY-MM-DD`
+- **Rate limit:** 10 requests/minute unauthenticated; 30 requests/minute with `GITHUB_TOKEN`
+- **Auth:** Optional `GITHUB_TOKEN` (`Accept: application/vnd.github+json` and `X-GitHub-Api-Version: 2022-11-28` headers recommended)
 - **Returns:** Repositories matching the brand name
 
 ## Sentiment Analysis
@@ -188,18 +202,19 @@ Brand mentions on Reddit and HN influence how AI search tools describe your prod
 
 ## API Integrations (Optional)
 
-This skill works out of the box with free public APIs. However, Reddit and GitHub have rate limits that may restrict results for high-volume scans.
-
-If the user provides their own API credentials, use them for higher rate limits and broader coverage.
+Hacker News and GitHub work out of the box with no credentials. Reddit works without credentials only in degraded RSS mode (no upvote/comment data), so Reddit credentials are strongly recommended.
 
 | Environment Variable | Service | What It Unlocks |
 |---------------------|---------|-----------------|
-| `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` | Reddit OAuth API | 60 requests/minute (vs 1 per 2 seconds), deeper thread search |
-| `GITHUB_TOKEN` | GitHub Personal Access Token | 30 requests/minute (vs 10 unauthenticated), access to private repos |
+| `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` | Reddit OAuth API | Full post data (upvotes, comment counts); 100 queries/min per client ID (averaged over a 10-minute window). Without them: RSS fallback with limited data |
+| `GITHUB_TOKEN` | GitHub Personal Access Token | Higher search rate limit (30 requests/minute vs 10 unauthenticated) |
 
 **How to set up:**
 ```bash
-# Reddit (optional)
+# Reddit (recommended). New API access requires approval via Reddit's
+# developer request form (Responsible Builder Policy) at
+# support.reddithelp.com; apps created earlier at
+# https://www.reddit.com/prefs/apps keep working.
 export REDDIT_CLIENT_ID="your_client_id"
 export REDDIT_CLIENT_SECRET="your_client_secret"
 
@@ -208,8 +223,8 @@ export GITHUB_TOKEN="your_personal_access_token"
 ```
 
 **Behavior:**
-- If credentials are set → Use authenticated APIs with higher rate limits
-- If not set → Use free public APIs (current default behavior, no change)
+- If credentials are set → Use authenticated APIs with full data and higher rate limits
+- If not set → HN and GitHub still work fully; Reddit degrades to the RSS fallback (errors and limitations are recorded in the report)
 - Each platform is independent - you can set one without the others
 
 **When results are limited:** If a scan hits rate limits, returns fewer results than expected, or a platform times out, inform the user which API credentials would help. Example:
@@ -222,7 +237,6 @@ export GITHUB_TOKEN="your_personal_access_token"
 - NEVER ask "should I save this?" — just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
