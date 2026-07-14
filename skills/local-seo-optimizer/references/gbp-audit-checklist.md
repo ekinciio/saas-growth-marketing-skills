@@ -1,6 +1,6 @@
 # Google Business Profile Audit Checklist
 
-A comprehensive checklist of 35+ items to evaluate GBP profile completeness. Each item is scored as complete, partial, or missing.
+A comprehensive checklist of 41 items to evaluate GBP profile completeness. Each item is scored as complete, partial, or missing.
 
 ## 1. Basic Information (Required)
 
@@ -54,30 +54,31 @@ A comprehensive checklist of 35+ items to evaluate GBP profile completeness. Eac
 | # | Item | Weight | Notes |
 |---|------|--------|-------|
 | 28 | Business attributes configured | Medium | Accessibility, amenities, payment methods |
-| 29 | Health and safety attributes set | Low | COVID protocols, mask policy, etc. |
-| 30 | Highlights selected | Medium | Women-owned, veteran-owned, LGBTQ-friendly, etc. |
-| 31 | "From the business" section complete | Medium | First-person description of key offerings |
+| 29 | Highlights selected | Medium | Women-owned, veteran-owned, LGBTQ-friendly, etc. |
+| 30 | "From the business" section complete | Medium | First-person description of key offerings |
 
 ## 6. Google Posts
 
 | # | Item | Weight | Notes |
 |---|------|--------|-------|
-| 32 | Google Posts published regularly | High | At least 1 post per week recommended |
-| 33 | Posts include images | Medium | Visual posts get more engagement |
-| 34 | Posts include CTAs (call, learn more, book) | Medium | Drive action from post viewers |
-| 35 | Event posts for upcoming events | Low | Use event post type for time-based content |
-| 36 | Offer posts for promotions | Low | Use offer post type for deals and discounts |
+| 31 | Google Posts published regularly | High | At least 1 post per week recommended |
+| 32 | Posts include images | Medium | Visual posts get more engagement |
+| 33 | Posts include CTAs (call, learn more, book) | Medium | Drive action from post viewers |
+| 34 | Event posts for upcoming events | Low | Use event post type for time-based content |
+| 35 | Offer posts for promotions | Low | Use offer post type for deals and discounts |
 
-## 7. Reviews and Q&A
+## 7. Reviews and Messaging
 
 | # | Item | Weight | Notes |
 |---|------|--------|-------|
-| 37 | Review count (target: 50+ for most industries) | High | More reviews improve visibility and trust |
-| 38 | Average rating (target: 4.0+) | High | Higher ratings increase click-through rate |
-| 39 | Owner response to reviews (target: 90%+) | High | Respond to all reviews within 24-48 hours |
-| 40 | Response to negative reviews (target: 100%) | High | Professional, helpful responses are critical |
-| 41 | Q&A section has pre-populated questions | Medium | Add common questions with owner answers |
-| 42 | Q&A monitored and answered promptly | Medium | Unanswered questions look bad |
+| 36 | Review count (target: 50+ for most industries) | High | More reviews improve visibility and trust |
+| 37 | Average rating (target: 4.0+) | High | Higher ratings increase click-through rate |
+| 38 | Owner response to reviews (target: 90%+) | High | Respond to all reviews within 24-48 hours |
+| 39 | Response to negative reviews (target: 100%) | High | Professional, helpful responses are critical |
+| 40 | Messaging (chat) enabled | Medium | Lets customers message the business directly from the profile |
+| 41 | Messages answered promptly (within 24 hours) | Medium | Slow responses can get messaging deactivated |
+
+Note: Google removed the public Q&A feature (late 2025, replaced by the Gemini-powered "Ask Maps"), so Q&A items no longer apply.
 
 ## Scoring Guide
 
@@ -86,14 +87,8 @@ A comprehensive checklist of 35+ items to evaluate GBP profile completeness. Eac
 - **Partial (1 point):** Item exists but needs improvement
 - **Missing (0 points):** Item not addressed at all
 
-### Category Weights
-- Basic Information: 25%
-- Business Description: 10%
-- Photos and Visual Content: 20%
-- Services/Products/Menu: 10%
-- Attributes and Highlights: 10%
-- Google Posts: 10%
-- Reviews and Q&A: 15%
+### Item Weighting
+Each item carries a per-item weight based on the Weight column above: High = 3, Medium = 2, Low = 1. The scoring script multiplies each item's weight by its per-item score (0-2) and divides by the maximum possible weighted total to produce a 0-100 completeness score. There are no separate category weights — heavier items simply contribute more.
 
 ### Score Ranges
 - **90-100:** Excellent - fully optimized profile, maintain current efforts
@@ -111,6 +106,6 @@ When a profile scores below 70, focus on these high-impact items first:
 3. Upload logo and cover photo (items 15-16)
 4. Add at least 10 photos across categories (items 17-21)
 5. List all services with descriptions (item 24)
-6. Respond to all existing reviews (items 39-40)
-7. Start weekly Google Posts (item 32)
-8. Pre-populate Q&A with 5-10 common questions (item 41)
+6. Respond to all existing reviews (items 38-39)
+7. Start weekly Google Posts (item 31)
+8. Enable messaging and answer within 24 hours (items 40-41)

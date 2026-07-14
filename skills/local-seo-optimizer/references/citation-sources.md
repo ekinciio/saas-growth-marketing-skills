@@ -10,7 +10,7 @@ These are the highest-authority citation sources. Every local business should ha
 |---|--------|-----------------|-------|
 | 1 | Google Business Profile | 100 | Primary local listing, most important |
 | 2 | Apple Maps (via Apple Business Connect) | 100 | Critical for iOS users and Siri |
-| 3 | Bing Places | 95 | Powers Bing, Cortana, and many other platforms |
+| 3 | Bing Places | 95 | Powers Bing search and maps, plus Microsoft Copilot answers |
 | 4 | Yelp | 93 | High authority, often ranks in organic results |
 | 5 | Facebook Business Page | 96 | Social signals and large user base |
 
@@ -70,44 +70,44 @@ Directories relevant to specific business types. Claim those that match your ind
 | # | Source | Notes |
 |---|--------|-------|
 | 31 | OpenTable | Restaurant reservations |
-| 32 | Zomato | Restaurant discovery and reviews |
-| 33 | MenuPages | Restaurant menu directory |
-| 34 | EatStreet | Food delivery and discovery |
-| 35 | TheFork | Restaurant booking platform |
+| 32 | MenuPages | Restaurant menu directory |
+| 33 | TheFork | Restaurant booking platform |
+| 34 | Grubhub | Food delivery marketplace with local listings |
+| 35 | DoorDash | Food delivery marketplace with local listings |
+| 36 | Resy | Restaurant reservation platform |
 
 ### Real Estate
 | # | Source | Notes |
 |---|--------|-------|
-| 36 | Zillow | Real estate marketplace |
-| 37 | Realtor.com | Agent and property directory |
-| 38 | Redfin | Real estate brokerage directory |
-| 39 | Homes.com | Property and agent listings |
-| 40 | Trulia | Home search platform |
+| 37 | Zillow | Real estate marketplace |
+| 38 | Realtor.com | Agent and property directory |
+| 39 | Redfin | Real estate brokerage directory |
+| 40 | Homes.com | Property and agent listings |
+| 41 | Trulia | Home search platform |
 
 ### General Business
 | # | Source | Notes |
 |---|--------|-------|
-| 41 | Manta | Small business directory |
-| 42 | Citysearch | Local business directory |
+| 42 | Manta | Small business directory |
 | 43 | Brownbook | Global business directory |
 | 44 | Cylex | Business directory with reviews |
 | 45 | EZlocal | Local business listings |
 | 46 | Local.com | Local search platform |
+| 47 | ChamberofCommerce.com | Business directory with local chamber listings |
 
 **Action:** Identify your industry category and claim all relevant Tier 3 directories within the first 2-3 months.
 
 ## Data Aggregators
 
-Data aggregators distribute your business information to hundreds of smaller directories and apps. Submitting to these four aggregators is one of the most efficient ways to build citation volume.
+Data aggregators distribute your business information to hundreds of smaller directories and apps. Submitting to these three aggregators is one of the most efficient ways to build citation volume. (Acxiom exited the listings business in 2019 and is no longer a citation channel.)
 
 | # | Aggregator | Distribution Reach | Notes |
 |---|-----------|-------------------|-------|
-| 47 | Neustar (formerly Localeze) | 100+ directories | Major data provider |
-| 48 | Factual (now part of Foursquare) | 65+ apps and sites | Powers location data for many apps |
-| 49 | Data Axle (formerly Infogroup) | 70+ directories | Large distribution network |
-| 50 | Acxiom | 50+ platforms | Data broker with broad reach |
+| 48 | Data Axle (formerly Infogroup) | 70+ directories | Large distribution network |
+| 49 | Foursquare (formerly Factual) | 65+ apps and sites | Powers location data for many apps |
+| 50 | TransUnion/Localeze (formerly Neustar Localeze) | 100+ directories | Now TransUnion Digital Business Profile |
 
-**Action:** Submit accurate data to all four aggregators. This can take 2-4 weeks to propagate across their networks.
+**Action:** Submit accurate data to all three aggregators. This can take 2-4 weeks to propagate across their networks.
 
 ## NAP Consistency Guidelines
 
@@ -143,7 +143,7 @@ Data aggregators distribute your business information to hundreds of smaller dir
 |------|--------|
 | 1 | Claim and optimize all Tier 1 sources |
 | 2-3 | Claim and optimize all Tier 2 sources |
-| 3-4 | Submit to all four data aggregators |
+| 3-4 | Submit to all three data aggregators |
 | 4-8 | Claim relevant Tier 3 (industry-specific) sources |
 | 8-12 | Audit for consistency and fix issues |
 | Ongoing | Quarterly audit and monitoring |

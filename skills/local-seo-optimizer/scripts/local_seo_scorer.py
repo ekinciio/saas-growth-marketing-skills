@@ -4,8 +4,29 @@
 Takes business information and GBP checklist responses, then calculates
 a comprehensive local SEO score (0-100) with a breakdown by category
 and prioritized recommendations.
+
+Usage:
+    python3 local_seo_scorer.py audit.json
+    python3 local_seo_scorer.py --demo
+
+The JSON file uses the run_full_audit input shape (all keys optional;
+missing sections score 0 and are marked "unknown - data not provided"):
+    {
+      "business_info": {"name": "...", "address": "..."},
+      "gbp_responses": {"business_name": 2, ...},      # item_id -> 0/1/2
+      "review_data": {"review_count": 47, ...},
+      "nap_data": {"total_citations": 3, ...},
+      "on_page_data": {"has_nap_on_site": true, ...},
+      "citation_data": {"tier1_claimed": 3, ...},
+      "content_data": {"has_google_posts_weekly": false, ...}
+    }
 """
 
+from __future__ import annotations
+
+import argparse
+import json
+import sys
 from typing import Any
 
 
@@ -54,9 +75,14 @@ GBP_CHECKLIST_ITEMS: list[dict[str, Any]] = [
     {"id": "average_rating", "label": "Average rating 4.0+", "weight": 3},
     {"id": "review_response_rate", "label": "Owner responds to 90%+ reviews", "weight": 3},
     {"id": "negative_review_responses", "label": "All negative reviews addressed", "weight": 3},
-    {"id": "qa_prepopulated", "label": "Q&A pre-populated with common questions", "weight": 2},
-    {"id": "qa_monitored", "label": "Q&A monitored and answered", "weight": 2},
+    {"id": "messaging_enabled", "label": "Messaging (chat) enabled in GBP", "weight": 2},
+    {"id": "messages_answered", "label": "Messages answered within 24 hours", "weight": 2},
 ]
+
+
+def _clamp(value: float, low: float = 0.0, high: float = 100.0) -> float:
+    """Clamp a value to the given range (default 0-100)."""
+    return max(low, min(high, value))
 
 
 def score_gbp_completeness(checklist_responses: dict[str, int]) -> dict[str, Any]:
@@ -105,9 +131,9 @@ def score_gbp_completeness(checklist_responses: dict[str, int]) -> dict[str, Any
 
 
 def score_review_signals(
-    review_count: int,
-    average_rating: float,
-    response_rate: float,
+    review_count: int = 0,
+    average_rating: float = 0.0,
+    response_rate: float = 0.0,
     recent_reviews_30d: int = 0,
     industry_target: int = 30,
 ) -> dict[str, Any]:
@@ -123,13 +149,13 @@ def score_review_signals(
     Returns:
         Dictionary with score (0-100) and sub-scores.
     """
-    count_score = min(100, (review_count / max(industry_target, 1)) * 100)
-    rating_score = max(0, (average_rating - 1) / 4 * 100)
-    response_score = min(100, response_rate)
-    velocity_score = min(100, (recent_reviews_30d / max(industry_target * 0.1, 1)) * 100)
+    count_score = _clamp((review_count / max(industry_target, 1)) * 100)
+    rating_score = _clamp((average_rating - 1) / 4 * 100)
+    response_score = _clamp(response_rate)
+    velocity_score = _clamp((recent_reviews_30d / max(industry_target * 0.1, 1)) * 100)
 
     weighted = (count_score * 0.3) + (rating_score * 0.3) + (response_score * 0.25) + (velocity_score * 0.15)
-    score = round(min(100, weighted))
+    score = round(_clamp(weighted))
 
     return {
         "score": score,
@@ -141,8 +167,8 @@ def score_review_signals(
 
 
 def score_nap_consistency(
-    total_citations: int,
-    consistent_citations: int,
+    total_citations: int = 0,
+    consistent_citations: int = 0,
     has_duplicates: bool = False,
 ) -> dict[str, Any]:
     """Score NAP consistency across citations.
@@ -156,9 +182,15 @@ def score_nap_consistency(
         Dictionary with score (0-100) and details.
     """
     if total_citations == 0:
-        return {"score": 0, "consistency_pct": 0, "has_duplicates": has_duplicates}
+        return {
+            "score": 0,
+            "consistency_pct": 0,
+            "consistent_count": consistent_citations,
+            "total_count": total_citations,
+            "has_duplicates": has_duplicates,
+        }
 
-    consistency_pct = (consistent_citations / total_citations) * 100
+    consistency_pct = _clamp((consistent_citations / total_citations) * 100)
     score = round(consistency_pct)
 
     if has_duplicates:
@@ -179,7 +211,7 @@ def score_on_page_seo(
     has_local_schema: bool = False,
     has_local_keywords_titles: bool = False,
     is_mobile_friendly: bool = False,
-    page_speed_score: int = 50,
+    page_speed_score: int = 0,
 ) -> dict[str, Any]:
     """Score on-page local SEO factors.
 
@@ -220,14 +252,14 @@ def score_on_page_seo(
 
 
 def score_citation_coverage(
-    tier1_claimed: int,
-    tier2_claimed: int,
-    tier3_claimed: int,
-    aggregators_submitted: int,
+    tier1_claimed: int = 0,
+    tier2_claimed: int = 0,
+    tier3_claimed: int = 0,
+    aggregators_submitted: int = 0,
     tier1_total: int = 5,
     tier2_total: int = 10,
     tier3_total: int = 10,
-    aggregators_total: int = 4,
+    aggregators_total: int = 3,
 ) -> dict[str, Any]:
     """Score citation coverage across tiers.
 
@@ -244,13 +276,13 @@ def score_citation_coverage(
     Returns:
         Dictionary with score (0-100) and tier breakdown.
     """
-    tier1_pct = (tier1_claimed / max(tier1_total, 1)) * 100
-    tier2_pct = (tier2_claimed / max(tier2_total, 1)) * 100
-    tier3_pct = (tier3_claimed / max(tier3_total, 1)) * 100
-    agg_pct = (aggregators_submitted / max(aggregators_total, 1)) * 100
+    tier1_pct = _clamp((tier1_claimed / max(tier1_total, 1)) * 100)
+    tier2_pct = _clamp((tier2_claimed / max(tier2_total, 1)) * 100)
+    tier3_pct = _clamp((tier3_claimed / max(tier3_total, 1)) * 100)
+    agg_pct = _clamp((aggregators_submitted / max(aggregators_total, 1)) * 100)
 
     weighted = (tier1_pct * 0.40) + (tier2_pct * 0.25) + (tier3_pct * 0.15) + (agg_pct * 0.20)
-    score = round(min(100, weighted))
+    score = round(_clamp(weighted))
 
     return {
         "score": score,
@@ -430,7 +462,7 @@ def generate_recommendations(
         recs.append({
             "priority": "medium",
             "category": "Citations",
-            "action": "Submit to data aggregators (Neustar, Factual, Data Axle, Acxiom)",
+            "action": "Submit to data aggregators (Data Axle, Foursquare, TransUnion/Localeze)",
             "impact": "Aggregators distribute data to hundreds of smaller directories",
         })
 
@@ -482,6 +514,9 @@ def run_full_audit(
     Returns:
         Full audit results with overall score, category breakdown,
         and prioritized recommendations.
+
+    Sections with empty input dicts (e.g., the user typed "skip") score 0
+    and are annotated with a note instead of raising an error.
     """
     gbp_result = score_gbp_completeness(gbp_responses)
     review_result = score_review_signals(**review_data)
@@ -489,6 +524,19 @@ def run_full_audit(
     on_page_result = score_on_page_seo(**on_page_data)
     citation_result = score_citation_coverage(**citation_data)
     content_result = score_local_content(**content_data)
+
+    # Annotate sections that had no input data (skipped by the user)
+    skip_note = "unknown - data not provided"
+    for data, result in (
+        (gbp_responses, gbp_result),
+        (review_data, review_result),
+        (nap_data, nap_result),
+        (on_page_data, on_page_result),
+        (citation_data, citation_result),
+        (content_data, content_result),
+    ):
+        if not data:
+            result["note"] = skip_note
 
     # Calculate overall weighted score
     category_scores = {
@@ -543,9 +591,27 @@ def run_full_audit(
 
 
 # ---------------------------------------------------------------------------
-# Standalone demo
+# CLI
 # ---------------------------------------------------------------------------
-if __name__ == "__main__":
+def print_report(results: dict[str, Any]) -> None:
+    """Print a formatted audit report to stdout."""
+    print(f"\nBusiness: {results['business_name']}")
+    print(f"Overall Score: {results['overall_score']}/100 ({results['score_label']})")
+    print("\nCategory Breakdown:")
+    details = results["category_details"]
+    for category, score in results["category_scores"].items():
+        weight = CATEGORY_WEIGHTS[category]
+        note = details[category].get("note", "")
+        suffix = f" [{note}]" if note else ""
+        print(f"  {category:25s} {score:3d}/100 (weight: {weight:.0%}){suffix}")
+
+    print(f"\nTop Recommendations ({results['recommendations_count']} total):")
+    for i, rec in enumerate(results["recommendations"][:10], 1):
+        print(f"  {i}. [{rec['priority'].upper()}] {rec['category']}: {rec['action']}")
+
+
+def run_demo() -> None:
+    """Run a demo audit with sample data."""
     print("=" * 60)
     print("Local SEO Scorer - Demo Audit")
     print("=" * 60)
@@ -566,7 +632,7 @@ if __name__ == "__main__":
         "posts_regular": 0, "posts_with_images": 0, "posts_with_cta": 0,
         "review_count_target": 2, "average_rating": 2,
         "review_response_rate": 1, "negative_review_responses": 1,
-        "qa_prepopulated": 0, "qa_monitored": 0,
+        "messaging_enabled": 0, "messages_answered": 0,
     }
 
     results = run_full_audit(
@@ -607,13 +673,63 @@ if __name__ == "__main__":
         },
     )
 
-    print(f"\nBusiness: {results['business_name']}")
-    print(f"Overall Score: {results['overall_score']}/100 ({results['score_label']})")
-    print("\nCategory Breakdown:")
-    for category, score in results["category_scores"].items():
-        weight = CATEGORY_WEIGHTS[category]
-        print(f"  {category:25s} {score:3d}/100 (weight: {weight:.0%})")
+    print_report(results)
 
-    print(f"\nTop Recommendations ({results['recommendations_count']} total):")
-    for i, rec in enumerate(results["recommendations"][:10], 1):
-        print(f"  {i}. [{rec['priority'].upper()}] {rec['category']}: {rec['action']}")
+
+def main() -> None:
+    """Command-line entry point for the local SEO scorer."""
+    parser = argparse.ArgumentParser(
+        description="Score local SEO presence from a JSON audit input file.",
+        epilog="Example: python3 local_seo_scorer.py audit.json",
+    )
+    parser.add_argument(
+        "audit_file",
+        nargs="?",
+        help="Path to JSON file with the run_full_audit input shape "
+             "(see module docstring). All sections are optional.",
+    )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Run a demo audit with built-in sample data",
+    )
+    args = parser.parse_args()
+
+    if args.demo:
+        run_demo()
+        return
+
+    if not args.audit_file:
+        parser.print_usage(sys.stderr)
+        print(
+            "error: provide a JSON audit file "
+            "(e.g., python3 local_seo_scorer.py audit.json) or use --demo.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    try:
+        with open(args.audit_file, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"error: could not read {args.audit_file}: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    results = run_full_audit(
+        business_info=data.get("business_info", {}),
+        gbp_responses=data.get("gbp_responses", {}),
+        review_data=data.get("review_data", {}),
+        nap_data=data.get("nap_data", {}),
+        on_page_data=data.get("on_page_data", {}),
+        citation_data=data.get("citation_data", {}),
+        content_data=data.get("content_data", {}),
+    )
+
+    print("=" * 60)
+    print("Local SEO Scorer - Audit")
+    print("=" * 60)
+    print_report(results)
+
+
+if __name__ == "__main__":
+    main()

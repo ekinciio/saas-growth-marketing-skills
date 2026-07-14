@@ -9,13 +9,23 @@ Requirements:
     pip install requests beautifulsoup4
 
 Usage:
+    python3 competitor_scanner.py https://competitor.com [--json]
+    python3 competitor_scanner.py --demo
+
+    Or as a library:
+
     from competitor_scanner import scan_competitor
 
     result = scan_competitor("https://example.com")
     print(result)
 """
 
+from __future__ import annotations
+
+import argparse
+import json
 import re
+import sys
 from typing import Any, Optional
 from urllib.parse import urljoin, urlparse
 
@@ -62,10 +72,11 @@ def scan_competitor(url: str) -> dict[str, Any]:
 
     try:
         headers = {
+            # Refresh the Chrome version periodically; stale UAs trigger bot detection
             "User-Agent": (
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
+                "Chrome/138.0.0.0 Safari/537.36"
             )
         }
         response = requests.get(url, headers=headers, timeout=15, allow_redirects=True)
@@ -118,8 +129,8 @@ def scan_competitor(url: str) -> dict[str, Any]:
         soup, base_url, ["blog", "articles", "resources", "news"]
     ) is not None
 
-    has_integrations = _find_link_by_keywords(
-        soup, base_url, ["integrations", "apps", "marketplace", "connect"]
+    has_integrations = _find_link_by_path_segment(
+        soup, base_url, ["integrations", "integration", "apps", "marketplace", "connect"]
     ) is not None
 
     has_careers = _find_link_by_keywords(
@@ -211,10 +222,31 @@ def _find_link_by_keywords(
     return None
 
 
+def _find_link_by_path_segment(
+    soup: Any, base_url: str, keywords: list[str]
+) -> Optional[str]:
+    """Find the first link whose URL path segment or exact text matches a keyword.
+
+    Stricter than substring matching to avoid false positives
+    (e.g., "whatsapp" containing "apps", or "Connect with us" social blurbs).
+    """
+    for link in soup.find_all("a", href=True):
+        full_url = urljoin(base_url, link["href"])
+        path_segments = [
+            seg.lower() for seg in urlparse(full_url).path.split("/") if seg
+        ]
+        text = link.get_text(strip=True).lower()
+        for kw in keywords:
+            if kw in path_segments or text == kw:
+                return full_url
+    return None
+
+
 def _extract_social_links(soup: Any) -> dict[str, str]:
     """Extract social media profile links."""
     social_patterns = {
-        "twitter": r"(twitter\.com|x\.com)/[^/\s\"']+",
+        # Exclude share-intent links (twitter.com/intent, x.com/intent, /share)
+        "twitter": r"(twitter\.com|x\.com)/(?!intent\b|share\b)[^/\s\"']+",
         "linkedin": r"linkedin\.com/(company|in)/[^/\s\"']+",
         "facebook": r"facebook\.com/[^/\s\"']+",
         "youtube": r"youtube\.com/(c/|channel/|@)[^/\s\"']+",
@@ -248,7 +280,7 @@ def _detect_tech_stack(html: str, soup: Any) -> list[str]:
         "Drift": [r"drift\.com", r"driftt"],
         "HubSpot": [r"hubspot", r"hs-scripts"],
         "Google Analytics": [r"google-analytics", r"gtag", r"googletagmanager"],
-        "Segment": [r"segment\.com/analytics", r"analytics\.js"],
+        "Segment": [r"cdn\.segment\.com", r"segment\.com/analytics\.js"],
         "Hotjar": [r"hotjar"],
         "Stripe": [r"stripe\.com", r"js\.stripe"],
         "Cloudflare": [r"cloudflare", r"cf-ray"],
@@ -309,9 +341,12 @@ def _extract_ctas(soup: Any) -> list[str]:
 
 
 def _count_trust_signals(soup: Any) -> int:
-    """Count trust signals on the page (testimonials, logos, badges, reviews)."""
-    count = 0
+    """Count trust signals on the page (testimonials, logos, badges, reviews).
 
+    Deduplicates nested matches (a matching element inside another matching
+    element counts once) and repeated text, so the count stays directional
+    rather than inflated by wrapper markup.
+    """
     # Check for common trust signal patterns in class names and IDs
     trust_keywords = [
         "testimonial", "review", "customer-logo", "client-logo", "trust",
@@ -319,75 +354,150 @@ def _count_trust_signals(soup: Any) -> int:
         "as-seen", "featured-in", "partner-logo",
     ]
 
+    matched: list[Any] = []
+    matched_ids: set[int] = set()
+
+    def _add(element: Any) -> None:
+        if id(element) not in matched_ids:
+            matched.append(element)
+            matched_ids.add(id(element))
+
     for element in soup.find_all(True):
         classes = " ".join(element.get("class", [])).lower()
         element_id = (element.get("id") or "").lower()
         for kw in trust_keywords:
             if kw in classes or kw in element_id:
-                count += 1
+                _add(element)
                 break
 
     # Check for star rating patterns
-    star_elements = soup.find_all(
+    for element in soup.find_all(
         True, class_=re.compile(r"star|rating", re.IGNORECASE)
-    )
-    count += len(star_elements)
+    ):
+        _add(element)
 
     # Check for blockquotes (often used for testimonials)
-    count += len(soup.find_all("blockquote"))
+    for element in soup.find_all("blockquote"):
+        _add(element)
+
+    # Mark matched elements that contain another matched element, so only
+    # the innermost match in a nested chain is counted (wrappers are skipped).
+    has_matched_descendant: set[int] = set()
+    for element in matched:
+        for parent in element.parents:
+            if id(parent) in matched_ids:
+                has_matched_descendant.add(id(parent))
+
+    count = 0
+    seen_texts: set[str] = set()
+    for element in matched:
+        if id(element) in has_matched_descendant:
+            continue
+        # Dedupe by text content (fall back to tag+class for text-less badges)
+        text = element.get_text(strip=True).lower()[:120]
+        key = text or " ".join([element.name] + element.get("class", []))
+        if key in seen_texts:
+            continue
+        seen_texts.add(key)
+        count += 1
 
     return count
 
 
+def _sample_result() -> dict[str, Any]:
+    """Sample output structure used by demo mode."""
+    return {
+        "url": "https://example.com",
+        "company_name": "Example",
+        "page_title": "Example - The Best Tool for Teams",
+        "meta_description": "Example helps teams collaborate better.",
+        "og_tags": {"title": "Example", "description": "Collaborate better."},
+        "value_proposition": "Example helps teams collaborate better.",
+        "pricing_url": "https://example.com/pricing",
+        "tech_stack": ["Google Analytics", "Intercom", "React"],
+        "social_links": {
+            "twitter": "https://twitter.com/example",
+            "linkedin": "https://linkedin.com/company/example",
+        },
+        "cta_texts": ["Get Started Free", "Book a Demo"],
+        "trust_signal_count": 12,
+        "has_blog": True,
+        "has_integrations": True,
+        "has_careers": True,
+        "raw_headers": {
+            "h1": ["Collaborate better with your team"],
+            "h2": ["Features", "Pricing", "Testimonials"],
+        },
+    }
+
+
 def main() -> None:
-    """Standalone demo of the competitor scanner."""
-    print("=" * 60)
-    print("Competitor Scanner - Demo")
-    print("=" * 60)
+    """Command-line entry point for the competitor scanner."""
+    parser = argparse.ArgumentParser(
+        description="Scan a competitor's webpage and extract public signals.",
+        epilog="Example: python3 competitor_scanner.py https://competitor.com",
+    )
+    parser.add_argument(
+        "url",
+        nargs="?",
+        help="Full URL to scan (e.g., https://competitor.com)",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output raw JSON instead of formatted text",
+    )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Show sample output structure without fetching anything",
+    )
+    args = parser.parse_args()
 
-    if not HAS_DEPENDENCIES:
-        print("\nDependencies not installed.")
-        print("Install with: pip install requests beautifulsoup4")
-        print("\nShowing sample output structure instead:\n")
-
-        sample_result = {
-            "url": "https://example.com",
-            "company_name": "Example",
-            "page_title": "Example - The Best Tool for Teams",
-            "meta_description": "Example helps teams collaborate better.",
-            "og_tags": {"title": "Example", "description": "Collaborate better."},
-            "value_proposition": "Example helps teams collaborate better.",
-            "pricing_url": "https://example.com/pricing",
-            "tech_stack": ["Google Analytics", "Intercom", "React"],
-            "social_links": {
-                "twitter": "https://twitter.com/example",
-                "linkedin": "https://linkedin.com/company/example",
-            },
-            "cta_texts": ["Get Started Free", "Book a Demo"],
-            "trust_signal_count": 12,
-            "has_blog": True,
-            "has_integrations": True,
-            "has_careers": True,
-            "raw_headers": {
-                "h1": ["Collaborate better with your team"],
-                "h2": ["Features", "Pricing", "Testimonials"],
-            },
-        }
-
-        _print_result(sample_result)
+    if args.demo:
+        result = _sample_result()
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print("=" * 60)
+            print("Competitor Scanner - Demo (sample data, nothing fetched)")
+            print("=" * 60)
+            _print_result(result)
         return
 
-    # Demo with a real URL
-    demo_url = "https://example.com"
-    print(f"\nScanning: {demo_url}")
-    print("-" * 60)
+    if not args.url:
+        parser.print_usage(sys.stderr)
+        print(
+            "error: a URL argument is required "
+            "(e.g., python3 competitor_scanner.py https://competitor.com). "
+            "Use --demo to see sample output.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
-    result = scan_competitor(demo_url)
+    if not HAS_DEPENDENCIES:
+        print(
+            "Missing dependencies. Install with: pip install requests beautifulsoup4",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    result = scan_competitor(args.url)
+
+    if args.json:
+        print(json.dumps(result, indent=2))
+        if "error" in result:
+            sys.exit(1)
+        return
 
     if "error" in result:
-        print(f"Error: {result['error']}")
-    else:
-        _print_result(result)
+        print(f"Error: {result['error']}", file=sys.stderr)
+        sys.exit(1)
+
+    print("=" * 60)
+    print(f"Competitor Scanner - {args.url}")
+    print("=" * 60)
+    _print_result(result)
 
 
 def _print_result(result: dict[str, Any]) -> None:

@@ -1,12 +1,16 @@
 ---
 name: onboarding-optimizer
 description: >
-  Evaluate and optimize user onboarding flows for SaaS products. Analyzes
+  Evaluates and optimizes user onboarding flows for SaaS products. Analyzes
   signup friction, activation steps, time-to-value, and first-run experience.
   Provides pattern recommendations based on product type. Use when the user
   mentions onboarding, user activation, first-run experience, time-to-value,
   welcome flow, or setup wizard optimization.
 ---
+
+# Onboarding Optimizer
+
+Evaluate, score, and improve SaaS user onboarding flows to maximize activation rates and reduce time-to-value.
 
 ## First Run
 
@@ -16,7 +20,7 @@ summary before asking questions:
 """
 📝 Onboarding Optimizer
 
-What I'll ask you (10 questions about your current onboarding):
+What I'll ask you (11 questions about your current onboarding):
   1.  Product type and primary use case
   2.  Steps from signup to first value moment    → a number
   3.  Required fields at signup                  → a number
@@ -27,6 +31,7 @@ What I'll ask you (10 questions about your current onboarding):
   8.  Credit card required before trial?         → yes/no
   9.  Welcome email sequence?                    → yes/no
   10. In-app guidance (tooltips, checklists)?    → yes/no
+  11. Educational empty states (guide next action)? → yes/no
 
   Most answers are yes/no or a number. Takes ~3 minutes.
   Type "demo" to see a sample audit first.
@@ -43,19 +48,19 @@ Let's start — what's your product type?
 
 ### Demo Mode
 
-If the user types "demo", use this data to generate a full sample report:
+If the user types "demo", use this data to generate a full sample report. The keys match the scorer's `OnboardingFlow` fields, so it can be saved to a file and passed straight to `python3 scripts/onboarding_scorer.py <file>`:
 
 ```json
 {
-  "product_type": "project management tool",
-  "steps_to_value": 4,
+  "product_type": "collaboration",
+  "total_steps": 4,
   "required_fields": 2,
   "has_progress_indicator": true,
-  "can_skip_steps": true,
+  "has_skip_option": true,
   "has_template_gallery": true,
-  "time_to_value_minutes": 8,
-  "credit_card_required": false,
-  "has_welcome_email": true,
+  "time_to_first_value_minutes": 8,
+  "requires_credit_card_upfront": false,
+  "has_welcome_email_sequence": true,
   "has_in_app_guidance": false,
   "has_empty_state_education": false
 }
@@ -70,10 +75,6 @@ If the user doesn't know an answer:
 - Accept "not sure" or "skip" and score that factor as neutral (0 points)
 - Continue with remaining questions
 - Note which factors were unknown in the report
-
-# Onboarding Optimizer
-
-Evaluate, score, and improve SaaS user onboarding flows to maximize activation rates and reduce time-to-value.
 
 ## Commands
 
@@ -101,7 +102,7 @@ Interactive onboarding flow audit. Walk through the user's current onboarding ex
 
 **Output format:**
 ```
-Onboarding Score: 72/100 (Grade: B)
+Onboarding Score: 75/100 (Grade: C)
 
 Scoring Breakdown:
   Base score:              50
@@ -110,11 +111,11 @@ Scoring Breakdown:
   Progress indicator:      +10
   Skip option:             +10
   Template gallery:        +5
+  Empty state education:   +0  (not present)
   Time-to-value (8 min):   +5  (5-15 min range)
-  Welcome email sequence:  +10
-  In-app guidance:         -0  (not present)
   Credit card upfront:     -15
-  Empty state education:   -0  (not present)
+  Welcome email sequence:  +10
+  In-app guidance:         +0  (not present)
 
 Recommended Pattern: Progressive Disclosure
 Top Improvements: [...]
@@ -183,7 +184,6 @@ Generate a customized onboarding improvement checklist based on the current flow
 - NEVER ask "should I save this?" — just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -217,6 +217,8 @@ NEVER dump the full report in chat. The file is the deliverable.
 
 - `references/onboarding-patterns.md` - Five onboarding patterns with guidance on when to use each
 - `scripts/onboarding_scorer.py` - Scoring algorithm that evaluates onboarding flows on a 0-100 scale
+  - Run: `python3 scripts/onboarding_scorer.py flow.json` where `flow.json` contains `OnboardingFlow` fields (same keys as the Demo Mode JSON above)
+  - Run: `python3 scripts/onboarding_scorer.py --demo` for a built-in sample run
 
 ## Guidelines
 
