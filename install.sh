@@ -56,6 +56,11 @@ fi
 PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
 echo -e "  ${GREEN}python3${NC} - found (v$PYTHON_VERSION)"
 
+if ! python3 -c 'import sys; raise SystemExit(sys.version_info < (3, 9))'; then
+    echo -e "${RED}Error: Python 3.9 or newer is required.${NC}"
+    exit 1
+fi
+
 if ! command -v pip3 &> /dev/null && ! command -v pip &> /dev/null; then
     echo -e "${YELLOW}Warning: pip not found. Python dependencies will need manual installation.${NC}"
     PIP_AVAILABLE=false
@@ -89,7 +94,7 @@ SKILL_COUNT=0
 for skill_dir in "$TEMP_DIR/$REPO_NAME/skills"/*/; do
     if [ -d "$skill_dir" ]; then
         skill_name=$(basename "$skill_dir")
-        rm -rf "$SKILLS_DIR/$skill_name"
+        rm -rf "${SKILLS_DIR:?}/$skill_name"
         cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
         echo -e "  ${GREEN}+${NC} $skill_name"
         SKILL_COUNT=$((SKILL_COUNT + 1))

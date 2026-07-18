@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Skills-15-blue?style=for-the-badge" alt="15 Skills" />
+  <img src="https://img.shields.io/badge/Skills-16-blue?style=for-the-badge" alt="16 Skills" />
   <img src="https://img.shields.io/badge/Templates-4-yellow?style=for-the-badge" alt="4 Templates" />
-  <img src="https://img.shields.io/badge/Scripts-19-green?style=for-the-badge" alt="19 Scripts" />
+  <img src="https://img.shields.io/badge/Scripts-20-green?style=for-the-badge" alt="20 Scripts" />
   <img src="https://img.shields.io/badge/Built_for-Claude_Code-blueviolet?style=for-the-badge" alt="Built for Claude Code" />
   <img src="https://img.shields.io/badge/License-MIT-orange?style=for-the-badge" alt="MIT License" />
 </p>
@@ -14,7 +14,7 @@
 
 ---
 
-15 specialized skills that turn your AI coding agent into a growth marketing expert. Built for Claude Code, compatible with any tool supporting the [Agent Skills](https://github.com/anthropics/skills) standard.
+16 specialized skills that turn your AI coding agent into a growth marketing expert. Built for Claude Code, compatible with any tool supporting the [Agent Skills](https://github.com/anthropics/skills) standard.
 
 Every skill produces **actionable output** saved as a `.md` report file - scores, audits, and data-driven recommendations. Not just knowledge dumps. Give it a URL, your metrics, or your app name and get back a scored audit with prioritized fixes, saved to a file you can share.
 
@@ -24,8 +24,8 @@ Every skill produces **actionable output** saved as a `.md` report file - scores
 
 | | |
 |---|---|
-| **Skills** | 15 specialized growth skills |
-| **Scripts** | 19 Python automation scripts |
+| **Skills** | 16 specialized growth skills |
+| **Scripts** | 20 Python automation scripts |
 | **Agents** | 3 orchestration agents |
 | **Templates** | 4 strategy templates |
 | **License** | MIT - free forever |
@@ -51,6 +51,7 @@ Every skill produces **actionable output** saved as a `.md` report file - scores
 | **saas-landing-builder** | Landing URL | Section completeness (X/12), missing elements, structure score | `LANDING-PAGE-REVIEW-REPORT.md` |
 | **reddit-opportunity-finder** | Keywords | Scored Reddit threads, opportunity ranking, best subreddits | `REDDIT-OPPORTUNITIES-REPORT.md` |
 | **brand-mention-scanner** | Brand name | Cross-platform mentions (Reddit/HN/GitHub), sentiment, opportunities | `BRAND-MENTIONS-REPORT.md` |
+| **xquik-social-intel** | Xquik data or API key | X post theme, intent, and opportunity scoring | `XQUIK-SOCIAL-INTEL-REPORT.md` |
 
 ---
 
@@ -89,6 +90,7 @@ pip install -r requirements.txt
 | 13 | saas-landing-builder | `/saas-landing-builder review <url>` | Landing page structure review, design, and copy frameworks |
 | 14 | reddit-opportunity-finder | `/reddit-opportunity-finder search <kw>` | Find high-intent Reddit threads for your product |
 | 15 | brand-mention-scanner | `/brand-mention-scanner scan <brand>` | Brand mention tracking across Reddit, HN, and GitHub |
+| 16 | xquik-social-intel | `/xquik-social-intel analyze` | Analyze X data from Xquik exports or API results |
 | - | growth-skills | `/growth-skills` | Index of all available skills and commands |
 
 ---
@@ -113,6 +115,7 @@ saas-growth-marketing-skills/
     saas-landing-builder/     # Landing page design
     reddit-opportunity-finder/ # Reddit thread discovery
     brand-mention-scanner/    # Brand monitoring
+    xquik-social-intel/       # X data social intelligence
     growth-skills/            # /growth-skills index of all skills
   agents/
     growth-strategist.md      # Orchestrates growth audits
@@ -160,12 +163,13 @@ Install and start auditing in under 60 seconds.
 
 ### Optional API Integrations
 
-7 skills support optional API keys for higher rate limits and richer data. If no keys are set, the free flow works exactly as before.
+8 skills support optional API keys for higher rate limits and richer data. If no keys are set, the free flow works exactly as before.
 
 | Skill | Environment Variable | Service | What It Adds |
 |-------|---------------------|---------|-------------|
 | reddit-opportunity-finder | `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET` | Reddit OAuth | Full Reddit search data (without keys, falls back to limited RSS results) |
 | brand-mention-scanner | `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `GITHUB_TOKEN` | Reddit OAuth, GitHub | Full Reddit data + 30 req/min GitHub search (vs 10) |
+| xquik-social-intel | `XQUIK_API_KEY` | Xquik | Live X data extraction and analysis |
 | geo-seo-auditor | `GOOGLE_API_KEY`, `AHREFS_API_KEY` | PageSpeed, Ahrefs | Real Core Web Vitals, backlink data |
 | landing-page-cro | `GOOGLE_API_KEY` | PageSpeed Insights | Real performance scores |
 | web-app-growth-engine | `GOOGLE_API_KEY` | PageSpeed Insights | Real performance scores |

@@ -36,6 +36,7 @@ GIVE ME A KEYWORD OR BRAND:
   /aso-optimizer analyze <app>       App store listing score
   /reddit-opportunity-finder search  High-intent Reddit threads
   /brand-mention-scanner scan        Mentions across Reddit/HN/GitHub
+  /xquik-social-intel analyze        X data growth signals from Xquik
   /local-seo-optimizer audit         Google Business Profile audit
 
 GIVE ME TEXT - I'LL ANALYZE:
