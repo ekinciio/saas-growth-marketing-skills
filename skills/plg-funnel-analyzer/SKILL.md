@@ -8,6 +8,10 @@ description: >
   metrics, or growth loops.
 ---
 
+# PLG Funnel Analyzer
+
+Analyze and optimize Product-Led Growth funnels using the AARRR (Pirate Metrics) framework. Compares your metrics against industry benchmarks, identifies the biggest funnel leaks, and generates prioritized recommendations to improve conversion at every stage.
+
 ## First Run
 
 When a user runs `/plg-funnel-analyzer audit`, ALWAYS display this input
@@ -63,10 +67,6 @@ If the user types "skip" for any metric:
 - Note which funnel stages could not be assessed
 - Never block the report because one metric is missing
 
-# PLG Funnel Analyzer
-
-Analyze and optimize Product-Led Growth funnels using the AARRR (Pirate Metrics) framework. Compares your metrics against industry benchmarks, identifies the biggest funnel leaks, and generates prioritized recommendations to improve conversion at every stage.
-
 ## Commands
 
 | Command | Description |
@@ -90,9 +90,9 @@ Prompt the user for key PLG metrics:
 
 ### Step 2: Benchmark Comparison
 Compare each metric against PLG SaaS industry benchmarks using a traffic light system:
-- **GREEN** - Top 25% performance
-- **YELLOW** - Median performance
-- **RED** - Bottom 25% performance
+- **GREEN** - Top 25% performance (at or beyond the top-25% threshold)
+- **YELLOW** - Middle 50% (between the bottom-25% and top-25% thresholds)
+- **RED** - Bottom 25% performance (at or beyond the bottom-25% threshold)
 
 ### Step 3: Funnel Leak Detection
 Identify the stage with the largest drop-off and the greatest potential for improvement. The biggest leak is the metric furthest below median in relative terms.
@@ -122,7 +122,7 @@ Use `/plg-funnel-analyzer benchmark <category>` with one of these categories:
 | Monthly Churn | >8% | 5% | <3% |
 | NRR | <95% | 105% | >120% |
 | Time-to-Value | >7 days | 3 days | <1 day |
-| Payback Period | >18 mo | 12 mo | <6 mo |
+| Payback Period | >24 mo | 16 mo | <6 mo |
 
 ## Command Details
 
@@ -212,11 +212,11 @@ The audit maps to the AARRR (Pirate Metrics) framework:
 
 The overall funnel health grade is calculated from the aggregate benchmark performance:
 
-- **A (Excellent)** - 5-6 metrics in GREEN range
-- **B (Good)** - 3-4 metrics in GREEN, rest YELLOW
-- **C (Fair)** - Mostly YELLOW with 1-2 GREEN
-- **D (Needs Work)** - Mix of YELLOW and RED
-- **F (Critical)** - 3+ metrics in RED range
+- **A (Excellent)** - 5-6 metrics GREEN, 0 RED
+- **B (Good)** - 3-4 metrics GREEN, 0 RED
+- **C (Fair)** - Everything else: mostly YELLOW, or 1 RED with at most 1 YELLOW
+- **D (Needs Work)** - 2 RED, or 1 RED plus 2+ YELLOW
+- **F (Critical)** - 3+ metrics RED
 
 ## Important Notes
 
@@ -233,10 +233,9 @@ No metrics or data entered during the audit are stored, cached, or transmitted b
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -248,10 +247,10 @@ No metrics or data entered during the audit are stored, cached, or transmitted b
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Funnel audit complete — saved to PLG-FUNNEL-AUDIT-REPORT.md
+✅ Funnel audit complete - saved to PLG-FUNNEL-AUDIT-REPORT.md
 
 Funnel Health: Grade [A-F]
-Biggest Leak: [stage] — [metric] is [value] (benchmark: [benchmark])
+Biggest Leak: [stage] - [metric] is [value] (benchmark: [benchmark])
 
 Assessment:
   🟢 [Best metric]
@@ -273,3 +272,5 @@ NEVER dump the full report in chat. The file is the deliverable.
 ### `scripts/funnel_analyzer.py`
 
 Accepts user metrics, runs benchmark comparison with traffic light scoring, detects the biggest funnel leak, and generates prioritized recommendations. Includes standalone demo with example data.
+
+Run it directly: `python3 scripts/funnel_analyzer.py metrics.json` (JSON keys: `signup_to_active`, `free_to_paid`, `monthly_churn`, `nrr`, `time_to_value_days`, `payback_months` - all optional), pipe JSON via stdin, or use `--demo` for sample data.

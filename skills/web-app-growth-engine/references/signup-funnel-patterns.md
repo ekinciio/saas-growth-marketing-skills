@@ -33,6 +33,20 @@ A comprehensive reference for optimizing SaaS signup flows, reducing friction, a
 - Product requires custom username creation
 - Enterprise customers need domain-specific email validation
 
+## Passwordless & Passkeys
+
+Passwordless authentication has become a dominant PLG signup pattern - many modern SaaS products never ask new users to create a password at all.
+
+### Patterns
+- **Passkeys (WebAuthn):** device-bound credentials using Face ID, Touch ID, or a security key. Phishing-resistant, no shared secret to leak, and one-tap sign-in on return visits. Offer "Create a passkey" at signup or immediately after the first SSO/email login.
+- **Email OTP / magic-link-first:** the user enters only an email and receives a one-time code or sign-in link. Removes the password field entirely and doubles as email verification. Now a common default for PLG products.
+- **SSO-only:** no email/password path at all - Google/GitHub/Microsoft buttons only. Lowest friction, but exclude it if part of your audience cannot use those providers.
+
+### Fallback Design
+- Always offer at least one fallback (e.g. email OTP) for users on devices without passkey support or who lose access to a provider.
+- Let users add a passkey later from account settings; prompt them after their first successful login rather than blocking signup.
+- If you keep a password path, make it the secondary option visually, below passkey/SSO/OTP.
+
 ## Social Login Friction Reduction
 
 ### Implementation Best Practices
@@ -89,18 +103,20 @@ Collecting user information gradually over multiple sessions rather than all at 
 
 ## Form Field Optimization
 
-### The 7% Rule
-Industry research consistently shows that each additional form field reduces signup conversions by approximately 7%. This compounds:
+### The "Each Field Costs You" Rule
+Industry studies suggest each additional form field reduces signup conversions by roughly 5-10% (often quoted as ~7%, though the exact figure varies widely by audience and field type). Assuming ~7% per field, the effect compounds:
 
-| Number of Fields | Estimated Conversion Impact |
+| Number of Fields | Estimated Conversion Impact (at ~7%/field) |
 |-----------------|---------------------------|
 | 1 field (email only) | Baseline (100%) |
 | 2 fields | ~93% of baseline |
 | 3 fields | ~86% of baseline |
 | 4 fields | ~80% of baseline |
-| 5 fields | ~74% of baseline |
-| 7 fields | ~64% of baseline |
-| 10 fields | ~48% of baseline |
+| 5 fields | ~75% of baseline |
+| 7 fields | ~65% of baseline |
+| 10 fields | ~52% of baseline |
+
+Treat these as directional estimates, not guarantees - a well-motivated audience tolerates more fields than a cold one.
 
 ### Field Priority (Most to Least Essential)
 1. **Email** - Required for account creation and communication
@@ -160,8 +176,8 @@ Industry research consistently shows that each additional form field reduces sig
 
 ### Best Practices Summary
 1. Keep signup to 1-3 fields maximum
-2. Always offer at least one SSO option
-3. Never require a credit card for free trials (reduces signups by 60-80%)
+2. Always offer at least one SSO option (and consider passkeys/email OTP as the default path)
+3. Never require a credit card for free trials (industry studies suggest it sharply reduces signups - figures of 60-80% are often cited)
 4. Use progressive profiling to collect additional data
 5. Make the CTA specific ("Start free trial" beats "Submit")
 6. Show social proof near the signup form

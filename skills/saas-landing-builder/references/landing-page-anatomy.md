@@ -11,7 +11,7 @@ Create an immediate, compelling first impression that communicates your core val
 - Primary headline: 6-10 words, benefit-focused, clear
 - Subheadline: 15-25 words, expand on the headline with specifics
 - Single primary CTA button with action-oriented text
-- Supporting visual: product screenshot, illustration, or demo video
+- Supporting visual: product screenshot, illustration, demo video, or an interactive product demo/tour (embedded walkthroughs let visitors try the product before signing up)
 - Above the fold - everything visible without scrolling
 - White space around the CTA to draw attention
 
@@ -154,7 +154,7 @@ Provide social proof through real customer stories. Let your customers sell your
 - Include specific numbers and outcomes when possible
 - Match testimonials to your target persona
 - 2-3 testimonials is ideal (more is not always better)
-- Video testimonials outperform text by 2-3x
+- Video testimonials often outperform text testimonials (exact lift varies by audience)
 - Include the customer's problem and the result they achieved
 
 ### Common Mistakes
@@ -178,6 +178,7 @@ Present pricing clearly so visitors can self-qualify and make a purchase decisio
 - List the most important features per tier (5-7 max)
 - Include a free tier or trial option
 - Show annual vs monthly pricing toggle
+- For usage-based or credit-based pricing, show a simple calculator or worked examples ("1,000 API calls ≈ $X") so buyers can estimate their bill
 - Add "No credit card required" near the CTA
 - Place pricing above the FAQ section
 
@@ -203,6 +204,7 @@ Address common objections and questions that might prevent a visitor from conver
 - Include questions about pricing, security, setup time, and cancellation
 - Write in the customer's voice for the questions
 - Keep answers concise (2-3 sentences)
+- Consider pairing the FAQ with an AI chat widget/assistant that answers long-tail questions the FAQ does not cover
 
 ### Common Mistakes
 - Too many questions that overwhelm the page

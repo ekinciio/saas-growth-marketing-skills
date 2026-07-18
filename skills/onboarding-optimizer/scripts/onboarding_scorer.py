@@ -5,11 +5,33 @@ Evaluates SaaS user onboarding flows on a 0-100 scale based on friction
 factors, guidance quality, and time-to-value. Recommends an onboarding
 pattern and produces a prioritized improvement list with estimated
 activation lift.
+
+Usage:
+    python3 onboarding_scorer.py flow.json
+    python3 onboarding_scorer.py --demo
+
+The JSON file contains OnboardingFlow fields (all optional), e.g.:
+    {
+      "product_type": "collaboration",
+      "total_steps": 4,
+      "required_fields": 2,
+      "has_progress_indicator": true,
+      "has_skip_option": true,
+      "has_template_gallery": true,
+      "has_empty_state_education": false,
+      "time_to_first_value_minutes": 8,
+      "requires_credit_card_upfront": false,
+      "has_welcome_email_sequence": true,
+      "has_in_app_guidance": false
+    }
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import argparse
+import json
+import sys
+from dataclasses import dataclass, field, fields
 from typing import Dict, List, Optional, Tuple
 
 
@@ -482,11 +504,10 @@ def print_score_report(result: ScoringResult) -> None:
 
     print("\n  Scoring Breakdown:")
     for item in result.breakdown:
-        sign = "+" if item.adjustment >= 0 else ""
         if item.factor == "Base score":
             print(f"    {item.factor:<28} {item.adjustment:>4}  ({item.detail})")
         else:
-            print(f"    {item.factor:<28} {sign}{item.adjustment:>3}  ({item.detail})")
+            print(f"    {item.factor:<28} {item.adjustment:+4d}  ({item.detail})")
 
     print(f"\n  Recommended Pattern: {result.recommended_pattern}")
     print(f"  Rationale: {result.pattern_rationale}")
@@ -511,7 +532,25 @@ def print_score_report(result: ScoringResult) -> None:
 # Standalone demo
 # ---------------------------------------------------------------------------
 
-def main() -> None:
+def _print_flow_details(flow: OnboardingFlow, heading: str) -> None:
+    """Print the input flow details."""
+    print("Onboarding Flow Scorer")
+    print("=" * 55)
+    print(f"\n{heading}:")
+    print(f"  Total steps: {flow.total_steps}")
+    print(f"  Required fields: {flow.required_fields}")
+    print(f"  Progress indicator: {flow.has_progress_indicator}")
+    print(f"  Skip option: {flow.has_skip_option}")
+    print(f"  Template gallery: {flow.has_template_gallery}")
+    print(f"  Empty state education: {flow.has_empty_state_education}")
+    print(f"  Time to first value: {flow.time_to_first_value_minutes} min")
+    print(f"  Credit card upfront: {flow.requires_credit_card_upfront}")
+    print(f"  Welcome email sequence: {flow.has_welcome_email_sequence}")
+    print(f"  In-app guidance: {flow.has_in_app_guidance}")
+    print(f"  Product type: {flow.product_type}")
+
+
+def run_demo() -> None:
     """Run a demo scoring with a sample onboarding flow."""
     sample_flow = OnboardingFlow(
         total_steps=8,
@@ -527,22 +566,62 @@ def main() -> None:
         product_type="collaboration",
     )
 
-    print("Onboarding Flow Scorer")
-    print("=" * 55)
-    print("\nSample Flow Details:")
-    print(f"  Total steps: {sample_flow.total_steps}")
-    print(f"  Required fields: {sample_flow.required_fields}")
-    print(f"  Progress indicator: {sample_flow.has_progress_indicator}")
-    print(f"  Skip option: {sample_flow.has_skip_option}")
-    print(f"  Template gallery: {sample_flow.has_template_gallery}")
-    print(f"  Empty state education: {sample_flow.has_empty_state_education}")
-    print(f"  Time to first value: {sample_flow.time_to_first_value_minutes} min")
-    print(f"  Credit card upfront: {sample_flow.requires_credit_card_upfront}")
-    print(f"  Welcome email sequence: {sample_flow.has_welcome_email_sequence}")
-    print(f"  In-app guidance: {sample_flow.has_in_app_guidance}")
-    print(f"  Product type: {sample_flow.product_type}")
-
+    _print_flow_details(sample_flow, "Sample Flow Details")
     result = score_onboarding(sample_flow)
+    print_score_report(result)
+
+
+def main() -> None:
+    """Command-line entry point for the onboarding scorer."""
+    parser = argparse.ArgumentParser(
+        description="Score a SaaS onboarding flow from a JSON file.",
+        epilog="Example: python3 onboarding_scorer.py flow.json",
+    )
+    parser.add_argument(
+        "flow_file",
+        nargs="?",
+        help="Path to JSON file with OnboardingFlow fields (see module docstring)",
+    )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Run a demo scoring with built-in sample data",
+    )
+    args = parser.parse_args()
+
+    if args.demo:
+        run_demo()
+        return
+
+    if not args.flow_file:
+        parser.print_usage(sys.stderr)
+        print(
+            "error: provide a JSON flow file "
+            "(e.g., python3 onboarding_scorer.py flow.json) or use --demo.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    try:
+        with open(args.flow_file, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"error: could not read {args.flow_file}: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    valid_fields = {f.name for f in fields(OnboardingFlow)}
+    unknown = sorted(set(data) - valid_fields)
+    if unknown:
+        print(
+            f"error: unknown fields in {args.flow_file}: {', '.join(unknown)}. "
+            f"Valid fields: {', '.join(sorted(valid_fields))}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    flow = OnboardingFlow(**data)
+    _print_flow_details(flow, "Flow Details")
+    result = score_onboarding(flow)
     print_score_report(result)
 
 

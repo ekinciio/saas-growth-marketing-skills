@@ -13,16 +13,16 @@
 
 ## Opportunity Summary
 
-Reddit is a **critical channel** for Notion — it's one of the top platforms where prospective users research, compare, and decide on productivity tools. The "Notion alternative" conversation is extremely active, with multiple competitor blogs, listicles, and Reddit threads driving organic traffic.
+Reddit is a **critical channel** for Notion - it's one of the top platforms where prospective users research, compare, and decide on productivity tools. The "Notion alternative" conversation is extremely active, with multiple competitor blogs, listicles, and Reddit threads driving organic traffic.
 
 ### Key Findings
 
 | Metric | Value |
 |--------|-------|
 | Active Notion subreddit | r/Notion (~1M+ members) |
-| Alternative discussion frequency | Very high — dozens of "best alternative" articles reference Reddit |
+| Alternative discussion frequency | Very high - dozens of "best alternative" articles reference Reddit |
 | Common search intent | "Best Notion alternative," "Notion vs [X]," "replace Notion" |
-| Sentiment trend | Mixed — users love flexibility, complain about speed and complexity |
+| Sentiment trend | Mixed - users love flexibility, complain about speed and complexity |
 | Top competing mentions | Obsidian, ClickUp, Coda, Anytype, AFFiNE, Airtable |
 
 ---
@@ -32,7 +32,7 @@ Reddit is a **critical channel** for Notion — it's one of the top platforms wh
 | Subreddit | Relevance | Opportunity Type | Self-Promo Rules |
 |-----------|-----------|-----------------|------------------|
 | **r/Notion** | 🔴 Very High | Product questions, templates, tips, complaints | Value-first content welcome |
-| **r/productivity** | 🔴 Very High | Tool recommendations, workflow optimization | Strict — must provide genuine value |
+| **r/productivity** | 🔴 Very High | Tool recommendations, workflow optimization | Strict - must provide genuine value |
 | **r/SaaS** | 🟡 High | Product launches, competitive discussions | Allowed with transparency |
 | **r/startups** | 🟡 High | Tool stack discussions, efficiency tips | Limited self-promo |
 | **r/Entrepreneur** | 🟡 High | Business tool recommendations | Moderate rules |
@@ -51,14 +51,14 @@ Reddit is a **critical channel** for Notion — it's one of the top platforms wh
 **What users are asking:**
 - "What's the best Notion alternative for [specific use case]?"
 - "I'm tired of Notion's lag, what should I switch to?"
-- "Notion vs ClickUp vs Monday — which one?"
+- "Notion vs ClickUp vs Monday - which one?"
 
 **Common pain points driving these threads:**
-1. **Performance/Speed** — "Notion is slow with large databases"
-2. **Learning Curve** — "Spent hours setting it up, still confused"
-3. **Offline Access** — "Need something that works without internet"
-4. **Privacy/Data Ownership** — "Want local-first or self-hosted"
-5. **Overkill for Simple Needs** — "I just need notes, not a full workspace"
+1. **Performance/Speed** - "Notion is slow with large databases"
+2. **Learning Curve** - "Spent hours setting it up, still confused"
+3. **Offline Access** - "Need something that works without internet"
+4. **Privacy/Data Ownership** - "Want local-first or self-hosted"
+5. **Overkill for Simple Needs** - "I just need notes, not a full workspace"
 
 **Opportunity for Notion:** These threads are defensive opportunities. Notion should have community advocates (or employees) responding with:
 - Acknowledgment of the pain point
@@ -85,12 +85,12 @@ Reddit is a **critical channel** for Notion — it's one of the top platforms wh
 
 ---
 
-### Category 3: "Notion Tips & Workflows" (Medium Opportunity — Retention)
+### Category 3: "Notion Tips & Workflows" (Medium Opportunity - Retention)
 
 **What users are asking:**
 - "How do you organize your Notion workspace?"
 - "Best Notion templates for [use case]?"
-- "Notion AI — is it worth it?"
+- "Notion AI - is it worth it?"
 
 **Opportunity for Notion:** Content marketing + retention. Share:
 - Advanced workflows and template links
@@ -109,7 +109,7 @@ Reddit is a **critical channel** for Notion — it's one of the top platforms wh
 - "Should I pay for Notion AI?"
 
 **Community sentiment (from indexed discussions):**
-- Mixed reviews — some find it useful for meeting notes and writing
+- Mixed reviews - some find it useful for meeting notes and writing
 - Others feel it's a wrapper over generic LLM capabilities
 - Price sensitivity around AI add-on cost
 - Custom Agents generating positive early buzz
@@ -179,13 +179,13 @@ Reddit is a **critical channel** for Notion — it's one of the top platforms wh
 The majority of Reddit threads about Notion are either (a) users asking for alternatives or (b) users asking for help with complexity. Notion needs to shift the conversation toward "look what I built with Notion" success stories.
 
 ### 2. Obsidian Is the Philosophical Alternative, Not a Feature Competitor
-Reddit's Obsidian community doesn't compare features — they compare philosophy (local-first, privacy, Markdown ownership). Notion can't win this argument; instead, focus on collaboration and AI as differentiators that Obsidian can't match.
+Reddit's Obsidian community doesn't compare features - they compare philosophy (local-first, privacy, Markdown ownership). Notion can't win this argument; instead, focus on collaboration and AI as differentiators that Obsidian can't match.
 
 ### 3. Template Sharing Is the #1 Growth Hack on Reddit
-The most upvoted Notion-related posts are template shares. Every template shared is a signup funnel — the user must create a Notion account to duplicate it. Invest in community template creators.
+The most upvoted Notion-related posts are template shares. Every template shared is a signup funnel - the user must create a Notion account to duplicate it. Invest in community template creators.
 
 ### 4. AI Discussion Is the New Battleground
-"Notion AI vs ChatGPT" threads are increasing. Notion needs clear, specific use cases that show AI value *inside* the workspace (not just generic text generation). Custom Agents and Enterprise Search are the strongest differentiators — these need Reddit-friendly explainers.
+"Notion AI vs ChatGPT" threads are increasing. Notion needs clear, specific use cases that show AI value *inside* the workspace (not just generic text generation). Custom Agents and Enterprise Search are the strongest differentiators - these need Reddit-friendly explainers.
 
 ---
 

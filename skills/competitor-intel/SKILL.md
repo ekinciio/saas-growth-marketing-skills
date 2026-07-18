@@ -1,12 +1,16 @@
 ---
 name: competitor-intel
 description: >
-  Conduct competitive analysis for SaaS products. Analyzes competitor
+  Conducts competitive analysis for SaaS products. Analyzes competitor
   positioning, pricing, features, marketing channels, and content strategy.
   Generates battle cards and competitive positioning frameworks.
   Use when the user mentions competitive analysis, competitor research,
   battle cards, competitive positioning, or market landscape.
 ---
+
+# Competitor Intel
+
+Conduct structured competitive analysis for SaaS products, generate sales battle cards, map market landscapes, and build competitive positioning strategies.
 
 ## First Run
 
@@ -17,7 +21,7 @@ display this intro before starting:
 📡 Competitor Intel
 
 What I'll do:
-  Fetch the competitor URL and extract publicly visible signals —
+  Fetch the competitor URL and extract publicly visible signals -
   positioning, features, CTAs, social channels, and trust elements.
 
 What you'll get:
@@ -36,10 +40,6 @@ Starting...
 
 Then proceed immediately.
 
-# Competitor Intel
-
-Conduct structured competitive analysis for SaaS products, generate sales battle cards, map market landscapes, and build competitive positioning strategies.
-
 ## Commands
 
 ### `/competitor-intel analyze <competitor-url>`
@@ -48,7 +48,7 @@ Run a full competitor analysis by scanning the provided URL and combining it wit
 
 **Steps:**
 1. Accept the competitor URL from the user
-2. Run `scripts/competitor_scanner.py` to extract publicly available page data (title, meta description, headers, CTAs, social links, tech signals)
+2. Run `python3 scripts/competitor_scanner.py <url>` to extract publicly available page data (title, meta description, headers, CTAs, social links, tech signals). Add `--json` for machine-readable output.
 3. Ask the user to supplement with any known information about pricing, funding, team size, and market positioning
 4. Analyze the extracted data against the framework in `references/analysis-framework.md`
 5. Generate a structured competitor profile
@@ -86,6 +86,8 @@ Opportunities Against:
   - [Opportunity 1]
   - [Opportunity 2]
 ```
+
+Note: tech stack and social channel detection is heuristic and directional - verify manually before citing it in deliverables.
 
 **Report:** Save output to `COMPETITOR-ANALYSIS-REPORT.md`
 
@@ -161,10 +163,9 @@ Develop a competitive positioning strategy.
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -176,7 +177,7 @@ Develop a competitive positioning strategy.
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Competitor analysis complete — saved to COMPETITOR-ANALYSIS-REPORT.md
+✅ Competitor analysis complete - saved to COMPETITOR-ANALYSIS-REPORT.md
 
 Competitor: [Name]
 Positioning: [one-line value prop extracted]
@@ -195,7 +196,7 @@ NEVER dump the full report in chat. The file is the deliverable.
 
 This skill works out of the box by fetching a single public web page. However, deeper competitive data (traffic estimates, keyword rankings, tech stack) cannot be extracted from a single page fetch alone.
 
-If the user provides their own API keys, use them for richer competitive intelligence.
+If the user provides their own API keys, use them for richer competitive intelligence. Enrichment is model-driven: the scanner script does not call these APIs. When a key is set, Claude calls the service's API directly (e.g., via curl or WebFetch) and merges the results into the competitor profile.
 
 | Environment Variable | Service | What It Unlocks |
 |---------------------|---------|-----------------|
@@ -213,6 +214,18 @@ export SIMILARWEB_API_KEY="your_api_key"
 
 # BuiltWith (optional)
 export BUILTWITH_API_KEY="your_api_key"
+```
+
+**Example endpoints** (call directly with the key set, substituting the competitor's domain):
+```bash
+# SEMrush - domain overview (traffic, keywords)
+curl "https://api.semrush.com/?type=domain_ranks&key=$SEMRUSH_API_KEY&domain=competitor.com&database=us"
+
+# SimilarWeb - monthly visits
+curl "https://api.similarweb.com/v1/website/competitor.com/total-traffic-and-engagement/visits?api_key=$SIMILARWEB_API_KEY&granularity=monthly&main_domain_only=true"
+
+# BuiltWith - full technology stack
+curl "https://api.builtwith.com/v21/api.json?KEY=$BUILTWITH_API_KEY&LOOKUP=competitor.com"
 ```
 
 **Behavior:**

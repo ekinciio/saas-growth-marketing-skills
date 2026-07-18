@@ -76,12 +76,20 @@ def score_record(record: dict[str, Any]) -> dict[str, Any]:
 def analyze(path: str) -> dict[str, Any]:
     """Analyze an Xquik JSON or CSV export."""
     records = _load_records(Path(path))
-    scored = sorted((score_record(record) for record in records), key=lambda item: item["score"], reverse=True)
+    scored = sorted(
+        (score_record(record) for record in records),
+        key=lambda item: item["score"],
+        reverse=True,
+    )
     top_records = scored[:10]
     return {
         "records_analyzed": len(records),
         "top_records": top_records,
-        "average_score": round(sum(item["score"] for item in scored) / len(scored), 2) if scored else 0,
+        "average_score": (
+            round(sum(item["score"] for item in scored) / len(scored), 2)
+            if scored
+            else 0
+        ),
     }
 
 
@@ -91,7 +99,7 @@ def format_report(results: dict[str, Any]) -> str:
         "# Xquik Social Intel Report",
         "",
         f"Records analyzed: {results['records_analyzed']}",
-        f"Average opportunity score: {results['average_score']}",
+        f"Average lexical signal score: {results['average_score']}",
         "",
         "## Top Signals",
         "",
@@ -108,7 +116,12 @@ def main() -> None:
     if len(sys.argv) != 2:
         print("Usage: python xquik_social_intel.py <xquik-export.json|csv>")
         raise SystemExit(1)
-    print(format_report(analyze(sys.argv[1])))
+    try:
+        report = format_report(analyze(sys.argv[1]))
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        raise SystemExit(1) from error
+    print(report)
 
 
 if __name__ == "__main__":

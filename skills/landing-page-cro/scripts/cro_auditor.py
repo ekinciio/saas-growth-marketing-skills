@@ -6,20 +6,25 @@ Detects CTAs, forms, social proof elements, trust signals, and heading
 structure. Returns a score breakdown and top 5 recommendations.
 
 Usage:
-    python cro_auditor.py <url>
+    python cro_auditor.py <url-or-html-file>
+
+    Accepts either a URL to fetch or a path to a saved HTML file
+    (useful for auditing rendered SPA pages saved from the browser).
 
 Requirements:
     pip install requests beautifulsoup4
 """
 
+from __future__ import annotations
+
+import os
 import re
 import sys
 from dataclasses import dataclass, field
 from typing import Optional
-from urllib.parse import urljoin
 
 import requests
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 
 # ---------------------------------------------------------------------------
 # Data structures
@@ -32,6 +37,7 @@ class DimensionScore:
     score: int  # 0-10
     evidence: list[str] = field(default_factory=list)
     recommendations: list[str] = field(default_factory=list)
+    applicable: bool = True  # False = N/A, excluded from the total score
 
 
 @dataclass
@@ -41,16 +47,18 @@ class CROAuditResult:
     total_score: int  # 0-100
     dimensions: list[DimensionScore] = field(default_factory=list)
     top_5_recommendations: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
 # Page fetcher
 # ---------------------------------------------------------------------------
 
+# NOTE: refresh the Chrome version below periodically so the UA stays current.
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
     )
 }
 
@@ -64,6 +72,26 @@ def fetch_page(url: str, timeout: int = 15) -> Optional[BeautifulSoup]:
     except requests.RequestException as exc:
         print(f"Error fetching {url}: {exc}")
         return None
+
+
+def load_source(source: str) -> Optional[BeautifulSoup]:
+    """Load a page from a URL or a local HTML file path."""
+    if os.path.isfile(source):
+        try:
+            with open(source, encoding="utf-8", errors="replace") as fh:
+                return BeautifulSoup(fh.read(), "html.parser")
+        except OSError as exc:
+            print(f"Error reading {source}: {exc}")
+            return None
+    return fetch_page(source)
+
+
+def detect_page_language(soup: BeautifulSoup) -> str:
+    """Return the declared <html lang> value (lowercased), or '' if unset."""
+    html_tag = soup.find("html")
+    if html_tag is None:
+        return ""
+    return (html_tag.get("lang") or "").strip().lower()
 
 
 # ---------------------------------------------------------------------------
@@ -82,9 +110,12 @@ WEAK_CTA_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
+# Word boundaries matter: without them "rated" matches "frustrated"/"integrated"
+# and problem-statement copy gets counted as social proof.
 SOCIAL_PROOF_PATTERNS = re.compile(
-    r"(testimonial|review|customer|client|trust|rated|rating|"
-    r"case\s*study|success\s*stor|loved\s*by|used\s*by|"
+    r"(\btestimonials?\b|\breviews?\b|\bcustomers?\b|\bclients?\b|"
+    r"\btrust(ed)?\b|\brated\b|\bratings?\b|"
+    r"\bcase\s*stud(y|ies)|\bsuccess\s*stor|\bloved\s*by|\bused\s*by|"
     r"companies\s*use|teams\s*use|\d[\d,]*\+?\s*(users|customers|teams|companies))",
     re.IGNORECASE,
 )
@@ -153,19 +184,30 @@ def count_form_fields(soup: BeautifulSoup) -> tuple[int, int]:
 def count_social_proof(soup: BeautifulSoup) -> tuple[int, list[str]]:
     """Count social proof elements. Returns (count, evidence_list)."""
     evidence: list[str] = []
-    text = soup.get_text(" ", strip=True)
 
-    # Check for testimonial/review sections
-    for section in soup.find_all(["section", "div"]):
+    # Check for testimonial/review sections. Only look at top-level containers
+    # and dedupe by matched text so nested wrappers are not double-counted
+    # (one piece of evidence per section at most).
+    containers = [
+        s for s in soup.find_all("section") if s.find_parent("section") is None
+    ]
+    if not containers:
+        body = soup.find("body") or soup
+        containers = body.find_all("div", recursive=False)
+    seen_snippets: set[str] = set()
+    for section in containers:
         section_text = section.get_text(" ", strip=True)[:200]
+        if not section_text or section_text in seen_snippets:
+            continue
         if SOCIAL_PROOF_PATTERNS.search(section_text):
+            seen_snippets.add(section_text)
             evidence.append(f"Social proof section detected: {section_text[:80]}...")
 
     # Check for customer logos (images in logo-like containers)
     for img in soup.find_all("img"):
         alt = (img.get("alt", "") or "").lower()
         src = (img.get("src", "") or "").lower()
-        parent_class = " ".join((img.parent or Tag(name="div")).get("class", []))
+        parent_class = " ".join(img.parent.get("class", []) if img.parent else [])
         if any(k in alt + src + parent_class for k in ["logo", "client", "customer", "partner", "trust"]):
             evidence.append(f"Logo/trust image: {alt or src[:60]}")
 
@@ -258,15 +300,32 @@ def score_above_fold(soup: BeautifulSoup) -> DimensionScore:
         dim.score = 2
         dim.recommendations.append("Add a clear H1 headline that communicates your value proposition")
 
-    # Check for subheadline (h2 or p near h1)
-    h2_tags = soup.find_all("h2")
+    # Restrict hero heuristics to the first <section>/<header> after the nav
+    # (page-wide checks would count e.g. the nav logo as a hero image).
+    hero_container = None
+    nav = soup.find("nav")
+    if nav is not None:
+        hero_container = nav.find_next(["section", "header"])
+    if hero_container is None:
+        hero_container = soup.find(["section", "header"])
+    hero_scope = hero_container if hero_container is not None else soup
+
+    # Check for subheadline (h2 within the hero area)
+    h2_tags = hero_scope.find_all("h2")
     if h2_tags:
         dim.score = min(dim.score + 1, 10)
         dim.evidence.append(f"Subheadline (H2) found: '{h2_tags[0].get_text(strip=True)[:60]}'")
 
-    # Check for hero image
-    first_img = soup.find("img")
-    if first_img:
+    # Check for hero image (skip logos and icons)
+    hero_img = None
+    for img in hero_scope.find_all("img"):
+        alt = (img.get("alt", "") or "").lower()
+        src = (img.get("src", "") or "").lower()
+        if "logo" in alt + src or "icon" in alt + src:
+            continue
+        hero_img = img
+        break
+    if hero_img is not None:
         dim.evidence.append("Hero image detected")
         dim.score = min(dim.score + 1, 10)
 
@@ -317,7 +376,7 @@ def score_cta(soup: BeautifulSoup) -> DimensionScore:
         next_sib = el.find_next_sibling()
         if next_sib:
             sibling_text = next_sib.get_text(strip=True).lower()
-        if any(k in sibling_text for k in ["no credit card", "free", "cancel anytime", "no obligation"]):
+        if any(k in sibling_text for k in ["no credit card", "cancel anytime", "free trial", "no obligation"]):
             dim.score = min(dim.score + 1, 10)
             dim.evidence.append("Anxiety-reducing microcopy found near CTA")
             break
@@ -392,8 +451,12 @@ def score_form_simplicity(soup: BeautifulSoup) -> DimensionScore:
     form_count, avg_fields = count_form_fields(soup)
 
     if form_count == 0:
-        dim.score = 7
-        dim.evidence.append("No forms detected (may use external form or CTA link)")
+        dim.score = 0
+        dim.applicable = False
+        dim.evidence.append(
+            "No forms detected (may use external form or CTA link) - "
+            "dimension marked N/A and excluded from the total score"
+        )
         return dim
 
     dim.evidence.append(f"Forms found: {form_count}, avg fields: {avg_fields}")
@@ -508,7 +571,7 @@ def score_objection_handling(soup: BeautifulSoup) -> DimensionScore:
     else:
         dim.score = 1
 
-    if "faq" not in text:
+    if not re.search(r"\bfaq\b|frequently\s+asked", text):
         dim.recommendations.append("Add an FAQ section to proactively address common buyer questions")
     if "pricing" not in text and "price" not in text:
         dim.recommendations.append("Include pricing information or a clear link to pricing page")
@@ -580,19 +643,65 @@ def score_copy_clarity(soup: BeautifulSoup) -> DimensionScore:
 # Main audit function
 # ---------------------------------------------------------------------------
 
-def audit_page(url: str) -> Optional[CROAuditResult]:
+DIMENSION_NAMES = [
+    "Above-the-fold clarity",
+    "CTA visibility and copy strength",
+    "Social proof presence and quality",
+    "Trust signals",
+    "Form simplicity",
+    "Page speed and mobile responsiveness",
+    "Visual hierarchy and scan-ability",
+    "Objection handling",
+    "Urgency and scarcity",
+    "Copy clarity and benefit-driven language",
+]
+
+
+def audit_page(source: str) -> Optional[CROAuditResult]:
     """
-    Run a full CRO audit on the given URL.
+    Run a full CRO audit on the given URL or local HTML file.
 
     Args:
-        url: The landing page URL to audit.
+        source: The landing page URL or HTML file path to audit.
 
     Returns:
         CROAuditResult with scores and recommendations, or None if fetch fails.
     """
-    soup = fetch_page(url)
+    soup = load_source(source)
     if soup is None:
         return None
+
+    warnings: list[str] = []
+
+    # Non-English pages: the text-pattern heuristics are English-only and
+    # would silently punish the page. Warn prominently instead.
+    lang = detect_page_language(soup)
+    if lang and not lang.startswith("en"):
+        warnings.append(
+            f"Page language is '{lang}'. Text-pattern dimensions (copy, trust, "
+            "social proof, objection handling, urgency) are unreliable for "
+            "non-English pages - score those dimensions manually from the "
+            "page content."
+        )
+
+    # Empty page: no visible text means no meaningful audit is possible.
+    if get_text_stats(soup)["word_count"] == 0:
+        warnings.append(
+            "Page contains no visible text content - all dimensions scored 0. "
+            "The page may be an empty shell or a JavaScript-rendered SPA; "
+            "save the rendered HTML and audit that file instead."
+        )
+        dimensions = [
+            DimensionScore(name=name, score=0, evidence=["No visible text content"])
+            for name in DIMENSION_NAMES
+        ]
+        return CROAuditResult(
+            url=source,
+            total_score=0,
+            dimensions=dimensions,
+            top_5_recommendations=[],
+            warnings=warnings,
+        )
 
     # Score all 10 dimensions
     dimensions = [
@@ -608,11 +717,18 @@ def audit_page(url: str) -> Optional[CROAuditResult]:
         score_copy_clarity(soup),
     ]
 
-    total_score = sum(d.score for d in dimensions)
+    # N/A dimensions (e.g. no form on the page) are excluded and the total
+    # is rescaled to /100 so pages are not rewarded or punished for them.
+    applicable = [d for d in dimensions if d.applicable]
+    max_points = len(applicable) * 10
+    raw = sum(d.score for d in applicable)
+    total_score = round(raw / max_points * 100) if max_points else 0
 
     # Collect all recommendations, prioritize by lowest-scoring dimensions
     all_recs: list[tuple[int, str]] = []
     for dim in dimensions:
+        if not dim.applicable:
+            continue
         for rec in dim.recommendations:
             all_recs.append((dim.score, rec))
 
@@ -621,10 +737,11 @@ def audit_page(url: str) -> Optional[CROAuditResult]:
     top_5 = [rec for _, rec in all_recs[:5]]
 
     return CROAuditResult(
-        url=url,
+        url=source,
         total_score=total_score,
         dimensions=dimensions,
         top_5_recommendations=top_5,
+        warnings=warnings,
     )
 
 
@@ -635,6 +752,13 @@ def print_report(result: CROAuditResult) -> None:
     print(f"  URL: {result.url}")
     print("=" * 70)
     print()
+
+    if result.warnings:
+        print("!" * 70)
+        for warning in result.warnings:
+            print(f"  WARNING: {warning}")
+        print("!" * 70)
+        print()
 
     # Score label
     if result.total_score >= 90:
@@ -657,6 +781,9 @@ def print_report(result: CROAuditResult) -> None:
     print("-" * 70)
 
     for dim in result.dimensions:
+        if not dim.applicable:
+            print(f"  [N/A] {dim.name:<41} {'N/A':>6}")
+            continue
         indicator = "RED" if dim.score <= 3 else ("YEL" if dim.score <= 6 else "GRN")
         print(f"  [{indicator}] {dim.name:<41} {dim.score:>3}/10")
 
@@ -675,7 +802,8 @@ def print_report(result: CROAuditResult) -> None:
     print("  DETAILED EVIDENCE:")
     print()
     for dim in result.dimensions:
-        print(f"  [{dim.score}/10] {dim.name}")
+        label = f"{dim.score}/10" if dim.applicable else "N/A"
+        print(f"  [{label}] {dim.name}")
         for ev in dim.evidence[:3]:
             print(f"    - {ev}")
         print()
@@ -688,21 +816,19 @@ def print_report(result: CROAuditResult) -> None:
 def main() -> None:
     """Run the CRO auditor from the command line."""
     if len(sys.argv) < 2:
-        # Demo mode with example
-        print("Usage: python cro_auditor.py <url>")
-        print()
-        print("Running demo audit on https://example.com ...")
-        print()
-        url = "https://example.com"
-    else:
-        url = sys.argv[1]
+        print("Usage: python cro_auditor.py <url-or-html-file>")
+        print("Example: python cro_auditor.py https://example.com")
+        print("Example: python cro_auditor.py ./saved-page.html")
+        sys.exit(2)
 
-    if not url.startswith(("http://", "https://")):
-        url = "https://" + url
+    source = sys.argv[1]
 
-    result = audit_page(url)
+    if not os.path.isfile(source) and not source.startswith(("http://", "https://")):
+        source = "https://" + source
+
+    result = audit_page(source)
     if result is None:
-        print(f"Failed to audit {url}. Check the URL and try again.")
+        print(f"Failed to audit {source}. Check the URL/path and try again.")
         sys.exit(1)
 
     print_report(result)

@@ -8,21 +8,23 @@ Citability measures how likely an AI search engine is to select and quote a spec
 
 ## The Optimal AI-Cited Passage
 
-Research on AI search engine citation patterns reveals consistent characteristics of passages that get cited:
+Passages that get cited by AI search engines tend to share consistent characteristics:
 
-- **Length:** 134-167 words (the sweet spot for AI citations)
+- **Length:** roughly 130-170 words (a working heuristic used by this skill's scorer, not a published research finding - the practical point is "one complete, self-contained idea per passage")
 - **Structure:** Self-contained - makes sense without surrounding context
 - **Content:** Fact-rich with specific data points, statistics, or definitions
 - **Format:** Clear and direct, answering an implicit or explicit question
 - **Tone:** Authoritative and neutral, avoiding hedging language
 
-### Why 134-167 Words?
+### Why That Length Range?
 
-AI search engines need passages long enough to be informative but short enough to display as a citation. Passages in this range are:
+AI search engines need passages long enough to be informative but short enough to quote or summarize as a citation. Passages around this heuristic range are:
 - Long enough to provide complete, useful answers
 - Short enough to fit within citation display limits
 - Dense enough to contain meaningful information
 - Concise enough to avoid filler content
+
+Treat the exact numbers as a guideline, not a rule: a crisp 80-word definition can outperform a padded 150-word paragraph.
 
 ## Citability Scoring Rubric (0-100)
 
@@ -158,7 +160,7 @@ These patterns significantly reduce citability:
 
 Use this checklist when writing or revising content for AI citability:
 
-- [ ] Each key passage is 134-167 words
+- [ ] Each key passage is roughly 130-170 words (heuristic; one complete idea)
 - [ ] Every passage has at least 2 specific data points
 - [ ] Passages make sense without reading the rest of the page
 - [ ] Each passage answers a question someone might ask an AI
@@ -168,6 +170,31 @@ Use this checklist when writing or revising content for AI citability:
 - [ ] No vague quantifiers ("many", "some", "various")
 - [ ] No dangling references ("this", "that", "the above")
 - [ ] No promotional fluff without supporting evidence
+
+## Other GEO Factors Beyond Passage Quality
+
+Passage-level citability is necessary but not sufficient. Three page- and site-level factors also influence whether AI systems trust and cite your content:
+
+### Content Freshness
+
+AI search engines prefer recently updated sources for time-sensitive queries. Signal freshness explicitly:
+- Keep `dateModified` (and `datePublished`) accurate in Article/WebPage schema markup
+- Show a visible "Last updated" date near the top of evergreen content
+- Actually refresh stale statistics and examples - a bumped date on unchanged content is a trust risk, not a freshness signal
+
+### Structured Data
+
+Schema.org JSON-LD helps AI systems disambiguate what a page is and who is behind it:
+- `Article`/`BlogPosting` with author, publisher, `datePublished`, `dateModified`
+- `Organization`/`Person` with `sameAs` links to authoritative profiles
+- `FAQPage`/`HowTo` where the content genuinely matches those formats
+
+### Entity and Brand Consistency
+
+AI models resolve brands and people as entities across the web. Inconsistency dilutes the entity signal:
+- Use one canonical spelling of the brand/product name everywhere (site, LinkedIn, GitHub, directories, Wikipedia/Wikidata if applicable)
+- Keep descriptions of what the company does consistent across platforms
+- Ensure author names and bios match across the site and external profiles
 
 ## Score Interpretation
 

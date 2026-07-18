@@ -1,15 +1,25 @@
 """
 llmstxt_generator.py - Analyze, validate, and generate llms.txt files.
 
-Checks whether a site has an llms.txt file, validates its format
-against the specification, and generates a recommended llms.txt
+Checks whether a site has an llms.txt file, validates it against the
+llms.txt proposal (llmstxt.org), and generates a recommended llms.txt
 if one is missing or incomplete.
+
+The llms.txt format is pure Markdown:
+- A required H1 with the site/project name (the only hard requirement)
+- A recommended blockquote summary directly after the H1
+- Optional free-form markdown details (no headings)
+- Zero or more H2 sections containing link lists of the form
+  `- [name](url): optional notes`
+- A special `## Optional` section whose links AI systems may skip
+  when a shorter context is needed
 """
 
 import re
 import sys
+import time
 from typing import Any, Dict, List, Optional, Tuple
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 try:
     import requests
@@ -24,27 +34,17 @@ except ImportError:
 
 DEFAULT_TIMEOUT = 15
 
-REQUIRED_FIELDS = ["name", "description", "url", "preferred_name", "citation_policy"]
+# Delay between sequential requests to the same site (politeness)
+REQUEST_DELAY_SECONDS = 1
 
-OPTIONAL_FIELDS = [
-    "founded",
-    "industry",
-    "primary_topics",
-    "content_types",
-    "update_frequency",
-    "language",
-    "preferred_url",
-    "ai_inquiries",
-    "abuse_reports",
-]
+# A curated llms.txt should stay small; warn beyond these bounds
+MAX_RECOMMENDED_LINES = 500
+MAX_RECOMMENDED_LINKS = 200
 
-VALID_SECTIONS = [
-    "Identity",
-    "Content",
-    "Citation",
-    "Contact",
-    "Important Pages",
-]
+# Matches `- [title](url)` or `* [title](url)`, optionally `: notes`
+LINK_ENTRY_RE = re.compile(
+    r"^[-*]\s+\[(?P<title>[^\]]+)\]\((?P<url>[^)\s]+)\)\s*(?::\s*(?P<notes>.*))?$"
+)
 
 
 def fetch_llmstxt(url: str, timeout: int = DEFAULT_TIMEOUT) -> Tuple[bool, Optional[str]]:
@@ -56,8 +56,10 @@ def fetch_llmstxt(url: str, timeout: int = DEFAULT_TIMEOUT) -> Tuple[bool, Optio
 
     Returns:
         A tuple of (exists, content). exists is True if the file
-        was found and returned HTTP 200. content is the file text
-        or None.
+        was found, returned HTTP 200, and is not an HTML page
+        (SPA catch-all routes often return the app shell for any
+        path, which is not a real llms.txt). content is the file
+        text or None.
     """
     parsed = urlparse(url)
     llms_url = f"{parsed.scheme}://{parsed.netloc}/llms.txt"
@@ -67,10 +69,13 @@ def fetch_llmstxt(url: str, timeout: int = DEFAULT_TIMEOUT) -> Tuple[bool, Optio
         }
         response = requests.get(llms_url, headers=headers, timeout=timeout)
         if response.status_code == 200:
-            content_type = response.headers.get("Content-Type", "")
-            if "text" in content_type or "plain" in content_type or not content_type:
-                return True, response.text
-            return True, response.text
+            body = response.text
+            # Sniff for HTML bodies: a SPA catch-all serving index.html
+            # at /llms.txt is a false positive, not a real llms.txt.
+            body_head = body.lstrip()[:200].lower()
+            if body_head.startswith("<!doctype") or body_head.startswith("<html"):
+                return False, None
+            return True, body
         return False, None
     except requests.RequestException:
         return False, None
@@ -83,146 +88,158 @@ def parse_llmstxt(content: str) -> Dict[str, Any]:
         content: The raw llms.txt file content.
 
     Returns:
-        Dictionary with sections as keys, each containing their
-        fields and values.
+        Dictionary with:
+        - title: The H1 text (site/project name), or None
+        - summary: The blockquote summary text, or None
+        - details: Free-form markdown lines before the first H2
+        - sections: Dict mapping H2 section name to a list of link
+          entries ({title, url, notes})
+        - has_optional_section: Whether an `## Optional` section exists
     """
     result: Dict[str, Any] = {
-        "title_comment": None,
+        "title": None,
+        "summary": None,
+        "details": [],
         "sections": {},
-        "important_pages": [],
+        "has_optional_section": False,
     }
 
+    # Strip an optional byte-order mark
+    content = content.lstrip("\ufeff")
+
     current_section: Optional[str] = None
+    summary_lines: List[str] = []
 
     for line in content.splitlines():
         stripped = line.strip()
 
-        # Title comment (first # line)
-        if stripped.startswith("# ") and result["title_comment"] is None:
-            result["title_comment"] = stripped[2:].strip()
+        # H1 title (first one wins)
+        if stripped.startswith("# ") and result["title"] is None:
+            result["title"] = stripped[2:].strip()
             continue
 
-        # Section header
+        # H2 section header
         if stripped.startswith("## "):
             current_section = stripped[3:].strip()
-            if current_section not in result["sections"]:
-                result["sections"][current_section] = {}
+            result["sections"].setdefault(current_section, [])
+            if current_section.lower() == "optional":
+                result["has_optional_section"] = True
             continue
 
-        # Skip empty lines and other comments
-        if not stripped or stripped.startswith("#"):
+        # Blockquote summary (before the first H2 only)
+        if stripped.startswith(">") and current_section is None:
+            summary_lines.append(stripped.lstrip("> ").strip())
             continue
 
-        # Important Pages entries (list format)
-        if current_section and current_section.lower() == "important pages":
-            if stripped.startswith("- "):
-                entry = stripped[2:].strip()
-                if ": " in entry:
-                    title, page_url = entry.split(": ", 1)
-                    result["important_pages"].append({
-                        "title": title.strip(),
-                        "url": page_url.strip(),
-                    })
+        if not stripped:
             continue
 
-        # Key-value pairs
-        if current_section and ": " in stripped:
-            key, value = stripped.split(": ", 1)
-            result["sections"].setdefault(current_section, {})
-            result["sections"][current_section][key.strip()] = value.strip()
+        # Link-list entries inside H2 sections
+        if current_section is not None:
+            match = LINK_ENTRY_RE.match(stripped)
+            if match:
+                result["sections"][current_section].append({
+                    "title": match.group("title").strip(),
+                    "url": match.group("url").strip(),
+                    "notes": (match.group("notes") or "").strip() or None,
+                })
+            continue
+
+        # Free-form details between the summary and the first H2
+        result["details"].append(stripped)
+
+    if summary_lines:
+        result["summary"] = " ".join(summary_lines).strip() or None
 
     return result
 
 
 def validate_llmstxt(content: str) -> Dict[str, Any]:
-    """Validate an llms.txt file against the specification.
+    """Validate an llms.txt file against the llms.txt proposal.
+
+    The only hard requirement is an H1 with the site/project name.
+    Everything else (blockquote summary, H2 link-list sections,
+    valid URLs, reasonable length) is a recommendation and produces
+    warnings rather than errors.
 
     Args:
         content: The raw llms.txt file content.
 
     Returns:
         Dictionary containing:
-        - valid: Whether the file passes all required checks
-        - errors: List of validation errors
-        - warnings: List of non-critical issues
+        - valid: Whether the file passes the required checks
+        - errors: List of validation errors (required checks)
+        - warnings: List of non-critical issues (recommendations)
         - parsed: The parsed file structure
-        - field_coverage: Percentage of recommended fields present
+        - coverage: Percentage of recommended checks passed
     """
     errors: List[str] = []
     warnings: List[str] = []
 
-    # Parse the file
     parsed = parse_llmstxt(content)
 
-    # Check for required sections
-    section_names = [s.lower() for s in parsed["sections"].keys()]
+    # Required: H1 with the site/project name
+    if not parsed["title"]:
+        errors.append(
+            "Missing required H1 title. The file must start with "
+            "'# Site Name' (the only hard requirement of the spec)."
+        )
 
-    required_sections = ["identity", "citation"]
-    for section in required_sections:
-        if section not in section_names:
-            errors.append(f"Missing required section: {section}")
+    # Recommended: blockquote summary after the H1
+    has_summary = bool(parsed["summary"])
+    if not has_summary:
+        warnings.append(
+            "No blockquote summary found. Add '> One-line summary' "
+            "directly after the H1 so AI systems get key context first."
+        )
 
-    # Collect all fields across sections
-    all_fields: Dict[str, str] = {}
-    for section_data in parsed["sections"].values():
-        if isinstance(section_data, dict):
-            all_fields.update(section_data)
+    # Recommended: at least one H2 section containing link entries
+    all_links: List[Dict[str, Any]] = []
+    for entries in parsed["sections"].values():
+        all_links.extend(entries)
 
-    # Check required fields
-    for field_name in REQUIRED_FIELDS:
-        if field_name not in all_fields:
-            errors.append(f"Missing required field: {field_name}")
-        elif not all_fields[field_name].strip():
-            errors.append(f"Required field is empty: {field_name}")
+    has_sections = bool(parsed["sections"])
+    has_links = bool(all_links)
+    if not has_sections:
+        warnings.append(
+            "No H2 sections found. Add sections like '## Docs' containing "
+            "'- [title](url): notes' link lists."
+        )
+    elif not has_links:
+        warnings.append(
+            "H2 sections exist but contain no '- [title](url)' link entries. "
+            "Each section should be a markdown list of links."
+        )
 
-    # Validate specific field formats
-    if "url" in all_fields:
-        url_value = all_fields["url"]
-        if not url_value.startswith(("http://", "https://")):
-            errors.append(f"URL field should start with http:// or https://: {url_value}")
-
-    if "description" in all_fields:
-        desc = all_fields["description"]
-        if len(desc) > 160:
+    # Recommended: link URLs are well-formed absolute URLs
+    urls_ok = True
+    for link in all_links:
+        if not link["url"].startswith(("http://", "https://")):
+            urls_ok = False
             warnings.append(
-                f"Description is {len(desc)} characters. Recommended: under 160 characters."
+                f"Link '{link['title']}' does not use an absolute http(s) URL: {link['url']}"
             )
 
-    if "language" in all_fields:
-        lang = all_fields["language"]
-        if len(lang) != 2:
-            warnings.append(
-                f"Language code '{lang}' does not appear to be a valid ISO 639-1 code (should be 2 letters)."
-            )
+    # Recommended: reasonable length (curated overview, not a sitemap dump)
+    line_count = len(content.splitlines())
+    length_ok = True
+    if line_count > MAX_RECOMMENDED_LINES or len(all_links) > MAX_RECOMMENDED_LINKS:
+        length_ok = False
+        warnings.append(
+            f"File is very long ({line_count} lines, {len(all_links)} links). "
+            "llms.txt should be a curated overview, not an exhaustive sitemap."
+        )
 
-    # Check email fields
-    email_fields = ["ai_inquiries", "abuse_reports"]
-    for ef in email_fields:
-        if ef in all_fields:
-            email = all_fields[ef]
-            if "@" not in email or "." not in email:
-                warnings.append(f"Field '{ef}' does not look like a valid email: {email}")
-
-    # Check Important Pages
-    if not parsed["important_pages"]:
-        warnings.append("No Important Pages listed. Consider adding 5-10 key pages.")
-    else:
-        for page in parsed["important_pages"]:
-            if not page["url"].startswith(("http://", "https://")):
-                warnings.append(
-                    f"Important Page URL should use full URL: {page['title']} - {page['url']}"
-                )
-
-    # Check optional sections
-    optional_sections = ["content", "contact"]
-    for section in optional_sections:
-        if section not in section_names:
-            warnings.append(f"Recommended section missing: {section}")
-
-    # Calculate field coverage
-    all_known_fields = REQUIRED_FIELDS + OPTIONAL_FIELDS
-    present_count = sum(1 for f in all_known_fields if f in all_fields)
-    coverage = (present_count / len(all_known_fields)) * 100 if all_known_fields else 0
+    # Coverage of recommended elements
+    checks = [
+        bool(parsed["title"]),
+        has_summary,
+        has_sections,
+        has_links,
+        urls_ok,
+        length_ok,
+    ]
+    coverage = (sum(1 for c in checks if c) / len(checks)) * 100
 
     is_valid = len(errors) == 0
 
@@ -231,7 +248,7 @@ def validate_llmstxt(content: str) -> Dict[str, Any]:
         "errors": errors,
         "warnings": warnings,
         "parsed": parsed,
-        "field_coverage": round(coverage, 1),
+        "coverage": round(coverage, 1),
     }
 
 
@@ -290,16 +307,18 @@ def extract_site_info(url: str, timeout: int = DEFAULT_TIMEOUT) -> Dict[str, Any
         if og_desc and og_desc.get("content"):
             info["og_description"] = og_desc["content"].strip()
 
-        # Extract navigation links for Important Pages
+        # Extract navigation links for section link lists
         nav_links = []
         for nav in soup.find_all("nav"):
             for a_tag in nav.find_all("a", href=True):
                 href = a_tag["href"]
                 text = a_tag.get_text(strip=True)
                 if text and href and not href.startswith(("#", "javascript:", "mailto:")):
-                    if not href.startswith(("http://", "https://")):
-                        href = f"{base_url}{href}" if href.startswith("/") else f"{base_url}/{href}"
-                    nav_links.append({"title": text, "url": href})
+                    # urljoin handles relative, root-relative, and
+                    # protocol-relative (//host/path) URLs correctly
+                    href = urljoin(base_url + "/", href)
+                    if href.startswith(("http://", "https://")):
+                        nav_links.append({"title": text, "url": href})
 
         # Deduplicate by URL
         seen_urls = set()
@@ -320,7 +339,9 @@ def generate_llmstxt(url: str, timeout: int = DEFAULT_TIMEOUT) -> str:
     """Generate a recommended llms.txt file based on site structure.
 
     Fetches the site homepage, extracts metadata and navigation,
-    and generates a well-formatted llms.txt file.
+    and generates an llms.txt file in the real markdown format:
+    H1 title, blockquote summary, free-form details, and H2
+    sections containing link lists (including an Optional section).
 
     Args:
         url: The site URL.
@@ -342,61 +363,53 @@ def generate_llmstxt(url: str, timeout: int = DEFAULT_TIMEOUT) -> str:
     description = (
         site_info.get("og_description")
         or site_info.get("description")
-        or f"Website at {domain}"
+        or f"[Add a one-paragraph summary of what {domain} is and does.]"
     )
-    # Truncate description to 160 chars
-    if len(description) > 160:
-        description = description[:157] + "..."
 
     base_url = site_info["base_url"]
 
     lines = []
-    lines.append(f"# {name} llms.txt")
+    lines.append(f"# {name}")
+    lines.append("")
+    lines.append(f"> {description}")
+    lines.append("")
+    lines.append(
+        "[Optional: add a few short paragraphs or bullet points with key facts "
+        "an AI should know before reading the linked pages. Delete this placeholder.]"
+    )
     lines.append("")
 
-    # Identity section
-    lines.append("## Identity")
-    lines.append(f"name: {name}")
-    lines.append(f"description: {description}")
-    lines.append(f"url: {base_url}")
-    lines.append("founded: [YEAR]")
-    lines.append("industry: [INDUSTRY]")
-    lines.append("")
+    links = site_info["important_links"]
+    if links:
+        # Primary links go in a Key Pages section; extras go in Optional
+        primary = links[:6]
+        extras = links[6:]
 
-    # Content section
-    lines.append("## Content")
-    lines.append("primary_topics: [TOPIC1, TOPIC2, TOPIC3]")
-    lines.append("content_types: [blog, documentation, product-pages]")
-    lines.append("update_frequency: [daily, weekly, monthly]")
-    lines.append("language: en")
-    lines.append("")
+        lines.append("## Key Pages")
+        lines.append("")
+        for link in primary:
+            lines.append(f"- [{link['title']}]({link['url']})")
+        lines.append("")
 
-    # Citation section
-    lines.append("## Citation")
-    lines.append(f"preferred_name: {name}")
-    lines.append(f"preferred_url: {base_url}")
-    lines.append("citation_policy: open - we welcome accurate citations with attribution")
-    lines.append("")
-
-    # Contact section
-    lines.append("## Contact")
-    lines.append(f"ai_inquiries: ai@{domain}")
-    lines.append(f"abuse_reports: legal@{domain}")
-    lines.append("")
-
-    # Important Pages section
-    lines.append("## Important Pages")
-
-    if site_info["important_links"]:
-        for link in site_info["important_links"]:
-            lines.append(f"- {link['title']}: {link['url']}")
+        lines.append("## Optional")
+        lines.append("")
+        if extras:
+            for link in extras:
+                lines.append(f"- [{link['title']}]({link['url']})")
+        else:
+            lines.append(f"- [Blog]({base_url}/blog): Articles and updates")
+        lines.append("")
     else:
-        lines.append(f"- Home: {base_url}")
-        lines.append(f"- About: {base_url}/about")
-        lines.append(f"- Blog: {base_url}/blog")
-        lines.append(f"- Contact: {base_url}/contact")
-
-    lines.append("")
+        lines.append("## Key Pages")
+        lines.append("")
+        lines.append(f"- [Home]({base_url}): Main landing page")
+        lines.append(f"- [About]({base_url}/about): Company background")
+        lines.append(f"- [Contact]({base_url}/contact): How to get in touch")
+        lines.append("")
+        lines.append("## Optional")
+        lines.append("")
+        lines.append(f"- [Blog]({base_url}/blog): Articles and updates")
+        lines.append("")
 
     return "\n".join(lines)
 
@@ -447,17 +460,22 @@ def analyze_llmstxt(url: str, timeout: int = DEFAULT_TIMEOUT) -> Dict[str, Any]:
         for warning in validation.get("warnings", []):
             result["recommendations"].append(f"Warning: {warning}")
 
-        if validation["field_coverage"] < 70:
+        if validation["coverage"] < 70:
             result["recommendations"].append(
-                f"Field coverage is {validation['field_coverage']}%. "
-                f"Consider adding more optional fields for better AI representation."
+                f"Recommended-element coverage is {validation['coverage']}%. "
+                f"Consider adding the missing recommended elements (summary, "
+                f"link-list sections) for better AI usability."
             )
 
     else:
         result["recommendations"].append(
-            "No llms.txt file found. Adding one helps AI systems accurately "
-            "represent your brand and content. See the generated example below."
+            "No llms.txt file found. llms.txt is an emerging (not yet universally "
+            "adopted) convention that helps AI systems find your key content. "
+            "See the generated example below."
         )
+
+    # Politeness delay before the next request to the same site
+    time.sleep(REQUEST_DELAY_SECONDS)
 
     # Always generate a recommended version
     try:
@@ -492,7 +510,7 @@ def format_report(results: Dict[str, Any]) -> str:
     # Validation details
     validation = results.get("validation")
     if validation:
-        lines.append(f"Field coverage: {validation['field_coverage']}%")
+        lines.append(f"Recommended-element coverage: {validation['coverage']}%")
 
         if validation["errors"]:
             lines.append(f"\n--- Validation Errors ({len(validation['errors'])}) ---")
@@ -506,17 +524,22 @@ def format_report(results: Dict[str, Any]) -> str:
 
         # Show parsed structure
         parsed = validation.get("parsed", {})
+        if parsed.get("title"):
+            lines.append(f"\nTitle (H1): {parsed['title']}")
+        if parsed.get("summary"):
+            summary = parsed["summary"]
+            if len(summary) > 120:
+                summary = summary[:117] + "..."
+            lines.append(f"Summary: {summary}")
+
         if parsed.get("sections"):
             lines.append("\n--- Detected Sections ---")
-            for section_name, fields in parsed["sections"].items():
-                if isinstance(fields, dict):
-                    lines.append(f"  [{section_name}] {len(fields)} fields")
-
-        pages = parsed.get("important_pages", [])
-        if pages:
-            lines.append(f"\n--- Important Pages ({len(pages)}) ---")
-            for page in pages:
-                lines.append(f"  - {page['title']}: {page['url']}")
+            for section_name, entries in parsed["sections"].items():
+                lines.append(f"  [{section_name}] {len(entries)} links")
+                for entry in entries[:5]:
+                    lines.append(f"    - {entry['title']}: {entry['url']}")
+                if len(entries) > 5:
+                    lines.append(f"    ... and {len(entries) - 5} more")
 
     # Recommendations
     recs = results.get("recommendations", [])
@@ -549,37 +572,32 @@ if __name__ == "__main__":
         print(f"Analyzing llms.txt for: {target_url}\n")
         results = analyze_llmstxt(target_url)
     else:
-        # Demo with sample llms.txt content
-        sample_content = """# Acme Corp llms.txt
+        # Demo with sample llms.txt content (real markdown format)
+        sample_content = """# Acme Corp
 
-## Identity
-name: Acme Corp
-description: Cloud-based project management platform for engineering teams
-url: https://www.acmecorp.com
-founded: 2018
-industry: SaaS / Project Management
+> Acme Corp is a cloud-based project management platform for engineering
+> teams, combining sprint planning, roadmaps, and automated reporting.
 
-## Content
-primary_topics: project management, agile, engineering workflows
-content_types: blog, documentation, api-reference
-update_frequency: weekly
-language: en
+Key facts:
 
-## Citation
-preferred_name: Acme Corp
-preferred_url: https://www.acmecorp.com
-citation_policy: open - accurate citations welcome with link attribution
+- The docs are the authoritative source for feature behavior.
+- The API is REST with token authentication.
 
-## Contact
-ai_inquiries: partnerships@acmecorp.com
-abuse_reports: legal@acmecorp.com
+## Docs
 
-## Important Pages
-- Product: https://www.acmecorp.com/product
-- Documentation: https://docs.acmecorp.com
-- Blog: https://www.acmecorp.com/blog
-- Pricing: https://www.acmecorp.com/pricing
-- About: https://www.acmecorp.com/about
+- [Product documentation](https://docs.acmecorp.com/index.md): Full user guide
+- [API reference](https://docs.acmecorp.com/api.md): Endpoints and authentication
+- [Quick start](https://docs.acmecorp.com/quickstart.md): Set up in 10 minutes
+
+## Company
+
+- [About](https://www.acmecorp.com/about): Company background
+- [Pricing](https://www.acmecorp.com/pricing): Plans and limits
+
+## Optional
+
+- [Blog](https://www.acmecorp.com/blog): Product updates
+- [Case studies](https://www.acmecorp.com/case-studies)
 """
         print("Running with sample llms.txt content...\n")
 

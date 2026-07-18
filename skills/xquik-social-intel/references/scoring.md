@@ -2,6 +2,10 @@
 
 Use this rubric to turn X data into a growth marketing signal.
 
+The bundled script calculates a 0-10 lexical pre-score from purchase-intent and
+pain terms. Apply the remaining factors manually after reviewing the SaaS
+category, post date, and engagement metrics.
+
 | Factor | Score | Guidance |
 |--------|-------|----------|
 | Purchase intent | 0-5 | Mentions buying, evaluating, switching, cancelling, or asking for tools |

@@ -5,13 +5,17 @@ Accepts user metrics, runs benchmark comparisons with traffic light scoring,
 detects the biggest funnel leak, and generates prioritized recommendations.
 
 Usage:
-    python funnel_analyzer.py
+    python3 funnel_analyzer.py --demo           # built-in sample data
+    python3 funnel_analyzer.py metrics.json     # JSON file with metric keys
+    cat metrics.json | python3 funnel_analyzer.py
+
+    JSON keys: signup_to_active, free_to_paid, monthly_churn, nrr,
+    time_to_value_days, payback_months (all optional).
 
 Requirements:
     No external dependencies - uses only the Python standard library.
 """
 
-import sys
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -81,8 +85,8 @@ BENCHMARKS: dict[str, BenchmarkRange] = {
     "payback_months": BenchmarkRange(
         name="Payback Period",
         unit="months",
-        bottom_25=18.0,
-        median=12.0,
+        bottom_25=24.0,
+        median=16.0,  # 2025 actuals ~16 months (Benchmarkit 2025)
         top_25=6.0,
         higher_is_better=False,
         description="Months to recover customer acquisition cost",
@@ -139,7 +143,7 @@ def classify_metric(key: str, value: float) -> str:
     if bench.higher_is_better:
         if value >= bench.top_25:
             return "GREEN"
-        elif value >= bench.median:
+        elif value > bench.bottom_25:
             return "YELLOW"
         else:
             return "RED"
@@ -147,7 +151,7 @@ def classify_metric(key: str, value: float) -> str:
         # Lower is better (churn, TTV, payback)
         if value <= bench.top_25:
             return "GREEN"
-        elif value <= bench.median:
+        elif value < bench.bottom_25:
             return "YELLOW"
         else:
             return "RED"
@@ -176,6 +180,29 @@ def calculate_gap_to_median(key: str, value: float) -> float:
     else:
         # For lower-is-better, invert the comparison
         return ((bench.median - value) / bench.median) * 100
+
+
+def normalized_position(key: str, value: float) -> float:
+    """
+    Position of a value within the bottom-25% -> top-25% benchmark range.
+
+    0.0 = at the bottom-25% threshold, 1.0 = at the top-25% threshold.
+    Values outside the range extend below 0 or above 1. Lower is worse,
+    for both higher-is-better and lower-is-better metrics, which makes
+    the score comparable across differently-scaled metrics.
+
+    Args:
+        key: The metric key.
+        value: The user's metric value.
+
+    Returns:
+        Normalized position (dimensionless).
+    """
+    bench = BENCHMARKS[key]
+    span = bench.top_25 - bench.bottom_25
+    if span == 0:
+        return 0.0
+    return (value - bench.bottom_25) / span
 
 
 # ---------------------------------------------------------------------------
@@ -311,22 +338,25 @@ def analyze_funnel(
         user_metrics["payback_months"] = payback_months
 
     assessments: list[MetricAssessment] = []
+    positions: dict[str, float] = {}
     green_count = 0
     yellow_count = 0
     red_count = 0
-    all_recs: list[tuple[float, str]] = []
+    all_recs: list[tuple[tuple[int, float], str]] = []
 
     for key, value in user_metrics.items():
         bench = BENCHMARKS[key]
         status = classify_metric(key, value)
         gap = calculate_gap_to_median(key, value)
+        norm = normalized_position(key, value)
+        positions[key] = norm
         recs = get_recommendations(key, status)
 
         if status == "GREEN":
             position = "Top 25% - outperforming most PLG companies"
             green_count += 1
         elif status == "YELLOW":
-            position = "Median range - room for improvement"
+            position = "Middle 50% (between bottom-25% and top-25% thresholds)"
             yellow_count += 1
         else:
             position = "Bottom 25% - significant improvement needed"
@@ -344,10 +374,11 @@ def analyze_funnel(
         )
         assessments.append(assessment)
 
-        # Weight recommendations by severity
-        priority = 0 if status == "RED" else (1 if status == "YELLOW" else 2)
+        # Weight recommendations by status first (RED before YELLOW before
+        # GREEN), then by normalized position (worst metrics first).
+        status_rank = 0 if status == "RED" else (1 if status == "YELLOW" else 2)
         for rec in recs:
-            all_recs.append((priority + abs(gap) * -0.01, rec))
+            all_recs.append(((status_rank, norm), rec))
 
     # Determine overall health
     total = green_count + yellow_count + red_count
@@ -355,27 +386,25 @@ def analyze_funnel(
         overall_health = "N/A"
     elif red_count >= 3:
         overall_health = "F"
-    elif red_count >= 2:
+    elif red_count == 2:
         overall_health = "D"
-    elif red_count >= 1 and yellow_count >= 2:
+    elif red_count == 1 and yellow_count >= 2:
         overall_health = "D"
-    elif yellow_count >= 3 and green_count < 2:
-        overall_health = "C"
-    elif green_count >= 5:
+    elif green_count >= 5 and red_count == 0:
         overall_health = "A"
-    elif green_count >= 3:
+    elif green_count >= 3 and red_count == 0:
         overall_health = "B"
-    elif green_count >= 1 and yellow_count >= 2:
-        overall_health = "C"
     else:
         overall_health = "C"
 
-    # Find biggest leak (worst relative gap among RED/YELLOW metrics)
+    # Find biggest leak: the RED/YELLOW metric that sits lowest within its
+    # own bottom-25% -> top-25% benchmark range. Normalizing by range keeps
+    # differently-scaled metrics (e.g. TTV vs NRR) comparable.
     biggest_leak: Optional[MetricAssessment] = None
-    worst_gap = float("inf")
+    worst_position = float("inf")
     for a in assessments:
-        if a.status in ("RED", "YELLOW") and a.gap_to_median < worst_gap:
-            worst_gap = a.gap_to_median
+        if a.status in ("RED", "YELLOW") and positions[a.metric_key] < worst_position:
+            worst_position = positions[a.metric_key]
             biggest_leak = a
 
     # Sort and deduplicate recommendations
@@ -521,5 +550,51 @@ def main() -> None:
     print_report(healthy_result)
 
 
+def _cli() -> None:
+    """Command-line entry point: JSON file, stdin, or --demo."""
+    import argparse
+    import json
+    import sys
+
+    parser = argparse.ArgumentParser(
+        description="PLG funnel analyzer",
+        epilog="JSON keys: signup_to_active, free_to_paid, monthly_churn, "
+               "nrr, time_to_value_days, payback_months (all optional).",
+    )
+    parser.add_argument(
+        "input", nargs="?",
+        help="Path to a JSON file with funnel metrics (or '-' for stdin)",
+    )
+    parser.add_argument(
+        "--demo", action="store_true", help="Run with built-in sample data"
+    )
+    args = parser.parse_args()
+
+    if args.demo or (args.input is None and sys.stdin.isatty()):
+        main()
+        return
+
+    if args.input is None or args.input == "-":
+        payload = json.load(sys.stdin)
+    else:
+        with open(args.input, "r", encoding="utf-8") as fh:
+            payload = json.load(fh)
+
+    unknown = sorted(set(payload) - set(BENCHMARKS))
+    if unknown:
+        print(
+            f"Warning: ignoring unknown metric(s): {', '.join(unknown)}",
+            file=sys.stderr,
+        )
+
+    kwargs = {
+        key: float(payload[key])
+        for key in BENCHMARKS
+        if payload.get(key) is not None
+    }
+    result = analyze_funnel(**kwargs)
+    print_report(result)
+
+
 if __name__ == "__main__":
-    main()
+    _cli()

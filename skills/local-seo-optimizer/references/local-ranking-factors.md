@@ -179,7 +179,7 @@ Personalization is largely outside your control. Focus on the factors you can in
 ### Lower Impact, Low Effort (Quick Wins)
 - Upload fresh photos monthly
 - Post weekly on Google Posts
-- Pre-populate Q&A section
+- Enable GBP messaging and answer promptly
 - Update special hours for holidays
 
 ### Lower Impact, High Effort (Consider Later)

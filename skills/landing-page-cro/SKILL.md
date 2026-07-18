@@ -4,14 +4,15 @@ description: >
   Audit and optimize landing pages for conversion rate optimization.
   Analyzes page structure, copy effectiveness, CTA placement, social proof,
   form friction, and trust signals. Provides a CRO score and actionable
-  recommendations. Use when the user mentions CRO, conversion optimization,
-  landing page audit, conversion rate, A/B testing ideas, or page optimization.
+  recommendations. Use when the user has an existing landing page and
+  mentions CRO, conversion audit, why isn't my page converting, A/B test
+  ideas, or wants a scored audit of a live URL. For designing a new page
+  from scratch, use saas-landing-builder instead.
 ---
 
-## First Run
+## Audit Intro
 
-When a user runs any landing-page-cro command for the first time, display
-this intro before starting:
+When starting an audit, show this intro before proceeding:
 
 """
 📡 Landing Page CRO Audit
@@ -218,10 +219,10 @@ Analyzes the page and generates a prioritized list of A/B test ideas.
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
+- Structure the report as: header (title, URL, `**Date:**`) → overall score → per-dimension breakdown → top recommendations → detailed evidence.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -233,7 +234,7 @@ Analyzes the page and generates a prioritized list of A/B test ideas.
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ CRO audit complete — saved to CRO-AUDIT-REPORT.md
+✅ CRO audit complete - saved to CRO-AUDIT-REPORT.md
 
 Score: [X]/100 ([interpretation])
 
@@ -255,7 +256,7 @@ If the user provides their own API key, use it for actual Core Web Vitals scores
 
 | Environment Variable | Service | What It Unlocks |
 |---------------------|---------|-----------------|
-| `GOOGLE_API_KEY` | Google PageSpeed Insights API | Real Core Web Vitals (LCP, FID, CLS), Lighthouse performance score, mobile vs desktop breakdown |
+| `GOOGLE_API_KEY` | Google PageSpeed Insights API | Real Core Web Vitals (LCP, INP, CLS), Lighthouse performance score, mobile vs desktop breakdown |
 
 **How to set up:**
 ```bash
@@ -263,8 +264,28 @@ export GOOGLE_API_KEY="your_google_api_key"
 ```
 
 **Behavior:**
-- If `GOOGLE_API_KEY` is set → Fetch real PageSpeed data and use it for Dimension 6 scoring
-- If not set → Estimate page speed from HTML signals (current default behavior, no change)
+- If `GOOGLE_API_KEY` is set → fetch real PageSpeed data and use it for Dimension 6 scoring (see below)
+- If not set → estimate page speed from HTML signals (default behavior, no change)
+
+**How to fetch PageSpeed data (model-driven, no script changes needed):**
+When `GOOGLE_API_KEY` is set, call the API directly (e.g. with curl or WebFetch):
+
+```
+https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=<url>&key=$GOOGLE_API_KEY&strategy=mobile
+```
+
+Read these fields from the JSON response:
+- `lighthouseResult.categories.performance.score` - overall performance (0-1)
+- `lighthouseResult.audits['largest-contentful-paint']` - LCP
+- `lighthouseResult.audits['interaction-to-next-paint']` - INP
+- `lighthouseResult.audits['cumulative-layout-shift']` - CLS
+
+Map them onto Dimension 6 (Page Speed and Mobile Responsiveness) like this:
+- All three CWV pass (LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1) and performance score ≥ 0.9 → 9-10
+- All CWV pass but performance score 0.5-0.89 → 7-8
+- One CWV fails → 4-6
+- Two or more CWV fail, or performance score < 0.5 → 1-3
+Replace the HTML-estimated Dimension 6 score with this value and cite the real metrics as evidence in the report.
 
 **When data is limited:** When scoring Dimension 6 (Page Speed and Mobile Responsiveness) without real data, note this in the report. Example:
 > ℹ️ Page speed score is estimated from HTML analysis. For real Lighthouse scores, set `GOOGLE_API_KEY`. See the API Integrations section in this skill's SKILL.md for setup instructions.
@@ -272,7 +293,13 @@ export GOOGLE_API_KEY="your_google_api_key"
 ## Important Notes
 
 ### SPA Limitation
-This tool works best with server-rendered pages. Single-page applications (SPAs) that rely heavily on client-side JavaScript rendering may return incomplete results because the fetched HTML may not contain the full rendered content. If auditing an SPA, consider providing a pre-rendered version or a URL that serves server-side rendered HTML.
+This tool works best with server-rendered pages. Single-page applications (SPAs) that rely heavily on client-side JavaScript rendering may return incomplete results because the fetched HTML may not contain the full rendered content. If auditing an SPA, save the fully rendered HTML from the browser and audit that file instead (see below).
+
+### Local HTML Files
+`scripts/cro_auditor.py` accepts either a URL or a path to a saved HTML file (`python cro_auditor.py ./saved-page.html`). Use this to audit rendered SPA output, staging pages behind auth, or any page saved from the browser.
+
+### Non-English Pages
+The script's text-pattern heuristics are English-only. When the page's `<html lang>` is not English, the script prints a prominent warning and the text-dependent dimensions (copy clarity, trust signals, social proof, objection handling, urgency) are unreliable. In that case, score those dimensions yourself by reading the actual page content, and note in the report which scores were assigned manually.
 
 ### Prerequisites
 The Python scripts in the `scripts/` directory require the following packages:

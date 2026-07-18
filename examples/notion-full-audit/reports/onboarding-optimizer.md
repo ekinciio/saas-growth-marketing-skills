@@ -11,7 +11,7 @@
 
 ## Onboarding Score: 80/100 (Grade: B+)
 
-> Notion's onboarding benefits from minimal signup friction (1 field, no credit card, 3 SSO options) and an excellent template gallery that accelerates time-to-value. The score is held back by limited in-app guidance for new users and the well-documented "Notion Paralysis" problem — where the product's flexibility becomes a barrier for first-time users.
+> Notion's onboarding benefits from minimal signup friction (1 field, no credit card, 3 SSO options) and an excellent template gallery that accelerates time-to-value. The score is held back by limited in-app guidance for new users and the well-documented "Notion Paralysis" problem - where the product's flexibility becomes a barrier for first-time users.
 
 ---
 
@@ -19,18 +19,18 @@
 
 | Factor | Value | Points | Notes |
 |--------|-------|--------|-------|
-| Base score | — | 50 | Starting baseline |
-| Steps to value (4 steps) | 4 | +0 | Under 5 is optimal — no penalty |
-| Required fields (1) | 1 | +5 | Email only — best-in-class |
+| Base score | - | 50 | Starting baseline |
+| Steps to value (4 steps) | 4 | +0 | Under 5 is optimal - no penalty |
+| Required fields (1) | 1 | +5 | Email only - best-in-class |
 | Progress indicator | Yes | +10 | Onboarding flow has visual progress |
 | Skip option | Yes | +5 | Optional steps can be bypassed |
-| Template gallery | Yes | +10 | 10,000+ templates — exceptional |
+| Template gallery | Yes | +10 | 10,000+ templates - exceptional |
 | Time-to-value (~3 min) | 3 min | +10 | Under 5 min via template path |
 | No credit card required | No CC | +0 | No penalty (already baseline) |
 | Welcome email sequence | Yes | +5 | Onboarding emails confirmed |
 | In-app guidance | Partial | -5 | Limited tooltips, no onboarding checklist |
 | Empty state education | Partial | -5 | Templates help, but blank pages lack guidance |
-| Credit card upfront | No | +0 | No penalty — free tier |
+| Credit card upfront | No | +0 | No penalty - free tier |
 | **Total** | | **80/100** | **Grade: B+** |
 
 ### What Helped the Score
@@ -42,7 +42,7 @@
 | Progress indicator (+10) | +10 | Post-signup flow shows clear steps (use case, team size, etc.) |
 | Single required field (+5) | +5 | Email-only signup is lowest possible friction |
 | Welcome emails (+5) | +5 | Drip campaign guides new users to key features |
-| Skip option (+5) | +5 | Non-critical steps can be bypassed — respects user time |
+| Skip option (+5) | +5 | Non-critical steps can be bypassed - respects user time |
 
 ### What Hurt the Score
 
@@ -57,7 +57,7 @@
 
 **Why this pattern fits Notion:**
 
-Notion's core challenge is that the product can do *everything* — but new users don't need everything on day 1. Progressive disclosure solves this by:
+Notion's core challenge is that the product can do *everything* - but new users don't need everything on day 1. Progressive disclosure solves this by:
 
 1. **Day 1:** Show only the essentials (pages, basic blocks, one template)
 2. **Week 1:** Introduce databases, relations, and team collaboration
@@ -99,7 +99,7 @@ This pattern works because:
 - Single email field for manual signup
 
 **Gaps:**
-- No GitHub SSO (relevant for developer audience — 50% of YC companies)
+- No GitHub SSO (relevant for developer audience - 50% of YC companies)
 - No "try without signing up" interactive demo option
 
 ### Phase 2: Onboarding Questions (Score: 7/10 🟢)
@@ -136,9 +136,9 @@ This pattern works because:
 - Pre-populated content gives context
 - Academy (academy.notion.com) offers learning resources
 
-**Gaps — "Notion Paralysis" Zone:**
-- Blank pages show a cursor and nothing else — no suggestion of what to type
-- New databases show empty columns — no explanation of properties, views, or relations
+**Gaps - "Notion Paralysis" Zone:**
+- Blank pages show a cursor and nothing else - no suggestion of what to type
+- New databases show empty columns - no explanation of properties, views, or relations
 - No onboarding checklist ("Create your first page ✅ → Invite a teammate → Try AI")
 - No contextual tooltips explaining blocks, databases, or AI features on first encounter
 - Help button exists but requires self-directed learning
@@ -147,7 +147,7 @@ This pattern works because:
 
 | Activation Signal | Supported? | Notes |
 |-------------------|-----------|-------|
-| Create first page | ✅ Easy | Immediate — click "+ New page" |
+| Create first page | ✅ Easy | Immediate - click "+ New page" |
 | Use a template | ✅ Easy | Template gallery prominent |
 | Invite a teammate | ⚠️ Available | Not prompted early enough |
 | Try AI features | ⚠️ Available | Not surfaced during onboarding |
@@ -170,26 +170,26 @@ This pattern works because:
 
 | # | Improvement | Expected Lift | Difficulty |
 |---|------------|--------------|------------|
-| 1 | **Add an onboarding checklist to the dashboard** — "Create a page ✅ → Use a template → Invite your team → Try Notion AI" | +8-12% activation | Low |
-| 2 | **Add empty state education** — When a user creates a blank page, show "Try typing / to see all block types" with a subtle animation | +5-8% feature discovery | Low |
-| 3 | **Prompt team invites earlier** — After first page creation, show "Share this with your team?" with a 1-click invite | +10-15% team expansion | Low |
+| 1 | **Add an onboarding checklist to the dashboard** - "Create a page ✅ → Use a template → Invite your team → Try Notion AI" | +8-12% activation | Low |
+| 2 | **Add empty state education** - When a user creates a blank page, show "Try typing / to see all block types" with a subtle animation | +5-8% feature discovery | Low |
+| 3 | **Prompt team invites earlier** - After first page creation, show "Share this with your team?" with a 1-click invite | +10-15% team expansion | Low |
 
 ### Medium Effort (1-2 weeks)
 
 | # | Improvement | Expected Lift | Difficulty |
 |---|------------|--------------|------------|
-| 4 | **Build role-based onboarding paths** — "I'm an engineer" → dev wiki template; "I'm a PM" → project tracker template | +10-15% activation | Medium |
-| 5 | **Add contextual tooltips for power features** — First time a user sees a database: "This is a database. Add properties to track anything." | +5-10% feature adoption | Medium |
-| 6 | **Create an "AI Quick Start"** — After workspace setup, offer "Let Notion AI set up your workspace based on your team's needs" | +8-12% AI adoption | Medium |
+| 4 | **Build role-based onboarding paths** - "I'm an engineer" → dev wiki template; "I'm a PM" → project tracker template | +10-15% activation | Medium |
+| 5 | **Add contextual tooltips for power features** - First time a user sees a database: "This is a database. Add properties to track anything." | +5-10% feature adoption | Medium |
+| 6 | **Create an "AI Quick Start"** - After workspace setup, offer "Let Notion AI set up your workspace based on your team's needs" | +8-12% AI adoption | Medium |
 
 ### Strategic Improvements (1+ months)
 
 | # | Improvement | Expected Lift | Difficulty |
 |---|------------|--------------|------------|
-| 7 | **Interactive product tour** — A 2-minute guided walkthrough that has users create a page, add a database row, and @mention a teammate | +15-20% activation | High |
-| 8 | **"New vs. Returning" path split** — First question: "Have you used Notion before?" → New users get guided tour, returning users skip to workspace | +5-8% retention | Medium |
-| 9 | **Progressive feature unlock** — Hide advanced features (rollups, formulas, API) until users complete basic tasks; unlock with celebratory moments | +10-15% retention | High |
-| 10 | **Personalized AI onboarding** — "Tell me about your team and what you work on" → AI generates a custom workspace structure | +12-18% activation | High |
+| 7 | **Interactive product tour** - A 2-minute guided walkthrough that has users create a page, add a database row, and @mention a teammate | +15-20% activation | High |
+| 8 | **"New vs. Returning" path split** - First question: "Have you used Notion before?" → New users get guided tour, returning users skip to workspace | +5-8% retention | Medium |
+| 9 | **Progressive feature unlock** - Hide advanced features (rollups, formulas, API) until users complete basic tasks; unlock with celebratory moments | +10-15% retention | High |
+| 10 | **Personalized AI onboarding** - "Tell me about your team and what you work on" → AI generates a custom workspace structure | +12-18% activation | High |
 
 ---
 
@@ -215,7 +215,7 @@ This pattern works because:
 
 | Category | Score | Notes |
 |----------|-------|-------|
-| Signup friction | 9/10 | Best-in-class — 1 field, 3 SSO, no CC |
+| Signup friction | 9/10 | Best-in-class - 1 field, 3 SSO, no CC |
 | Onboarding questions | 7/10 | Brief but doesn't lead to personalized setup |
 | First experience | 6/10 | Templates help, but blank pages cause paralysis |
 | Activation support | 7/10 | Features available but not surfaced proactively |

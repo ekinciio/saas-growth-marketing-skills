@@ -32,7 +32,7 @@ MIN_BLOCK_WORDS = 30
 FACTUAL_PATTERNS = [
     r"\d+%",                          # Percentages
     r"\$[\d,]+",                      # Dollar amounts
-    r"\d{4}",                         # Years
+    r"\b(?:19|20)\d{2}\b",            # Years (1900-2099)
     r"\d+\.\d+",                      # Decimal numbers
     r"\d+[,]\d{3}",                   # Large numbers with commas
     r"\b\d+x\b",                      # Multipliers (e.g., 3x)
@@ -113,20 +113,22 @@ def extract_content_blocks(html: str) -> List[str]:
 
     # Extract paragraphs
     for p in soup.find_all("p"):
-        text = p.get_text(strip=True)
+        text = " ".join(p.get_text().split())
         if text and len(text.split()) >= MIN_BLOCK_WORDS:
             blocks.append(text)
 
     # Extract list groups (combine list items under one parent)
     for ul in soup.find_all(["ul", "ol"]):
         items = ul.find_all("li", recursive=False)
-        combined = " ".join(li.get_text(strip=True) for li in items if li.get_text(strip=True))
+        combined = " ".join(
+            " ".join(li.get_text().split()) for li in items if li.get_text(strip=True)
+        )
         if combined and len(combined.split()) >= MIN_BLOCK_WORDS:
             blocks.append(combined)
 
     # Extract blockquotes
     for bq in soup.find_all("blockquote"):
-        text = bq.get_text(strip=True)
+        text = " ".join(bq.get_text().split())
         if text and len(text.split()) >= MIN_BLOCK_WORDS:
             blocks.append(text)
 
@@ -283,14 +285,8 @@ def score_self_containment(text: str) -> Tuple[float, List[str]]:
             "define subjects explicitly and avoid references to other sections."
         )
 
-    # Check if the block defines its subject early
-    first_sentence = text.split(".")[0] if "." in text else text
-    first_words = first_sentence.split()[:3]
-    pronoun_starts = {"this", "that", "these", "those", "it", "they", "he", "she"}
-    if first_words and first_words[0].lower() not in pronoun_starts:
-        score += 0.0  # No penalty
-    else:
-        score -= 3.0
+    # Pronoun-heavy openings are already covered by
+    # CONTEXT_DEPENDENT_PATTERNS above; no separate first-word penalty.
 
     return max(min(score, 25.0), 0.0), recommendations
 
@@ -542,6 +538,7 @@ if __name__ == "__main__":
                     headers={"User-Agent": "GEOSEOAuditor/1.0"},
                     timeout=15,
                 )
+                response.raise_for_status()
                 html_content = response.text
             except ImportError:
                 print("Install requests to fetch URLs: pip install requests", file=sys.stderr)

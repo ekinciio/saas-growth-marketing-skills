@@ -11,7 +11,9 @@ Industry benchmark data for Product-Led Growth SaaS companies across all funnel 
 | Monthly Churn | >8% | 5% | <3% | % of customers/mo |
 | Net Revenue Retention | <95% | 105% | >120% | % annual |
 | Time-to-Value | >7 days | 3 days | <1 day | days |
-| Payback Period | >18 mo | 12 mo | <6 mo | months |
+| Payback Period | >24 mo | 16 mo | <6 mo | months |
+
+Payback median reflects 2025 actuals (~16 months, with 15-18 months typical; top quartile ≤6 months) per Benchmarkit 2025. NRR above 120% is now considered best-in-class rather than merely top-quartile (SaaS Capital, ChartMogul, Benchmarkit 2025).
 
 ## Acquisition Metrics
 
@@ -64,13 +66,15 @@ Industry benchmark data for Product-Led Growth SaaS companies across all funnel 
 | Metric | Bottom 25% | Median | Top 25% | Notes |
 |--------|-----------|--------|---------|-------|
 | Free-to-Paid | <2% | 5% | >10% | Overall conversion rate |
-| Trial-to-Paid (no card) | <8% | 12% | >20% | 14-day trial without card |
-| Trial-to-Paid (card req.) | <30% | 40% | >55% | 14-day trial with card |
-| NRR | <95% | 105% | >120% | Net revenue retention |
+| Trial-to-Paid (no card) | <8% | 8-12% | >20% | 14-day trial without card; bimodal (see note) |
+| Trial-to-Paid (card req.) | <30% | 45-50% | >55% | 14-day trial with card |
+| NRR | <95% | 105% | >120% | Net revenue retention; >120% is best-in-class |
 | Expansion Revenue | <10% | 25% | >40% | As % of new ARR |
 | ARPU Growth YoY | <5% | 15% | >30% | Annual ARPU increase |
-| Payback Period | >18 mo | 12 mo | <6 mo | CAC payback |
+| Payback Period | >24 mo | 16 mo | <6 mo | CAC payback (2025 actuals ~16 mo) |
 | LTV/CAC Ratio | <2x | 3-4x | >6x | Lifetime value to CAC |
+
+Note: no-card / opt-in trial conversion is strongly bimodal - products cluster either well below the ~8-12% median or well above it (20%+), depending on onboarding quality, trial length, and buyer intent, so benchmark against products with a similar trial motion. Freemium conversion medians remain 2-3%. Sources: ChartMogul SaaS Conversion Report, ProductLed, Benchmarkit 2025.
 
 ### What Top Performers Do Differently (Revenue)
 - Clear upgrade triggers tied to usage limits or team size

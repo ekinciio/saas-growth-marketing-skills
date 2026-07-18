@@ -67,7 +67,7 @@
 - Power users describe creating systems tailored to their specific team workflows
 - Database features (tables, relations, rollups) praised for organizing complex information
 
-**Confidence:** 0.92 — Very strong positive signal
+**Confidence:** 0.92 - Very strong positive signal
 
 ### 2. All-in-One Consolidation (28% of reviews) 🟢
 
@@ -77,9 +77,9 @@
 - Notes, tasks, wikis, and project management in one place praised consistently
 - Some users report saving ~5 hours per week on writing tasks alone
 
-**Confidence:** 0.88 — Strong positive signal
+**Confidence:** 0.88 - Strong positive signal
 
-### 3. AI Features — When They Work (12% positive) 🟢
+### 3. AI Features - When They Work (12% positive) 🟢
 
 **Positive AI feedback:**
 - AI autofill for databases praised for classifying entries, summarizing content, and extracting tags
@@ -87,7 +87,7 @@
 - AI writing assistance valued for content generation and editing
 - Enterprise Search connecting multiple apps rated positively by power users
 
-**Confidence:** 0.70 — Moderate positive (offset by negative AI pricing sentiment)
+**Confidence:** 0.70 - Moderate positive (offset by negative AI pricing sentiment)
 
 ### 4. Templates & Community (10% of reviews) 🟢
 
@@ -97,7 +97,7 @@
 - Users share and recommend templates as a key Notion advantage
 - Academy and documentation quality rated as strong
 
-**Confidence:** 0.85 — Strong positive signal
+**Confidence:** 0.85 - Strong positive signal
 
 ---
 
@@ -107,11 +107,11 @@
 
 **Representative patterns:**
 - New team members require ~2 weeks to become comfortable with databases and relations
-- "Blank page syndrome" — users spend hours designing workspace structure instead of working
+- "Blank page syndrome" - users spend hours designing workspace structure instead of working
 - Mastering rollups, formulas, and relations described as requiring significant investment
 - Onboarding friction for non-technical team members
 
-**Severity:** High — this is Notion's most consistent criticism across all platforms
+**Severity:** High - this is Notion's most consistent criticism across all platforms
 **Confidence:** 0.93
 
 ### 2. Performance / Speed (22% of reviews) 🔴
@@ -122,19 +122,19 @@
 - Mobile app slower than desktop experience
 - Compared unfavorably to lighter alternatives (Obsidian, Slite)
 
-**Severity:** High — particularly impacts enterprise and power user retention
+**Severity:** High - particularly impacts enterprise and power user retention
 **Confidence:** 0.90
 
 ### 3. Pricing Changes & AI Cost (18% of reviews, trending negative) 🔴
 
 **Representative patterns:**
 - May 2025 pricing restructure forced AI into Business tier ($20/seat)
-- Previously $8/month AI add-on for any plan — removal frustrated Plus plan users
+- Previously $8/month AI add-on for any plan - removal frustrated Plus plan users
 - "Limited trial" (20 responses) on non-Business plans seen as restrictive
 - Trustpilot reviews heavily concentrated on pricing frustration
 - Some users feel forced to upgrade for features they previously had access to
 
-**Severity:** High — actively driving negative word-of-mouth on consumer platforms
+**Severity:** High - actively driving negative word-of-mouth on consumer platforms
 **Confidence:** 0.88
 
 ### 4. Offline Access (12% of reviews) 🔴
@@ -145,7 +145,7 @@
 - Compared unfavorably to Obsidian (fully local-first) and other offline-capable tools
 - Enterprise users in low-connectivity environments cite this as a blocker
 
-**Severity:** Medium — affects a specific but vocal user segment
+**Severity:** Medium - affects a specific but vocal user segment
 **Confidence:** 0.85
 
 ### 5. AI Reliability & Intrusiveness (8% of reviews) 🟡
@@ -156,7 +156,7 @@
 - AI recall unreliable when referencing specific database names or field constraints
 - Works well with static knowledge but struggles with dynamic, cross-tool information
 
-**Severity:** Medium — growing concern as AI becomes more central to the product
+**Severity:** Medium - growing concern as AI becomes more central to the product
 **Confidence:** 0.75
 
 ---

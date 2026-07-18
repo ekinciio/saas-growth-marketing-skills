@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Skills-15-blue?style=for-the-badge" alt="15 Skills" />
+  <img src="https://img.shields.io/badge/Skills-16-blue?style=for-the-badge" alt="16 Skills" />
   <img src="https://img.shields.io/badge/Templates-4-yellow?style=for-the-badge" alt="4 Templates" />
-  <img src="https://img.shields.io/badge/Scripts-19-green?style=for-the-badge" alt="19 Scripts" />
+  <img src="https://img.shields.io/badge/Scripts-20-green?style=for-the-badge" alt="20 Scripts" />
   <img src="https://img.shields.io/badge/Built_for-Claude_Code-blueviolet?style=for-the-badge" alt="Built for Claude Code" />
   <img src="https://img.shields.io/badge/License-MIT-orange?style=for-the-badge" alt="MIT License" />
 </p>
@@ -14,7 +14,7 @@
 
 ---
 
-16 specialized skills that turn your AI coding agent into a growth marketing expert. Built for Claude Code, compatible with any tool supporting the [Agent Skills](https://github.com/anthropics/agent-skills) standard.
+16 specialized skills that turn your AI coding agent into a growth marketing expert. Built for Claude Code, compatible with any tool supporting the [Agent Skills](https://github.com/anthropics/skills) standard.
 
 Every skill produces **actionable output** saved as a `.md` report file - scores, audits, and data-driven recommendations. Not just knowledge dumps. Give it a URL, your metrics, or your app name and get back a scored audit with prioritized fixes, saved to a file you can share.
 
@@ -48,7 +48,7 @@ Every skill produces **actionable output** saved as a `.md` report file - scores
 | **pricing-analyzer** | Pricing data | Van Westendorp analysis, tier recommendations, positioning | `PRICING-AUDIT-REPORT.md` |
 | **competitor-intel** | Competitor URL | Auto-extracted profile, positioning analysis, battle card | `COMPETITOR-ANALYSIS-REPORT.md` |
 | **web-app-growth-engine** | Signup URL | Friction score, field analysis, SSO/trust audit | `WEB-GROWTH-AUDIT-REPORT.md` |
-| **saas-landing-builder** | Landing URL | Section completeness (X/12), missing elements, structure score | `LANDING-PAGE-BLUEPRINT-REPORT.md` |
+| **saas-landing-builder** | Landing URL | Section completeness (X/12), missing elements, structure score | `LANDING-PAGE-REVIEW-REPORT.md` |
 | **reddit-opportunity-finder** | Keywords | Scored Reddit threads, opportunity ranking, best subreddits | `REDDIT-OPPORTUNITIES-REPORT.md` |
 | **brand-mention-scanner** | Brand name | Cross-platform mentions (Reddit/HN/GitHub), sentiment, opportunities | `BRAND-MENTIONS-REPORT.md` |
 | **xquik-social-intel** | Xquik data or API key | X post theme, intent, and opportunity scoring | `XQUIK-SOCIAL-INTEL-REPORT.md` |
@@ -87,11 +87,11 @@ pip install -r requirements.txt
 | 10 | pricing-analyzer | `/pricing-analyzer audit` | Pricing strategy analysis with Van Westendorp |
 | 11 | competitor-intel | `/competitor-intel analyze <url>` | Competitive analysis and battle card generation |
 | 12 | web-app-growth-engine | `/web-app-growth-engine audit <url>` | Web app signup funnel and growth loop analysis |
-| 13 | saas-landing-builder | `/saas-landing-builder create` | Landing page structure design and copy frameworks |
+| 13 | saas-landing-builder | `/saas-landing-builder review <url>` | Landing page structure review, design, and copy frameworks |
 | 14 | reddit-opportunity-finder | `/reddit-opportunity-finder search <kw>` | Find high-intent Reddit threads for your product |
 | 15 | brand-mention-scanner | `/brand-mention-scanner scan <brand>` | Brand mention tracking across Reddit, HN, and GitHub |
 | 16 | xquik-social-intel | `/xquik-social-intel analyze` | Analyze X data from Xquik exports or API results |
-| — | growth-skills | `/growth-skills` | Index of all available skills and commands |
+| - | growth-skills | `/growth-skills` | Index of all available skills and commands |
 
 ---
 
@@ -116,6 +116,7 @@ saas-growth-marketing-skills/
     reddit-opportunity-finder/ # Reddit thread discovery
     brand-mention-scanner/    # Brand monitoring
     xquik-social-intel/       # X data social intelligence
+    growth-skills/            # /growth-skills index of all skills
   agents/
     growth-strategist.md      # Orchestrates growth audits
     launch-planner.md         # Product launch planning
@@ -125,6 +126,10 @@ saas-growth-marketing-skills/
     pricing-analysis.md       # Pricing analysis template
     launch-checklist.md       # 60+ item launch checklist
     report-template.md        # Report structure template
+  examples/
+    notion-full-audit/        # Case study: 12 reports for Notion.com
+  install.sh                  # One-command installer
+  uninstall.sh                # Clean uninstaller
 ```
 
 Each skill contains:
@@ -162,16 +167,16 @@ Install and start auditing in under 60 seconds.
 
 | Skill | Environment Variable | Service | What It Adds |
 |-------|---------------------|---------|-------------|
-| reddit-opportunity-finder | `REDDIT_CLIENT_ID` | Reddit OAuth | 60 req/min vs 1/2s |
-| brand-mention-scanner | `REDDIT_CLIENT_ID`, `GITHUB_TOKEN` | Reddit OAuth, GitHub | Higher rate limits |
+| reddit-opportunity-finder | `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET` | Reddit OAuth | Full Reddit search data (without keys, falls back to limited RSS results) |
+| brand-mention-scanner | `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `GITHUB_TOKEN` | Reddit OAuth, GitHub | Full Reddit data + 30 req/min GitHub search (vs 10) |
 | xquik-social-intel | `XQUIK_API_KEY` | Xquik | Live X data extraction and analysis |
 | geo-seo-auditor | `GOOGLE_API_KEY`, `AHREFS_API_KEY` | PageSpeed, Ahrefs | Real Core Web Vitals, backlink data |
 | landing-page-cro | `GOOGLE_API_KEY` | PageSpeed Insights | Real performance scores |
-| web-app-growth-engine | `GOOGLE_API_KEY`, `GOOGLE_ANALYTICS_JSON` | PageSpeed, GA4 | Performance + analytics data |
+| web-app-growth-engine | `GOOGLE_API_KEY` | PageSpeed Insights | Real performance scores |
 | aso-optimizer | `SENSOR_TOWER_API_KEY`, `APPSTORE_CONNECT_KEY_ID` | Sensor Tower, ASC | Keyword volume, downloads |
-| competitor-intel | `SEMRUSH_API_KEY`, `SIMILARWEB_API_KEY` | SEMrush, SimilarWeb | Traffic, keywords, tech stack |
+| competitor-intel | `SEMRUSH_API_KEY`, `SIMILARWEB_API_KEY`, `BUILTWITH_API_KEY` | SEMrush, SimilarWeb, BuiltWith | Traffic, keywords, tech stack |
 
-See each skill's `SKILL.md` for full setup instructions.
+Reddit and GitHub keys are read directly by the bundled scripts. The Google/Ahrefs/SEMrush-style enrichments are model-driven: when a key is set, Claude calls the documented API endpoints itself. See each skill's `SKILL.md` for full setup instructions.
 
 ---
 
@@ -216,7 +221,7 @@ For real-time, always-accurate data, you can extend these skills by connecting y
 
 ## Case Study: Notion.com Full Audit
 
-See the [Notion full audit](examples/notion-full-audit/) — 12 reports generated by running skills and agents on Notion.com, demonstrating what a complete SaaS growth audit looks like.
+See the [Notion full audit](examples/notion-full-audit/) - 12 reports generated by running skills and agents on Notion.com, demonstrating what a complete SaaS growth audit looks like.
 
 ---
 
@@ -232,7 +237,7 @@ See the [Notion full audit](examples/notion-full-audit/) — 12 reports generate
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.9+
 - Claude Code CLI (primary) or any Agent Skills-compatible tool
 - Git
 - Internet connection (for page fetching and public API scripts)
@@ -245,7 +250,7 @@ See the [Notion full audit](examples/notion-full-audit/) — 12 reports generate
 
 - **ASO skill uses the free iTunes Search API by default.** It provides metadata quality analysis and competitor comparison, but does NOT provide keyword search volume, difficulty scores, or download estimates. Set `SENSOR_TOWER_API_KEY` or `APPSTORE_CONNECT_KEY_ID` to unlock these features.
 
-- **Reddit and GitHub APIs have rate limits by default.** Reddit: 2-second delays between requests. GitHub: 10 requests per minute without auth. Set `REDDIT_CLIENT_ID` for 60 req/min or `GITHUB_TOKEN` for 30 req/min to remove these bottlenecks.
+- **Reddit now requires an approved OAuth app for API access.** Reddit blocked unauthenticated JSON API access and (since late 2025) new API credentials require approval under Reddit's Responsible Builder Policy. Without `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET`, the Reddit-based skills fall back to Reddit's public RSS search (limited data: no scores or comment counts). GitHub search is 10 requests per minute without auth; set `GITHUB_TOKEN` for 30 req/min.
 
 - **Sentiment analysis is keyword-based, not ML-based.** The review-sentiment and brand-mention-scanner use keyword matching for sentiment (not machine learning models). Results are directional, not precise.
 
@@ -257,7 +262,7 @@ See the [Notion full audit](examples/notion-full-audit/) — 12 reports generate
 
 ## Compatible Tools
 
-These skills follow the open [Agent Skills](https://github.com/anthropics/agent-skills) standard. While built and tested for **Claude Code**, they are also compatible with:
+These skills follow the open [Agent Skills](https://github.com/anthropics/skills) standard. While built and tested for **Claude Code**, they are also compatible with:
 
 - Codex
 - Gemini CLI

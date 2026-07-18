@@ -4,8 +4,13 @@ description: >
   Analyze and optimize SaaS pricing strategy. Evaluates pricing tiers,
   feature gating, willingness-to-pay, and competitive pricing positioning.
   Use when the user mentions pricing strategy, pricing tiers, pricing page,
-  willingness to pay, freemium vs paid, feature gating, or pricing optimization.
+  willingness to pay, freemium vs paid, feature gating, pricing optimization,
+  Van Westendorp, price sensitivity, or monetization.
 ---
+
+# Pricing Analyzer
+
+Evaluate and optimize SaaS pricing strategy through tier analysis, competitive positioning, willingness-to-pay research, and feature gating recommendations.
 
 ## First Run
 
@@ -73,10 +78,6 @@ If the user types "skip" for any input:
 - Proceed with available data
 - Note which analyses were limited by missing data
 - Never block the report because competitor data is missing
-
-# Pricing Analyzer
-
-Evaluate and optimize SaaS pricing strategy through tier analysis, competitive positioning, willingness-to-pay research, and feature gating recommendations.
 
 ## Commands
 
@@ -181,9 +182,9 @@ Guide the user through a Van Westendorp Price Sensitivity analysis.
 3. If the user has survey results, input the data into `scripts/pricing_analyzer.py`
 4. Calculate the four price intersection points:
    - OPP (Optimal Price Point): Intersection of "too cheap" and "too expensive"
-   - IDP (Indifference Price Point): Intersection of "not a bargain" and "not expensive"
-   - PME (Point of Marginal Expensiveness): Intersection of "not a bargain" and "too expensive"
-   - PMC (Point of Marginal Cheapness): Intersection of "too cheap" and "not expensive"
+   - IDP (Indifference Price Point): Intersection of "bargain" (cheap) and "expensive"
+   - PMC (Point of Marginal Cheapness): Intersection of "too cheap" and "not cheap"
+   - PME (Point of Marginal Expensiveness): Intersection of "too expensive" and "not expensive"
 5. Define the acceptable price range (PMC to PME)
 6. Recommend a price point within the optimal range
 
@@ -205,10 +206,9 @@ Guide the user through a Van Westendorp Price Sensitivity analysis.
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -220,7 +220,7 @@ Guide the user through a Van Westendorp Price Sensitivity analysis.
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Pricing audit complete — saved to PRICING-AUDIT-REPORT.md
+✅ Pricing audit complete - saved to PRICING-AUDIT-REPORT.md
 
 Model: [identified pricing model]
 Tiers: [N] tiers ($[low] - $[high]/mo)
@@ -238,10 +238,17 @@ NEVER dump the full report in chat. The file is the deliverable.
 ## Key Reference Files
 
 - `references/pricing-models.md` - Six SaaS pricing models with pros, cons, examples, and implementation guidance
-- `scripts/pricing_analyzer.py` - Python analyzer for tier gaps, competitive positioning, and Van Westendorp calculations
+- `scripts/pricing_analyzer.py` - Python analyzer for tier gaps, competitive positioning, and Van Westendorp calculations.
+  Run it directly: `python3 scripts/pricing_analyzer.py tiers.json` (JSON with a `tiers` list, plus
+  optional `competitors`, `survey_data`, and `plg_motion` keys) or
+  `python3 scripts/pricing_analyzer.py survey.json` (JSON with `too_cheap`, `bargain`, `expensive`,
+  `too_expensive` lists for a Van Westendorp-only run); pipe JSON via stdin, or use `--demo` for sample data
 
 ## Guidelines
 
+- Before running tier-gap analysis, expand inherited features: when a tier is described as
+  "Everything in X, plus ..." replace that marker with the full feature list of tier X so
+  feature counts compare like-for-like across tiers
 - Never recommend a specific price without data to support it - provide ranges and frameworks instead
 - Pricing changes are high-impact decisions; always recommend A/B testing or gradual rollouts
 - Consider the psychological aspects of pricing: charm pricing ($49 vs $50), anchoring, and decoy effects

@@ -34,6 +34,7 @@ SKILLS=(
     "reddit-opportunity-finder"
     "brand-mention-scanner"
     "growth-skills"
+    "xquik-social-intel"
 )
 
 AGENTS=(
@@ -74,7 +75,7 @@ echo ""
 echo -e "${BOLD}Removing skills...${NC}"
 for skill in "${SKILLS[@]}"; do
     if [ -d "$SKILLS_DIR/$skill" ]; then
-        rm -rf "$SKILLS_DIR/$skill"
+        rm -rf "${SKILLS_DIR:?}/$skill"
         echo -e "  ${RED}-${NC} $skill"
     fi
 done
@@ -101,5 +102,5 @@ echo ""
 echo -e "${GREEN}${BOLD}Uninstall complete.${NC}"
 echo ""
 echo "SaaS Growth Marketing Skills have been removed from your system."
-echo "Python dependencies (requests, beautifulsoup4, lxml) were not removed."
+echo "Python dependencies (requests, beautifulsoup4) were not removed."
 echo ""

@@ -25,11 +25,15 @@ Usage:
 Limitation:
     This module uses the free iTunes Search API. It does NOT provide keyword
     search volume, keyword difficulty scores, or download estimates. For those
-    metrics, use paid tools like Sensor Tower, data.ai, or Apple Search Ads.
+    metrics, use paid tools like Sensor Tower, AppTweak, or Apple Search Ads.
 """
 
+from __future__ import annotations
+
+import argparse
 import json
 import re
+import sys
 import urllib.request
 import urllib.parse
 from typing import Any
@@ -45,18 +49,23 @@ ITUNES_SEARCH_URL = "https://itunes.apple.com/search"
 def fetch_app_metadata(app_name: str, country: str = "us") -> dict[str, Any] | None:
     """Fetch app metadata from the iTunes Search API.
 
+    Fetches up to 10 candidates and prefers a case-insensitive exact (then
+    startswith) trackName match against the query, so a nonsense search does
+    not silently score an unrelated app.
+
     Args:
         app_name: The app name to search for.
         country: Two-letter country code for the store region.
 
     Returns:
-        Dictionary of normalized metadata fields, or None if not found.
+        Dictionary of normalized metadata fields, or None if not found
+        (a distinct message is printed to stderr for network failures).
     """
     params = urllib.parse.urlencode({
         "term": app_name,
         "entity": "software",
         "country": country,
-        "limit": "1",
+        "limit": "10",
     })
     url = f"{ITUNES_SEARCH_URL}?{params}"
 
@@ -65,17 +74,40 @@ def fetch_app_metadata(app_name: str, country: str = "us") -> dict[str, Any] | N
         with urllib.request.urlopen(req, timeout=15) as response:
             data = json.loads(response.read().decode("utf-8"))
     except Exception as exc:
-        print(f"Error fetching data from iTunes API: {exc}")
+        print(f"Network error fetching data from iTunes API: {exc}", file=sys.stderr)
         return None
 
-    if not data.get("results"):
+    results = data.get("results")
+    if not results:
+        print(f"App '{app_name}' not found on the iTunes Store.", file=sys.stderr)
         return None
 
-    app = data["results"][0]
+    query = app_name.strip().lower()
+    app = None
+    for candidate in results:
+        if candidate.get("trackName", "").strip().lower() == query:
+            app = candidate
+            break
+    if app is None:
+        for candidate in results:
+            if candidate.get("trackName", "").strip().lower().startswith(query):
+                app = candidate
+                break
+    if app is None:
+        app = results[0]
+
+    matched_name = app.get("trackName", "")
+    if matched_name.strip().lower() != query:
+        print(
+            f"Matched '{matched_name}' - verify this is the right app",
+            file=sys.stderr,
+        )
+
     return _normalize_itunes_result(app)
 
 
 def fetch_competitors(
+    genre_name: str,
     genre_id: int,
     country: str = "us",
     limit: int = 5,
@@ -83,8 +115,14 @@ def fetch_competitors(
 ) -> list[dict[str, Any]]:
     """Fetch top apps in the same genre for competitor comparison.
 
+    The iTunes Search API does not support browsing by genre ID alone, so
+    this searches for the genre name as the term (e.g. "productivity") and
+    filters the results client-side by the target app's primary genre ID,
+    keeping the top apps by user rating count.
+
     Args:
-        genre_id: The iTunes genre ID for the app's primary category.
+        genre_name: The app's primary genre name, used as the search term.
+        genre_id: The iTunes genre ID to filter results by.
         country: Two-letter country code.
         limit: Number of competitor apps to return.
         exclude_app: App name to exclude from results.
@@ -93,11 +131,10 @@ def fetch_competitors(
         List of normalized metadata dictionaries for competitor apps.
     """
     params = urllib.parse.urlencode({
-        "term": "",
+        "term": genre_name,
         "entity": "software",
         "country": country,
-        "genreId": str(genre_id),
-        "limit": str(limit + 3),  # fetch extra to account for exclusion
+        "limit": "50",  # fetch extra to allow genre filtering and exclusion
     })
     url = f"{ITUNES_SEARCH_URL}?{params}"
 
@@ -105,16 +142,28 @@ def fetch_competitors(
         req = urllib.request.Request(url, headers={"User-Agent": "ASO-Scorer/1.0"})
         with urllib.request.urlopen(req, timeout=15) as response:
             data = json.loads(response.read().decode("utf-8"))
-    except Exception:
+    except Exception as exc:
+        print(f"Network error fetching competitors: {exc}", file=sys.stderr)
         return []
 
     competitors = []
     for app in data.get("results", []):
+        if genre_id and app.get("primaryGenreId") != genre_id:
+            continue
         normalized = _normalize_itunes_result(app)
-        if normalized["title"].lower() != exclude_app.lower():
-            competitors.append(normalized)
-        if len(competitors) >= limit:
-            break
+        if normalized["title"].lower() == exclude_app.lower():
+            continue
+        competitors.append(normalized)
+
+    competitors.sort(key=lambda c: c.get("rating_count", 0) or 0, reverse=True)
+    competitors = competitors[:limit]
+
+    if not competitors:
+        print(
+            f"Warning: no competitors found for genre '{genre_name}' "
+            f"(genre ID {genre_id}). Competitor comparison will be empty.",
+            file=sys.stderr,
+        )
 
     return competitors
 
@@ -129,6 +178,7 @@ def _normalize_itunes_result(app: dict[str, Any]) -> dict[str, Any]:
         Normalized metadata dictionary.
     """
     return {
+        "source": "itunes",
         "title": app.get("trackName", ""),
         "developer_name": app.get("artistName", ""),
         "description": app.get("description", ""),
@@ -193,10 +243,20 @@ def score_title(metadata: dict[str, Any]) -> dict[str, Any]:
         details.append("Title is empty.")
 
     # Keyword separator check (brand - keyword pattern)
+    # For established apps with very high rating counts, a short brand-only
+    # title is a valid strategy, so the separator is advisory rather than
+    # heavily penalized.
     has_separator = bool(re.search(r"[-:|]", title))
+    rating_count = metadata.get("rating_count", 0) or 0
     if has_separator:
         score += 30
         details.append("Title includes a separator for brand-keyword structure.")
+    elif rating_count > 100_000:
+        score += 25
+        details.append(
+            "Title lacks a separator, but a short brand-only title is a valid "
+            "strategy for established apps with strong brand recognition."
+        )
     else:
         score += 10
         details.append("Title lacks a separator. Consider 'Brand - Keyword' format.")
@@ -380,7 +440,11 @@ def score_ratings(metadata: dict[str, Any]) -> dict[str, Any]:
 def score_completeness(metadata: dict[str, Any]) -> dict[str, Any]:
     """Score metadata completeness (20% weight).
 
-    Checks whether all important fields are populated and utilized.
+    Checks whether all important fields are populated and utilized. When the
+    metadata came from the iTunes Search API (source == "itunes"), the
+    subtitle and keywords checks are skipped because the API never exposes
+    those fields, and the remaining checks are renormalized to /100 so live
+    apps are not unfairly capped.
 
     Args:
         metadata: Normalized metadata dictionary.
@@ -389,7 +453,9 @@ def score_completeness(metadata: dict[str, Any]) -> dict[str, Any]:
         Score breakdown dictionary with score (0-100) and details.
     """
     score = 0
+    max_points = 100
     details = []
+    from_itunes = metadata.get("source") == "itunes"
 
     # Title present
     if metadata.get("title"):
@@ -407,19 +473,28 @@ def score_completeness(metadata: dict[str, Any]) -> dict[str, Any]:
     else:
         details.append("Description is missing.")
 
-    # Subtitle (iOS field - may not be available via API)
-    if metadata.get("subtitle"):
-        score += 15
-        details.append("Subtitle is populated.")
+    if from_itunes:
+        # Subtitle and keywords are never exposed by the iTunes Search API,
+        # so skip those checks and renormalize the remaining weights.
+        max_points -= 30
+        details.append(
+            "Subtitle and keywords fields are not exposed by the iTunes API - "
+            "excluded from scoring (remaining checks renormalized to /100)."
+        )
     else:
-        details.append("Subtitle not detected (may not be available via API).")
+        # Subtitle (iOS field)
+        if metadata.get("subtitle"):
+            score += 15
+            details.append("Subtitle is populated.")
+        else:
+            details.append("Subtitle not detected.")
 
-    # Keywords field (iOS field - not exposed via API)
-    if metadata.get("keywords"):
-        score += 15
-        details.append("Keywords field is populated.")
-    else:
-        details.append("Keywords field not detected (not exposed via iTunes API).")
+        # Keywords field (iOS field)
+        if metadata.get("keywords"):
+            score += 15
+            details.append("Keywords field is populated.")
+        else:
+            details.append("Keywords field not detected.")
 
     # Screenshots
     screenshot_count = metadata.get("screenshot_count", 0)
@@ -454,7 +529,8 @@ def score_completeness(metadata: dict[str, Any]) -> dict[str, Any]:
     if not details:
         details.append("All metadata fields are populated.")
 
-    return {"score": min(score, 100), "details": details}
+    normalized_score = round(score * 100 / max_points) if max_points else 0
+    return {"score": min(normalized_score, 100), "details": details}
 
 
 def calculate_aso_score(metadata: dict[str, Any]) -> dict[str, Any]:
@@ -632,7 +708,8 @@ def score_app(
     """
     metadata = fetch_app_metadata(app_name, country)
     if metadata is None:
-        print(f"App '{app_name}' not found on the iTunes Store.")
+        # fetch_app_metadata already printed a specific error to stderr
+        # (app not found vs network failure).
         return None
 
     aso_result = calculate_aso_score(metadata)
@@ -646,9 +723,10 @@ def score_app(
         "metadata": metadata,
     }
 
-    if include_competitors and metadata.get("primary_genre_id"):
+    if include_competitors and metadata.get("primary_genre"):
         competitors = fetch_competitors(
-            genre_id=metadata["primary_genre_id"],
+            genre_name=metadata["primary_genre"],
+            genre_id=metadata.get("primary_genre_id", 0),
             country=country,
             limit=5,
             exclude_app=metadata["title"],
@@ -742,9 +820,11 @@ def format_score_report(result: dict[str, Any]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Standalone demo
+# Command-line interface
 # ---------------------------------------------------------------------------
-if __name__ == "__main__":
+
+def run_demo() -> None:
+    """Run the built-in demo: a sample metadata dict plus a live app fetch."""
     print("=" * 60)
     print("ASO Scorer - Demo")
     print("=" * 60)
@@ -795,3 +875,69 @@ if __name__ == "__main__":
         print(format_score_report(live_result))
     else:
         print("Could not fetch app data. Check your network connection.")
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point.
+
+    Usage:
+        python3 aso_scorer.py "App Name" [--country us] [--no-competitors] [--json]
+        python3 aso_scorer.py --demo
+    """
+    parser = argparse.ArgumentParser(
+        description=(
+            "Fetch an app's metadata from the iTunes Search API and "
+            "calculate its ASO health score (0-100)."
+        ),
+    )
+    parser.add_argument(
+        "app_name",
+        nargs="?",
+        help='App name to search for on the iTunes Store (e.g. "Slack").',
+    )
+    parser.add_argument(
+        "--country",
+        default="us",
+        help="Two-letter store country code (default: us).",
+    )
+    parser.add_argument(
+        "--no-competitors",
+        action="store_true",
+        help="Skip fetching and scoring competitor apps.",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output the full result as JSON instead of a text report.",
+    )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Run the built-in demo (sample metadata + live Slack fetch).",
+    )
+    args = parser.parse_args(argv)
+
+    if args.demo:
+        run_demo()
+        return 0
+
+    if not args.app_name:
+        parser.error("provide an app name to score, or use --demo")
+
+    result = score_app(
+        args.app_name,
+        country=args.country,
+        include_competitors=not args.no_competitors,
+    )
+    if result is None:
+        return 1
+
+    if args.json:
+        print(json.dumps(result, indent=2))
+    else:
+        print(format_score_report(result))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

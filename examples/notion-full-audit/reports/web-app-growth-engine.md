@@ -9,7 +9,7 @@
 
 ---
 
-## Signup Friction Score: 22/100 — Low Friction (Excellent)
+## Signup Friction Score: 22/100 - Low Friction (Excellent)
 
 > Notion has one of the lowest-friction signup flows in SaaS. Passwordless authentication, SSO options, a generous free tier, and no credit card requirement create a near-frictionless path from visitor to active user. The PLG engine is best-in-class.
 
@@ -17,7 +17,7 @@
 
 | Factor | Points | Notes |
 |--------|--------|-------|
-| Email field (required) | +8 | Standard — unavoidable |
+| Email field (required) | +8 | Standard - unavoidable |
 | No password required (magic link/passkey) | +0 | Passwordless reduces friction significantly |
 | SSO available (Google, Apple, Microsoft) | +0 | 3 SSO options eliminate manual entry |
 | No CAPTCHA | +0 | No visible bot detection on signup |
@@ -49,7 +49,7 @@
 | Apple SSO | ✅ Yes | Very Low (1-click with Face/Touch ID) |
 | Microsoft SSO | ✅ Yes | Very Low (1-click) |
 | SAML SSO | ✅ Yes (Business/Enterprise) | Low (IT-managed) |
-| GitHub SSO | ❌ No | — |
+| GitHub SSO | ❌ No | - |
 
 ### Estimated Signup Steps (Fastest Path)
 
@@ -59,7 +59,7 @@
 | 2 | Click "Continue with Google" (or Apple/Microsoft) | 1 sec |
 | 3 | Select Google account (if multiple) | 2 sec |
 | 4 | Onboarding questions (use case, team size) | 15 sec |
-| 5 | Land in workspace | — |
+| 5 | Land in workspace | - |
 | **Total** | **~20 seconds to first workspace** | **Excellent** |
 
 ### Estimated Signup Steps (Email Path)
@@ -71,7 +71,7 @@
 | 3 | Check email for verification code | 15-30 sec |
 | 4 | Enter verification code | 5 sec |
 | 5 | Onboarding questions | 15 sec |
-| 6 | Land in workspace | — |
+| 6 | Land in workspace | - |
 | **Total** | **~45-60 seconds to first workspace** | **Good** |
 
 ### Signup Page Design Assessment
@@ -92,12 +92,12 @@
 
 ## AARRR Funnel Analysis
 
-### 1. Acquisition — 9/10 🟢
+### 1. Acquisition - 9/10 🟢
 
 | Signal | Status | Evidence |
 |--------|--------|---------|
 | Organic search traffic | ✅ Strong | ~7M monthly visits, extensive content footprint |
-| Free tier availability | ✅ Yes | "Get Notion free" — no barriers |
+| Free tier availability | ✅ Yes | "Get Notion free" - no barriers |
 | Multiple CTAs | ✅ Yes | "Get Notion free" + "Request a demo" |
 | Template marketplace | ✅ Yes | Organic traffic driver via /templates |
 | Community (1.4M members) | ✅ Yes | Organic word-of-mouth engine |
@@ -110,7 +110,7 @@
 
 ---
 
-### 2. Activation — 8/10 🟢
+### 2. Activation - 8/10 🟢
 
 | Signal | Status | Evidence |
 |--------|--------|---------|
@@ -127,11 +127,11 @@
 - **Secondary:** % of users who invite a teammate within 7 days
 - **Tertiary:** % of users who use AI features within first session
 
-**Gap:** Notion's flexibility creates "blank page syndrome" — new users may not know where to start. The template library mitigates this, but an in-app onboarding checklist ("Create your first page → Invite a teammate → Try AI") would improve activation rates.
+**Gap:** Notion's flexibility creates "blank page syndrome" - new users may not know where to start. The template library mitigates this, but an in-app onboarding checklist ("Create your first page → Invite a teammate → Try AI") would improve activation rates.
 
 ---
 
-### 3. Retention — 8/10 🟢
+### 3. Retention - 8/10 🟢
 
 | Signal | Status | Evidence |
 |--------|--------|---------|
@@ -150,7 +150,7 @@
 
 ---
 
-### 4. Revenue — 7/10 🟢
+### 4. Revenue - 7/10 🟢
 
 | Signal | Status | Evidence |
 |--------|--------|---------|
@@ -167,16 +167,16 @@
 
 | Factor | Status | Impact |
 |--------|--------|--------|
-| "No credit card required" messaging | ❌ Missing | Medium — could reassure hesitant signups |
+| "No credit card required" messaging | ❌ Missing | Medium - could reassure hesitant signups |
 | Free trial of paid features | ⚠️ Limited | AI features have "Limited Trial" but duration unclear |
-| Pricing visible from homepage | ❌ No | Users must navigate to /pricing — adds friction |
+| Pricing visible from homepage | ❌ No | Users must navigate to /pricing - adds friction |
 | FAQ on pricing page | ✅ Yes | 18 questions covering common concerns |
 
 **Gap:** No "no credit card required" messaging anywhere. This is a missed reassurance signal for users who are wary of free-tier products auto-charging.
 
 ---
 
-### 5. Referral — 9/10 🟢
+### 5. Referral - 9/10 🟢
 
 | Signal | Status | Evidence |
 |--------|--------|---------|
@@ -209,7 +209,7 @@ Team members invite others → Workspace becomes essential →
 Hard to leave (content lock-in) → Team grows → More seats purchased
 ```
 **Estimated loop cycle:** 1-4 weeks
-**Viral coefficient:** High — each user invites 2-5 teammates on average
+**Viral coefficient:** High - each user invites 2-5 teammates on average
 
 ### Loop 2: Template Marketplace Loop
 ```
@@ -218,7 +218,7 @@ New users discover template via search → Sign up to use it →
 Some become power users → Create their own templates
 ```
 **Estimated loop cycle:** 2-8 weeks
-**Viral coefficient:** Moderate — templates drive organic discovery
+**Viral coefficient:** Moderate - templates drive organic discovery
 
 ### Loop 3: AI Agent Expansion Loop (Emerging)
 ```
@@ -237,7 +237,7 @@ Team adopts Calendar too → Notion Mail launched → Email in Notion →
 Full workday happens in Notion
 ```
 **Estimated loop cycle:** 4-12 weeks
-**Retention impact:** Very high — multi-product adoption dramatically reduces churn
+**Retention impact:** Very high - multi-product adoption dramatically reduces churn
 
 ---
 
@@ -247,7 +247,7 @@ Full workday happens in Notion
 
 | Factor | Status | Optimization Opportunity |
 |--------|--------|------------------------|
-| CTA above fold | ✅ "Get Notion free" | Optimized — action-oriented + "free" |
+| CTA above fold | ✅ "Get Notion free" | Optimized - action-oriented + "free" |
 | CTA contrast | ✅ Blue button on white | Good visibility |
 | Secondary CTA | ✅ "Request a demo" | Serves enterprise visitors |
 | Sticky nav CTA | ✅ Persists on scroll | Reduces scroll-to-CTA friction |
@@ -271,27 +271,27 @@ Full workday happens in Notion
 
 ### 1. Add "No credit card required" to homepage CTA area
 **Why:** Standard PLG reassurance signal. Notion's free tier genuinely requires no payment, but this isn't communicated. Reduces hesitation among cautious visitors.
-**Impact:** Medium — estimated 3-5% increase in CTA click-through rate
+**Impact:** Medium - estimated 3-5% increase in CTA click-through rate
 **Difficulty:** Easy (copy change only)
 
 ### 2. Add an interactive product demo before signup
-**Why:** Notion's SPA signup creates a "black box" — visitors can't preview the product without creating an account. An interactive demo (Navattic, Storylane, or custom) would let prospects explore before committing.
-**Impact:** High — estimated 10-20% increase in qualified signups
+**Why:** Notion's SPA signup creates a "black box" - visitors can't preview the product without creating an account. An interactive demo (Navattic, Storylane, or custom) would let prospects explore before committing.
+**Impact:** High - estimated 10-20% increase in qualified signups
 **Difficulty:** Medium (requires demo tooling)
 
 ### 3. Clarify AI trial terms on pricing page
 **Why:** "Limited Trial" for AI features is vague. How many queries? How many days? Unclear trial terms reduce conversion confidence.
-**Impact:** Medium — reduces upgrade hesitation
+**Impact:** Medium - reduces upgrade hesitation
 **Difficulty:** Easy (copy change)
 
 ### 4. Add GitHub SSO for developer audience
 **Why:** 50%+ of YC companies use Notion. Developer and startup audiences expect GitHub as an SSO option. Missing it adds friction for a key segment.
-**Impact:** Low-Medium — serves a specific but valuable segment
+**Impact:** Low-Medium - serves a specific but valuable segment
 **Difficulty:** Medium (engineering work)
 
 ### 5. Surface pricing anchor on homepage
 **Why:** No pricing info is visible without navigating to /pricing. A simple "Free forever. Plans from $10/seat/mo." near a CTA removes a common question without leaving the page.
-**Impact:** Medium — reduces drop-off from homepage to pricing page
+**Impact:** Medium - reduces drop-off from homepage to pricing page
 **Difficulty:** Easy (copy addition)
 
 ---
@@ -336,7 +336,7 @@ Full workday happens in Notion
 | Referral | 9/10 | 🟢 Excellent |
 | **Overall PLG Score** | **42/50** | **Best-in-class** |
 
-> ℹ️ Signup conversion rate and activation metrics could not be measured — only public page structure was analyzed. For real conversion data, set `GOOGLE_ANALYTICS_JSON`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+> ℹ️ Signup conversion rate and activation metrics could not be measured - only public page structure was analyzed. For real conversion data, set `GOOGLE_ANALYTICS_JSON`. See the API Integrations section in this skill's SKILL.md for setup instructions.
 
 ---
 

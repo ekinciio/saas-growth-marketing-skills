@@ -159,17 +159,21 @@ Common channels: paid search, paid social, organic/SEO, content marketing, outbo
 
 ### Simple Method
 
-**Definition:** The total revenue a customer generates over their entire relationship.
+**Definition:** The gross profit a customer generates over their entire relationship.
 
 **Formula:**
 ```
-LTV = ARPU / Monthly Churn Rate
+LTV = ARPU x Gross Margin / Monthly Churn Rate
 ```
 Or equivalently:
 ```
-LTV = ARPU x Average Customer Lifetime (in months)
+LTV = ARPU x Gross Margin x Average Customer Lifetime (in months)
 Average Customer Lifetime = 1 / Monthly Churn Rate
 ```
+
+Note: the widely used 3:1 LTV:CAC benchmark assumes margin-adjusted LTV
+(gross margin included in the LTV calculation). Comparing revenue-based
+LTV against that benchmark overstates unit economics.
 
 ### DCF (Discounted Cash Flow) Method
 
@@ -355,9 +359,10 @@ NRR = (Beginning MRR + Expansion MRR - Contraction MRR - Churned MRR) / Beginnin
 Measured over 12 months for annual NRR.
 
 **Healthy Range:**
-- Above 130%: exceptional (GREEN) - typical of best PLG companies
-- 110-130%: excellent (GREEN)
-- 100-110%: good (YELLOW)
+- Above 120%: best-in-class (GREEN)
+- 110-120%: excellent (GREEN)
+- 100-110%: solid (YELLOW) - at or above the ~101-106% 2025 median
+  (sources: SaaS Capital, ChartMogul, Benchmarkit 2025)
 - 90-100%: concerning, customers are shrinking (RED)
 - Below 90%: critical retention problem (RED)
 

@@ -36,7 +36,7 @@ Prefer user-provided exports when available:
 - Copied Xquik API responses.
 
 For live data, check the source references first:
-- API docs: https://docs.xquik.com/api-reference/introduction
+- API docs: https://docs.xquik.com/api-reference/overview
 - OpenAPI schema: https://xquik.com/openapi.json
 - MCP docs: https://docs.xquik.com/mcp/overview
 - MCP manifest: https://xquik.com/.well-known/mcp.json
@@ -48,9 +48,10 @@ Use the `x-api-key` header for REST requests. Read the key from `XQUIK_API_KEY`.
 1. Clarify the SaaS category, target audience, and growth question.
 2. Identify the narrowest Xquik endpoint or export that answers the question.
 3. Normalize each record into text, author, timestamp, URL, metrics, and source.
-4. Score records for purchase intent, pain intensity, recency, and relevance.
-5. Group the strongest records into themes and content opportunities.
-6. Write a concise report with evidence examples and clear next actions.
+4. Use the script to pre-rank records by intent and pain language.
+5. Apply the full rubric for ICP fit, recency, and engagement.
+6. Group the strongest records into themes and content opportunities.
+7. Write a concise report with evidence examples and clear next actions.
 
 ## Guardrails
 
@@ -58,3 +59,5 @@ Use the `x-api-key` header for REST requests. Read the key from `XQUIK_API_KEY`.
 - Do not infer sensitive traits from public X activity.
 - Do not help with spam, scraping private data, or access-control bypass.
 - Do not mention non-public implementation details or unsupported endpoint claims.
+
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.

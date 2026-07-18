@@ -4,8 +4,13 @@ description: >
   Identify churn risks and implement retention strategies for SaaS products.
   Provides churn signal detection, win-back campaign frameworks, and engagement
   scoring models. Use when the user mentions churn, retention, win-back,
-  engagement scoring, customer health, or reducing cancellations.
+  engagement scoring, customer health, reducing cancellations, dunning,
+  cancellation flow, or NRR.
 ---
+
+# Retention Playbook
+
+Detect churn risks early, score customer engagement health, and deploy proven retention and win-back strategies for SaaS products.
 
 ## First Run
 
@@ -67,10 +72,6 @@ If the user types "skip" for any metric:
 - Proceed with available data
 - Provide general retention recommendations when specific data is missing
 - Never block the report because one metric is unknown
-
-# Retention Playbook
-
-Detect churn risks early, score customer engagement health, and deploy proven retention and win-back strategies for SaaS products.
 
 ## Commands
 
@@ -175,7 +176,8 @@ Build an engagement scoring model to proactively identify healthy and at-risk cu
 1. Ask for key product actions that indicate value delivery (e.g., created a project, invited a teammate, used core feature)
 2. Ask for interaction frequency expectations (daily, weekly, monthly active usage)
 3. Ask for available data points (login data, feature usage, support tickets, NPS scores)
-4. Build a weighted engagement score using the logic from `scripts/churn_risk_scorer.py`
+4. Build a weighted engagement score using the logic from `scripts/churn_risk_scorer.py`:
+   engagement score = 100 − churn risk score
 5. Define engagement tiers: Champion, Healthy, At-Risk, Disengaging, Ghost
 6. Map each tier to proactive actions (success outreach, re-engagement campaign, escalation)
 
@@ -198,10 +200,9 @@ Build an engagement scoring model to proactively identify healthy and at-risk cu
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -213,14 +214,14 @@ Build an engagement scoring model to proactively identify healthy and at-risk cu
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Churn diagnosis complete — saved to RETENTION-DIAGNOSIS-REPORT.md
+✅ Churn diagnosis complete - saved to RETENTION-DIAGNOSIS-REPORT.md
 
 Monthly Logo Churn: [X]% | Revenue Churn: [X]% | NRR: [X]%
 
 Top churn drivers:
-  1. [#1 driver] — Impact: [HIGH/MED] — Addressable: [YES/PARTIAL]
-  2. [#2 driver] — Impact: [HIGH/MED] — Addressable: [YES/PARTIAL]
-  3. [#3 driver] — Impact: [MED] — Addressable: [YES/PARTIAL]
+  1. [#1 driver] - Impact: [HIGH/MED] - Addressable: [YES/PARTIAL]
+  2. [#2 driver] - Impact: [HIGH/MED] - Addressable: [YES/PARTIAL]
+  3. [#3 driver] - Impact: [MED] - Addressable: [YES/PARTIAL]
 
 Full diagnosis with action plan → open RETENTION-DIAGNOSIS-REPORT.md
 """
@@ -230,7 +231,9 @@ NEVER dump the full report in chat. The file is the deliverable.
 ## Key Reference Files
 
 - `references/churn-signals.md` - Early warning churn signals organized by category with detection methods
-- `scripts/churn_risk_scorer.py` - Python scorer that computes churn risk from customer behavior data
+- `scripts/churn_risk_scorer.py` - Python scorer that computes churn risk from customer behavior data.
+  Run it directly: `python3 scripts/churn_risk_scorer.py customers.json` (a JSON customer dict or
+  list of dicts; all keys optional), pipe JSON via stdin, or use `--demo` for sample customers
 
 ## Guidelines
 

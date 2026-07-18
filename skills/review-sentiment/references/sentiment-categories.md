@@ -65,7 +65,7 @@ Reviews about design, visual appearance, navigation, and ease of use.
 
 **Example negative review:**
 > "Navigation is a nightmare. I can never find what I'm looking for and the menu structure makes no sense."
-> - Sentiment: Negative (0.87)
+> - Sentiment: Negative (0.74)
 > - Theme: UX/UI
 
 ### Performance
@@ -75,13 +75,13 @@ Reviews about speed, loading times, crashes, and reliability.
 
 **Example positive review:**
 > "Pages load instantly and I've never experienced a single crash in 6 months of daily use."
-> - Sentiment: Positive (0.89)
-> - Theme: Performance
+> - Sentiment: Positive (0.74)
+> - Themes: Performance, Bugs (crash keyword)
 
 **Example negative review:**
 > "The app is incredibly slow. Takes 10+ seconds to load any page and crashes at least once a day."
-> - Sentiment: Negative (0.93)
-> - Theme: Performance
+> - Sentiment: Negative (0.82)
+> - Themes: Performance, Bugs
 
 ### Pricing
 Reviews about cost, value, subscription plans, and billing.
@@ -90,13 +90,13 @@ Reviews about cost, value, subscription plans, and billing.
 
 **Example positive review:**
 > "Great value for the price. The starter plan has everything a small business needs."
-> - Sentiment: Positive (0.78)
+> - Sentiment: Positive (0.74)
 > - Theme: Pricing
 
 **Example negative review:**
 > "Way too expensive for what you get. Competitors offer the same features at half the price."
-> - Sentiment: Negative (0.85)
-> - Theme: Pricing
+> - Sentiment: Negative (0.74)
+> - Themes: Pricing, Features
 
 ### Support
 Reviews about customer service, response times, and helpfulness.
@@ -105,12 +105,12 @@ Reviews about customer service, response times, and helpfulness.
 
 **Example positive review:**
 > "Support team is fantastic. Got a reply within an hour and they walked me through the solution step by step."
-> - Sentiment: Positive (0.92)
+> - Sentiment: Positive (0.74)
 > - Theme: Support
 
 **Example negative review:**
 > "Submitted a support ticket 5 days ago and still no response. This is unacceptable for a paid product."
-> - Sentiment: Negative (0.91)
+> - Sentiment: Negative (0.74)
 > - Theme: Support
 
 ### Features
@@ -120,27 +120,27 @@ Reviews about functionality, capabilities, and feature requests.
 
 **Example positive review:**
 > "The automation features are incredible. Saved us hours every week with the workflow builder."
-> - Sentiment: Positive (0.88)
+> - Sentiment: Positive (0.74)
 > - Theme: Features
 
 **Example negative review (feature request):**
 > "Really wish it had a Slack integration. Also missing basic export to CSV which is a dealbreaker for us."
-> - Sentiment: Negative (0.65)
+> - Sentiment: Negative (0.78)
 > - Theme: Features
 
 ### Bugs
 Reviews about errors, glitches, and broken functionality.
 
-**Keywords:** bug, error, glitch, broken, fix, issue, problem, doesn't work, not working, fail, failure, crash, unexpected, wrong, incorrect, stuck, loop, blank, missing data, lost data, corrupt, regression
+**Keywords:** bug, error, glitch, broken, fix, doesn't work, not working, fail, failure, crash, unexpected, wrong, incorrect, stuck, loop, blank, missing data, lost data, corrupt, regression (generic words like "issue" and "problem" are intentionally excluded to avoid tagging support reviews as Bugs)
 
 **Example negative review:**
 > "The export feature has been broken for two weeks. Getting a blank file every time. This is a critical bug."
-> - Sentiment: Negative (0.94)
-> - Theme: Bugs
+> - Sentiment: Negative (0.78)
+> - Themes: Bugs, Features
 
 **Example mixed review:**
 > "Love the product overall but there's a persistent bug where notifications don't appear on mobile."
-> - Sentiment: Neutral (0.50)
+> - Sentiment: Neutral (0.38)
 > - Themes: Bugs, Features
 
 ### Onboarding
@@ -150,13 +150,13 @@ Reviews about the initial setup experience, documentation, and learning curve.
 
 **Example positive review:**
 > "Had everything set up in under 10 minutes. The onboarding wizard and documentation are top-notch."
-> - Sentiment: Positive (0.90)
-> - Theme: Onboarding
+> - Sentiment: Positive (0.74)
+> - Themes: Onboarding, Support (documentation keyword)
 
 **Example negative review:**
 > "Took me three days to figure out the basic setup. Documentation is outdated and the UI gives no guidance."
-> - Sentiment: Negative (0.86)
-> - Themes: Onboarding, UX/UI
+> - Sentiment: Negative (0.74)
+> - Themes: Onboarding, UX/UI, Support
 
 ## Multi-Theme Reviews
 
@@ -164,12 +164,12 @@ Many reviews touch on multiple themes. Each review should be tagged with all rel
 
 **Example:**
 > "The design is beautiful and onboarding was smooth, but the app is way too slow and their pricing doesn't match the value."
-> - Sentiment: Neutral (0.45)
+> - Sentiment: Positive (0.56)
 > - Themes: UX/UI, Onboarding, Performance, Pricing
 
 **Example:**
 > "Support helped me fix a bug quickly, and they were very friendly. But I wish the feature set was more complete."
-> - Sentiment: Neutral (0.55)
+> - Sentiment: Neutral (0.4)
 > - Themes: Support, Bugs, Features
 
 ## Aggregate Metrics

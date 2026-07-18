@@ -101,7 +101,7 @@ important for ASO.
 | Platform | Max Length | Max Count |
 |----------|-----------|-----------|
 | Apple App Store | 30 seconds | 3 |
-| Google Play Store | 30 seconds (promo video, YouTube link) | 1 |
+| Google Play Store | No hard cap (promo video is a YouTube link; 30 seconds to 2 minutes recommended) | 1 |
 
 ### App Icon
 

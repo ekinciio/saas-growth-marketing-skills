@@ -26,6 +26,7 @@ def analyze_pricing(
     own_pricing: dict[str, Any],
     competitor_pricing: Optional[list[dict[str, Any]]] = None,
     survey_data: Optional[dict[str, list[float]]] = None,
+    plg_motion: Optional[bool] = None,
 ) -> dict[str, Any]:
     """
     Analyze SaaS pricing strategy.
@@ -45,6 +46,9 @@ def analyze_pricing(
                 - bargain (list[float]): Prices respondents consider a bargain.
                 - expensive (list[float]): Prices respondents consider getting expensive.
                 - too_expensive (list[float]): Prices respondents consider too expensive.
+        plg_motion: Whether the company runs a PLG/self-serve motion.
+            True raises a firm "no free tier" issue; False suppresses it;
+            None (unknown) phrases it as something to consider.
 
     Returns:
         Dictionary with keys:
@@ -54,7 +58,7 @@ def analyze_pricing(
             - recommended_changes (list[str]): Prioritized recommendations.
             - positioning_summary (str): Overall positioning assessment.
     """
-    tier_analysis = _analyze_tiers(own_pricing["tiers"])
+    tier_analysis = _analyze_tiers(own_pricing["tiers"], plg_motion=plg_motion)
 
     competitive_positioning = None
     if competitor_pricing:
@@ -83,7 +87,10 @@ def analyze_pricing(
     }
 
 
-def _analyze_tiers(tiers: list[dict[str, Any]]) -> dict[str, Any]:
+def _analyze_tiers(
+    tiers: list[dict[str, Any]],
+    plg_motion: Optional[bool] = None,
+) -> dict[str, Any]:
     """Analyze tier structure for gaps and issues."""
     if not tiers:
         return {"error": "No tiers provided"}
@@ -124,15 +131,24 @@ def _analyze_tiers(tiers: list[dict[str, Any]]) -> dict[str, Any]:
             tier_info["price_jump_pct"] = round(price_jump_pct, 1)
             tier_info["feature_jump_to_next"] = feature_jump
 
-            # Flag issues
-            if price_jump_pct > 200:
+            # Flag issues. The jump into the top (enterprise) tier is exempt:
+            # a large premium there is a standard anchoring pattern.
+            jump_is_into_top_tier = (i + 1) == len(sorted_tiers) - 1
+            if price_jump_pct > 300 and not jump_is_into_top_tier:
                 analysis["issues"].append(
                     f"Large price gap ({price_jump_pct:.0f}%) between "
                     f"{tier['name']} and {next_tier['name']} - "
                     f"consider adding an intermediate tier"
                 )
 
-            if feature_jump <= 1 and price_jump > 0:
+            # Tiers described as "everything in <lower tier>, plus ..." carry
+            # inherited features implicitly, so a small feature-count delta
+            # is not a weak upgrade signal there.
+            next_features_text = " ".join(
+                str(f) for f in next_tier["features"]
+            ).lower()
+            inherits_features = "everything in" in next_features_text
+            if feature_jump <= 1 and price_jump > 0 and not inherits_features:
                 analysis["issues"].append(
                     f"Only {feature_jump} new feature(s) between "
                     f"{tier['name']} (${tier['price']}) and "
@@ -152,11 +168,19 @@ def _analyze_tiers(tiers: list[dict[str, Any]]) -> dict[str, Any]:
             "More than 4 tiers may create decision paralysis - consider consolidating"
         )
 
-    # Check if lowest tier is free
+    # Check if lowest tier is free. Only firmly flag this for PLG/self-serve
+    # motions; sales-led products often deliberately have no free tier.
     if sorted_tiers[0]["price"] > 0:
-        analysis["issues"].append(
-            "No free tier - consider freemium or reverse trial for top-of-funnel growth"
-        )
+        if plg_motion:
+            analysis["issues"].append(
+                "No free tier - for a PLG/self-serve motion, consider freemium "
+                "or a reverse trial for top-of-funnel growth"
+            )
+        elif plg_motion is None:
+            analysis["issues"].append(
+                "No free tier - consider whether a free tier fits your motion "
+                "(mainly relevant for PLG/self-serve products)"
+            )
 
     return analysis
 
@@ -223,11 +247,19 @@ def _calculate_van_westendorp(
     """
     Calculate Van Westendorp price sensitivity intersections.
 
-    The four intersection points:
-        - OPP (Optimal Price Point): too_cheap and too_expensive intersect
-        - IDP (Indifference Price Point): bargain and expensive intersect
-        - PME (Point of Marginal Expensiveness): bargain cumulative and too_expensive cumulative
-        - PMC (Point of Marginal Cheapness): too_cheap cumulative and expensive cumulative
+    Uses the standard Price Sensitivity Meter (PSM) cumulative curves:
+        - "too cheap"     = % of respondents with too_cheap >= p (decreasing)
+        - "cheap"         = % of respondents with bargain >= p (decreasing)
+        - "expensive"     = % of respondents with expensive <= p (increasing)
+        - "too expensive" = % of respondents with too_expensive <= p (increasing)
+
+    Intersection points (R pricesensitivitymeter convention):
+        - OPP (Optimal Price Point): "too cheap" x "too expensive"
+        - IDP (Indifference Price Point): "cheap" x "expensive"
+        - PMC (Point of Marginal Cheapness): "too cheap" x "not cheap"
+          (where "not cheap" = 100 - "cheap", increasing)
+        - PME (Point of Marginal Expensiveness): "too expensive" x
+          "not expensive" (where "not expensive" = 100 - "expensive", decreasing)
     """
     too_cheap = sorted(survey_data["too_cheap"])
     bargain = sorted(survey_data["bargain"])
@@ -247,56 +279,60 @@ def _calculate_van_westendorp(
 
     price_points = [min_price + i * step for i in range(201)]
 
-    def cumulative_pct_below(data: list[float], price: float) -> float:
+    def pct_at_or_below(data: list[float], price: float) -> float:
         count = sum(1 for v in data if v <= price)
         return count / len(data) * 100 if data else 0
 
-    def cumulative_pct_above(data: list[float], price: float) -> float:
+    def pct_at_or_above(data: list[float], price: float) -> float:
         count = sum(1 for v in data if v >= price)
         return count / len(data) * 100 if data else 0
 
-    # Find intersections by scanning price points
-    opp = _find_intersection(
-        price_points,
-        lambda p: cumulative_pct_below(too_cheap, p),
-        lambda p: cumulative_pct_above(too_expensive, p),
-    )
+    def curve_too_cheap(p: float) -> float:
+        return pct_at_or_above(too_cheap, p)  # decreasing
 
-    idp = _find_intersection(
+    def curve_cheap(p: float) -> float:
+        return pct_at_or_above(bargain, p)  # decreasing
+
+    def curve_expensive(p: float) -> float:
+        return pct_at_or_below(expensive, p)  # increasing
+
+    def curve_too_expensive(p: float) -> float:
+        return pct_at_or_below(too_expensive, p)  # increasing
+
+    # Find intersections by scanning price points
+    opp = _find_intersection(price_points, curve_too_cheap, curve_too_expensive)
+
+    idp = _find_intersection(price_points, curve_cheap, curve_expensive)
+
+    pmc = _find_intersection(
         price_points,
-        lambda p: cumulative_pct_below(bargain, p),
-        lambda p: cumulative_pct_above(expensive, p),
+        curve_too_cheap,
+        lambda p: 100.0 - curve_cheap(p),  # "not cheap", increasing
     )
 
     pme = _find_intersection(
         price_points,
-        lambda p: cumulative_pct_below(expensive, p),
-        lambda p: cumulative_pct_below(too_expensive, p),
-    )
-
-    pmc = _find_intersection(
-        price_points,
-        lambda p: cumulative_pct_above(too_cheap, p),
-        lambda p: cumulative_pct_above(bargain, p),
+        curve_too_expensive,
+        lambda p: 100.0 - curve_expensive(p),  # "not expensive", decreasing
     )
 
     acceptable_range = {
-        "low": round(pmc, 2) if pmc else None,
-        "high": round(pme, 2) if pme else None,
+        "low": round(pmc, 2) if pmc is not None else None,
+        "high": round(pme, 2) if pme is not None else None,
     }
 
     return {
-        "optimal_price_point": round(opp, 2) if opp else None,
-        "indifference_price_point": round(idp, 2) if idp else None,
-        "point_of_marginal_expensiveness": round(pme, 2) if pme else None,
-        "point_of_marginal_cheapness": round(pmc, 2) if pmc else None,
+        "optimal_price_point": round(opp, 2) if opp is not None else None,
+        "indifference_price_point": round(idp, 2) if idp is not None else None,
+        "point_of_marginal_expensiveness": round(pme, 2) if pme is not None else None,
+        "point_of_marginal_cheapness": round(pmc, 2) if pmc is not None else None,
         "acceptable_price_range": acceptable_range,
         "sample_size": len(too_cheap),
         "recommendation": (
             f"Set price between ${acceptable_range['low']} and "
-            f"${acceptable_range['high']}, targeting ${round(opp, 2) if opp else 'N/A'} "
+            f"${acceptable_range['high']}, targeting ${round(opp, 2)} "
             f"as the optimal price point."
-            if opp and pmc and pme
+            if opp is not None and pmc is not None and pme is not None
             else "Insufficient data to determine optimal price point."
         ),
     }
@@ -307,15 +343,41 @@ def _find_intersection(
     curve_a: Any,
     curve_b: Any,
 ) -> Optional[float]:
-    """Find the price where two cumulative curves intersect."""
-    prev_diff = None
+    """Find the price where two cumulative curves intersect.
+
+    Treats any sign change (including touching zero) as a crossing. When the
+    two curves are exactly equal across a run of scan points, returns the
+    midpoint of that zero-run. Otherwise linearly interpolates between the
+    two scan points that bracket the sign flip.
+    """
+    prev_price: Optional[float] = None
+    prev_diff: Optional[float] = None
+    zero_start: Optional[float] = None
+    zero_end: Optional[float] = None
+
     for price in price_points:
-        val_a = curve_a(price)
-        val_b = curve_b(price)
-        diff = val_a - val_b
+        diff = curve_a(price) - curve_b(price)
+
+        if diff == 0:
+            if zero_start is None:
+                zero_start = price
+            zero_end = price
+            prev_price, prev_diff = price, diff
+            continue
+
+        if zero_start is not None:
+            # A zero-run just ended: the crossing is inside the run.
+            return (zero_start + zero_end) / 2
+
         if prev_diff is not None and prev_diff * diff < 0:
-            return price
-        prev_diff = diff
+            # Sign flip between two scan points: linear interpolation.
+            fraction = abs(prev_diff) / (abs(prev_diff) + abs(diff))
+            return prev_price + (price - prev_price) * fraction
+
+        prev_price, prev_diff = price, diff
+
+    if zero_start is not None:
+        return (zero_start + zero_end) / 2
     return None
 
 
@@ -385,6 +447,62 @@ def _generate_positioning_summary(
         )
 
     return summary
+
+
+def _fmt_price(value: Optional[float]) -> str:
+    """Format a price value, guarding against missing data."""
+    return f"${value}" if value is not None else "insufficient data"
+
+
+def _print_van_westendorp(vw: dict[str, Any]) -> None:
+    """Print a Van Westendorp result block."""
+    if vw.get("error"):
+        print(f"\nVan Westendorp Analysis: {vw['error']}")
+        return
+    print(f"\nVan Westendorp Analysis (n={vw['sample_size']}):")
+    print(f"  Optimal Price Point: {_fmt_price(vw['optimal_price_point'])}")
+    print(f"  Indifference Price Point: {_fmt_price(vw['indifference_price_point'])}")
+    print(f"  Point of Marginal Cheapness: {_fmt_price(vw['point_of_marginal_cheapness'])}")
+    print(f"  Point of Marginal Expensiveness: {_fmt_price(vw['point_of_marginal_expensiveness'])}")
+    print(
+        f"  Acceptable Range: {_fmt_price(vw['acceptable_price_range']['low'])}"
+        f" - {_fmt_price(vw['acceptable_price_range']['high'])}"
+    )
+    print(f"  Recommendation: {vw['recommendation']}")
+
+
+def _print_analysis(result: dict[str, Any]) -> None:
+    """Print a full pricing analysis result."""
+    print("Positioning Summary:")
+    print(f"  {result['positioning_summary']}")
+
+    print(f"\nTier Analysis ({result['tier_analysis']['tier_count']} tiers):")
+    for tier in result["tier_analysis"]["tiers"]:
+        print(
+            f"  {tier['name']}: ${tier['price']}/mo - {tier['feature_count']} "
+            f"features (${tier['price_per_feature']}/feature)"
+        )
+
+    if result["tier_analysis"]["issues"]:
+        print("\n  Issues:")
+        for issue in result["tier_analysis"]["issues"]:
+            print(f"    - {issue}")
+
+    if result["competitive_positioning"]:
+        cp = result["competitive_positioning"]
+        print("\nCompetitive Positioning:")
+        print(f"  Your avg price: ${cp['your_avg_price']}")
+        print(f"  Market avg price: ${cp['market_avg_price']}")
+        print(f"  Position: {cp['your_position']}")
+        for comp in cp["competitors"]:
+            print(f"  vs {comp['company']}: {comp['your_price_diff_pct']:+.1f}% ({comp['relative_positioning']})")
+
+    if result["van_westendorp"]:
+        _print_van_westendorp(result["van_westendorp"])
+
+    print("\nRecommended Changes:")
+    for i, rec in enumerate(result["recommended_changes"], 1):
+        print(f"  {i}. {rec}")
 
 
 def main() -> None:
@@ -466,40 +584,74 @@ def main() -> None:
 
     print("\n--- Analysis with all data ---\n")
     result = analyze_pricing(own_pricing, competitors, survey_data)
+    _print_analysis(result)
 
-    print("Positioning Summary:")
-    print(f"  {result['positioning_summary']}")
 
-    print(f"\nTier Analysis ({result['tier_analysis']['tier_count']} tiers):")
-    for tier in result["tier_analysis"]["tiers"]:
-        print(f"  {tier['name']}: ${tier['price']}/mo - {tier['feature_count']} features (${tier['price_per_feature']}/feature)")
+def _cli() -> None:
+    """Command-line entry point: JSON file, stdin, or --demo.
 
-    if result["tier_analysis"]["issues"]:
-        print("\n  Issues:")
-        for issue in result["tier_analysis"]["issues"]:
-            print(f"    - {issue}")
+    The JSON file can be either:
+      - a survey file with the four Van Westendorp keys
+        (too_cheap, bargain, expensive, too_expensive), or
+      - a pricing file with "tiers" (and optional "competitors",
+        "survey_data", and "plg_motion" keys).
+    """
+    import argparse
+    import json
+    import sys
 
-    if result["competitive_positioning"]:
-        cp = result["competitive_positioning"]
-        print(f"\nCompetitive Positioning:")
-        print(f"  Your avg price: ${cp['your_avg_price']}")
-        print(f"  Market avg price: ${cp['market_avg_price']}")
-        print(f"  Position: {cp['your_position']}")
-        for comp in cp["competitors"]:
-            print(f"  vs {comp['company']}: {comp['your_price_diff_pct']:+.1f}% ({comp['relative_positioning']})")
+    parser = argparse.ArgumentParser(
+        description="SaaS pricing analyzer",
+        epilog="Pass a tiers JSON ({\"tiers\": [...]}) or a Van Westendorp "
+               "survey JSON (too_cheap/bargain/expensive/too_expensive lists).",
+    )
+    parser.add_argument(
+        "input", nargs="?",
+        help="Path to a JSON file (or '-' for stdin)",
+    )
+    parser.add_argument(
+        "--demo", action="store_true", help="Run with built-in sample data"
+    )
+    args = parser.parse_args()
 
-    if result["van_westendorp"]:
-        vw = result["van_westendorp"]
-        print(f"\nVan Westendorp Analysis (n={vw['sample_size']}):")
-        print(f"  Optimal Price Point: ${vw['optimal_price_point']}")
-        print(f"  Indifference Price Point: ${vw['indifference_price_point']}")
-        print(f"  Acceptable Range: ${vw['acceptable_price_range']['low']} - ${vw['acceptable_price_range']['high']}")
-        print(f"  Recommendation: {vw['recommendation']}")
+    if args.demo or (args.input is None and sys.stdin.isatty()):
+        main()
+        return
 
-    print(f"\nRecommended Changes:")
-    for i, rec in enumerate(result["recommended_changes"], 1):
-        print(f"  {i}. {rec}")
+    if args.input is None or args.input == "-":
+        payload = json.load(sys.stdin)
+    else:
+        with open(args.input, "r", encoding="utf-8") as fh:
+            payload = json.load(fh)
+
+    survey_keys = {"too_cheap", "bargain", "expensive", "too_expensive"}
+    if survey_keys.issubset(payload):
+        # Survey-only file: run just the Van Westendorp analysis.
+        vw = _calculate_van_westendorp({k: payload[k] for k in survey_keys})
+        print("=" * 60)
+        print("Pricing Analyzer - Van Westendorp Price Sensitivity")
+        print("=" * 60)
+        _print_van_westendorp(vw)
+        return
+
+    if "tiers" not in payload:
+        sys.exit(
+            "Input JSON must contain either a 'tiers' list or the four Van "
+            "Westendorp survey keys (too_cheap, bargain, expensive, too_expensive)."
+        )
+
+    result = analyze_pricing(
+        {"tiers": payload["tiers"]},
+        payload.get("competitors") or payload.get("competitor_pricing"),
+        payload.get("survey_data") or payload.get("survey"),
+        plg_motion=payload.get("plg_motion"),
+    )
+    print("=" * 60)
+    print("Pricing Analyzer")
+    print("=" * 60)
+    print()
+    _print_analysis(result)
 
 
 if __name__ == "__main__":
-    main()
+    _cli()

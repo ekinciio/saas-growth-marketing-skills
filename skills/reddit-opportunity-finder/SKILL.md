@@ -9,6 +9,10 @@ description: >
   or community-driven growth.
 ---
 
+# Reddit Opportunity Finder
+
+A skill for discovering high-intent Reddit threads where your product or service can provide genuine value. Searches Reddit for keyword-matching posts (OAuth API when credentials are set, public RSS feed otherwise), scores them by engagement and recency, and surfaces the best opportunities for authentic participation.
+
 ## First Run
 
 When a user runs `/reddit-opportunity-finder search <keywords>` for the
@@ -27,8 +31,10 @@ What you'll get:
   → Top subreddits for your keywords
   → Engagement recommendations
 
-Note: Reddit rate limit is 1 request per 2 seconds (unauthenticated).
-      Set REDDIT_CLIENT_ID for 60 req/min. Results may take 30-60s.
+Note: Full data needs Reddit OAuth credentials (REDDIT_CLIENT_ID +
+      REDDIT_CLIENT_SECRET, 100 queries/min). Without them I use
+      Reddit's public RSS feed - no upvote/comment counts.
+      Results may take 30-60s.
 
 Output: Saved to REDDIT-OPPORTUNITIES-REPORT.md
 
@@ -36,10 +42,6 @@ Searching...
 """
 
 Then proceed immediately.
-
-# Reddit Opportunity Finder
-
-A skill for discovering high-intent Reddit threads where your product or service can provide genuine value. Searches Reddit's public API for keyword-matching posts, scores them by engagement and recency, and surfaces the best opportunities for authentic participation.
 
 ## Commands
 
@@ -82,7 +84,7 @@ Generates a monitoring setup guide for ongoing keyword tracking on Reddit.
 - Subreddit watchlist based on keyword analysis
 - Alert configuration guidance
 - RSS feed setup instructions
-- Automation suggestions using Reddit's JSON API
+- Automation suggestions using Reddit's RSS feeds (the JSON API now requires approved OAuth credentials)
 
 **Report:** Save output to `REDDIT-MONITOR-SETUP-REPORT.md`
 
@@ -105,20 +107,35 @@ Analyzes a specific subreddit for opportunity fit and engagement patterns.
 
 **Report:** Save output to `REDDIT-SUBREDDIT-REPORT.md`
 
+## Workflow
+
+When executing the `search` command:
+
+1. **Run the scanner script** (paths relative to this skill's directory):
+   ```bash
+   python3 scripts/reddit_scanner.py "<keywords>" --time week
+   ```
+   Use comma-separated keywords for multiple searches; add `--subreddit <name>` or `--min-upvotes <N>` when the user asks for them.
+
+2. **Check the script output for errors before reporting.** The report includes a `Data source:` line and an `Errors` section:
+   - If the RSS fallback was used, upvote/comment counts are unknown (shown as 0) and opportunity scores omit engagement components. Say so in the report and mention that setting `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` restores full data.
+   - If the script reports 403 errors or returns no results at all, fall back to WebSearch for thread discovery (e.g. `site:reddit.com "<keywords>"`) and note the degraded method in the report. Never present a failed scan as "0 opportunities found".
+
+3. **Read `references/reddit-engagement-guide.md` before writing engagement recommendations** - it defines the rules (10% rule, disclosure, subreddit compliance, response templates) that recommendations must follow.
+
 ## Technical Details
 
-This skill uses Reddit's public JSON API, which requires no authentication. All endpoints return JSON when `.json` is appended to the URL.
+Reddit no longer allows unauthenticated API access: `https://www.reddit.com/search.json` returns **403 Blocked** for all user agents. The scanner script tries three access methods in order:
 
-**API endpoint:**
-```
-https://www.reddit.com/search.json?q={keyword}&sort=new&limit=25&t={time_filter}
-```
+1. **OAuth API (primary, full data).** With `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` set, the script fetches an app-only token from `https://www.reddit.com/api/v1/access_token` (grant type `client_credentials`, HTTP basic auth) and searches via `https://oauth.reddit.com/search`. Free tier: 100 queries per minute per client ID, averaged over a 10-minute window.
+2. **Public JSON API (tried once).** Kept for the rare environment where it still responds; expect 403.
+3. **RSS fallback (no auth).** `https://www.reddit.com/search.rss?q={keyword}&sort=new&t={time_filter}&type=link` still returns 200. The Atom feed keeps title, URL, date, and subreddit but has no upvote or comment counts, so those score components are 0 and results are marked "limited data - RSS fallback".
 
 **Important:**
-- A User-Agent header is required for all requests
-- Rate limiting: Maximum one request every 2 seconds
-- Results are limited to 25 per request by default
+- A descriptive User-Agent header is required (Reddit's format: `script:app-name:version (by /u/username)`)
 - Time filters: hour, day, week, month, year, all
+- The script never silently returns 0 results on failure - every error is recorded in the result's `errors` list and printed in the report
+- If all methods fail, use WebSearch for thread discovery instead
 
 ## Engagement Guidelines
 
@@ -148,10 +165,9 @@ Reddit values authentic participation over marketing. When responding to opportu
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -163,33 +179,31 @@ Reddit values authentic participation over marketing. When responding to opportu
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Reddit scan complete — saved to REDDIT-OPPORTUNITIES-REPORT.md
+✅ Reddit scan complete - saved to REDDIT-OPPORTUNITIES-REPORT.md
 
 Found: [N] threads across [N] subreddits
 
 Top 3 opportunities:
-  1. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
-  2. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
-  3. [Thread title] (r/[sub], [score] upvotes) — Score: [X]/100
+  1. [Thread title] (r/[sub], [score] upvotes) - Score: [X]/100
+  2. [Thread title] (r/[sub], [score] upvotes) - Score: [X]/100
+  3. [Thread title] (r/[sub], [score] upvotes) - Score: [X]/100
 
 Full report with all threads and engagement tips → open REDDIT-OPPORTUNITIES-REPORT.md
 """
 
 NEVER dump the full report in chat. The file is the deliverable.
 
-## API Integrations (Optional)
+## API Integrations (Recommended)
 
-This skill works out of the box with Reddit's free public JSON API. However, the free API has strict rate limits (1 request per 2 seconds) which can cause timeouts or incomplete results for broad searches.
-
-If the user provides their own API credentials, use them for higher rate limits and richer data.
+Without credentials this skill falls back to Reddit's public RSS search feed, which still works but returns no upvote or comment data. OAuth credentials restore full data.
 
 | Environment Variable | Service | What It Unlocks |
 |---------------------|---------|-----------------|
-| `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` | Reddit OAuth API | 60 requests/minute (vs 1 per 2 seconds), access to more results per query, comment-level search |
+| `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` | Reddit OAuth API | Full post data (upvotes, comment counts, selftext); 100 queries/min per client ID (averaged over a 10-minute window) |
 
 **How to set up:**
-1. Create a Reddit app at `https://www.reddit.com/prefs/apps`
-2. Select "script" as the app type
+1. New Reddit API access requires approval: submit Reddit's developer request form (Responsible Builder Policy) via `support.reddithelp.com`. Approval is not instant.
+2. Apps created earlier at `https://www.reddit.com/prefs/apps` keep working - use their existing client ID and secret.
 3. Set the environment variables:
    ```bash
    export REDDIT_CLIENT_ID="your_client_id"
@@ -197,11 +211,11 @@ If the user provides their own API credentials, use them for higher rate limits 
    ```
 
 **Behavior:**
-- If `REDDIT_CLIENT_ID` is set → Use OAuth API with higher rate limits
-- If not set → Use free public JSON API (current default behavior, no change)
+- If credentials are set → OAuth API with full data (100 queries/min free tier)
+- If not set → RSS fallback: title/URL/date/subreddit only; engagement data missing and scores reflect that
 
-**When results are limited:** If a search returns fewer results than expected, hits a rate limit, or times out, inform the user that optional API credentials can improve results. Example:
-> ⚠️ Reddit rate limit reached - retrieved 12 of ~50 potential results. For higher limits (60 req/min), set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET`. See the API Integrations section in this skill's SKILL.md for setup instructions.
+**When results are limited:** If the scan used the RSS fallback or hit errors, tell the user plainly. Example:
+> ⚠️ Reddit blocks unauthenticated API access (403), so this scan used the RSS fallback - upvote and comment counts are unavailable and opportunity scores omit engagement. For full data, set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` (see API Integrations in this skill's SKILL.md).
 
 ## Integration with Other Skills
 

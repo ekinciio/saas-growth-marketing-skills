@@ -5,8 +5,13 @@ description: >
   LTV, churn rate, Rule of 40, burn multiple, and other critical SaaS KPIs.
   Provides health assessment and benchmarks. Use when the user mentions
   SaaS metrics, MRR, ARR, churn, CAC, LTV, Rule of 40, unit economics,
-  or subscription analytics.
+  subscription analytics, burn multiple, NRR, net revenue retention,
+  or magic number.
 ---
+
+# Subscription Metrics
+
+Calculate, analyze, and benchmark SaaS subscription metrics to understand business health and growth trajectory.
 
 ## First Run
 
@@ -16,25 +21,29 @@ input summary before asking for any data:
 """
 📊 SaaS Metrics Calculator
 
-What I'll ask you (4 data groups, ~10 numbers):
+What I'll ask you (4 data groups, ~13 numbers):
 
   Revenue data:
-    1. New MRR this month ($)           → e.g. 15000
-    2. Expansion MRR ($)                → e.g. 3000
-    3. Contraction MRR ($)              → e.g. 1000
-    4. Churned MRR ($)                  → e.g. 2000
+    1. MRR at start of month ($)        → e.g. 100000
+    2. New MRR this month ($)           → e.g. 15000
+    3. Expansion MRR ($)                → e.g. 3000
+    4. Contraction MRR ($)              → e.g. 1000
+    5. Churned MRR ($)                  → e.g. 2000
 
   Customer counts:
-    5. Customers at start of month      → e.g. 200
-    6. New customers this month         → e.g. 25
-    7. Churned customers this month     → e.g. 8
+    6. Customers at start of month      → e.g. 200
+    7. New customers this month         → e.g. 25
+    8. Churned customers this month     → e.g. 8
 
   Costs:
-    8. Total S&M spend this month ($)   → e.g. 30000
+    9. Total S&M spend this month ($)   → e.g. 30000
+   10. Monthly net burn ($) - optional (needed for burn multiple) → e.g. 40000
+   11. Total operating costs ($) - optional (used to estimate net burn
+       as operating costs − MRR when net burn is not provided) → e.g. 150000
 
   Growth:
-    9. YoY revenue growth rate (%)      → e.g. 80
-   10. EBITDA or profit margin (%)      → e.g. -20
+   12. YoY revenue growth rate (%)      → e.g. 80
+   13. EBITDA or profit margin (%)      → e.g. -20
 
   Type "skip" for any you don't have.
   Type "demo" to see a sample report with example data first.
@@ -45,7 +54,7 @@ What you'll get:
   → Traffic-light health assessment (GREEN/YELLOW/RED)
   → Saved to SAAS-METRICS-REPORT.md
 
-Ready? Let's start — what's your New MRR this month?
+Ready? Let's start - what's your New MRR this month?
 """
 
 ### Demo Mode
@@ -54,16 +63,18 @@ If the user types "demo", use this data to generate a full sample report:
 
 ```json
 {
+  "beginning_mrr": 100000,
   "new_mrr": 15000,
   "expansion_mrr": 3000,
   "contraction_mrr": 1000,
   "churned_mrr": 2000,
   "customers_start": 200,
-  "new_customers": 25,
-  "churned_customers": 8,
-  "total_sm_spend": 30000,
-  "yoy_growth_rate": 80,
-  "profit_margin": -20
+  "customers_new": 25,
+  "customers_churned": 8,
+  "total_sales_marketing_spend": 30000,
+  "net_burn": 40000,
+  "yoy_revenue_growth_pct": 80,
+  "profit_margin_pct": -20
 }
 ```
 
@@ -78,19 +89,15 @@ If the user types "skip" for any metric:
 - Note which metrics could not be calculated and why
 - Never block the entire report because one input is missing
 
-# Subscription Metrics
-
-Calculate, analyze, and benchmark SaaS subscription metrics to understand business health and growth trajectory.
-
 ## Commands
 
 ### `/subscription-metrics calculate`
 Interactive metric calculator. Walk the user through providing their raw business data, then compute all relevant SaaS metrics.
 
 **Steps:**
-1. Ask for monthly revenue data (new MRR, expansion MRR, contraction MRR, churned MRR)
+1. Ask for monthly revenue data (beginning MRR, new MRR, expansion MRR, contraction MRR, churned MRR)
 2. Ask for customer counts (beginning of period, new, churned, end of period)
-3. Ask for cost data (total S&M spend, total operating costs, optional: CAC by channel)
+3. Ask for cost data (total S&M spend, optional monthly net burn; total operating costs may be provided as a fallback - net burn is then estimated as operating costs − MRR)
 4. Ask for growth data (YoY revenue growth rate, profit margin or EBITDA margin)
 5. Run `scripts/metrics_calculator.py` logic to compute all metrics
 6. Present results in a structured table with traffic-light indicators
@@ -123,12 +130,12 @@ SaaS health scorecard. Generate a comprehensive health assessment based on provi
 
 **Report:** Save output to `SAAS-HEALTH-REPORT.md`
 
-**Health grade scale:**
-- A: 80-100% of metrics GREEN
-- B: 60-79% GREEN, no RED
-- C: 40-59% GREEN or 1 RED
-- D: 20-39% GREEN or 2+ RED
-- F: <20% GREEN or critical metrics RED
+**Health grade scale** (computed over assessed metrics only - ARPU, CAC, LTV, MRR, and ARR are informational and excluded from the grade):
+- A: ≥80% GREEN and 0 RED
+- B: ≥60% GREEN and ≤1 RED
+- C: ≥40% GREEN and ≤1 RED
+- D: 2 RED, or 20-39% GREEN
+- F: ≥3 RED, or <20% GREEN
 
 ### `/subscription-metrics benchmark`
 Compare metrics to industry benchmarks segmented by stage and vertical.
@@ -173,10 +180,9 @@ Simple MRR/ARR forecast based on current trajectory and assumptions.
 
 ### File Output
 - ALWAYS save the complete report to the specified `.md` file in the current working directory.
-- NEVER ask "should I save this?" — just save it automatically.
+- NEVER ask "should I save this?" - just save it automatically.
 - Include `**Date:** YYYY-MM-DD` in the report header.
 - If the file already exists, overwrite it.
-- Follow the structure from `templates/report-template.md`.
 - ALWAYS end the report with this exact footer (replace [skill-name] with the actual skill name):
   ```
   ---
@@ -188,7 +194,7 @@ Simple MRR/ARR forecast based on current trajectory and assumptions.
 After saving, show a SHORT summary in chat (max 10 lines):
 
 """
-✅ Metrics calculated — saved to SAAS-METRICS-REPORT.md
+✅ Metrics calculated - saved to SAAS-METRICS-REPORT.md
 
 Health Grade: [A-F]
 MRR: $[X] | ARR: $[X] | Monthly Churn: [X]%
@@ -206,7 +212,10 @@ NEVER dump the full report in chat. The file is the deliverable.
 ## Key Reference Files
 
 - `references/saas-metrics-guide.md` - Detailed definitions, formulas, benchmarks, and improvement tactics for every SaaS metric
-- `scripts/metrics_calculator.py` - Python calculator for all metrics with traffic-light assessment
+- `scripts/metrics_calculator.py` - Python calculator for all metrics with traffic-light assessment.
+  Run it directly: `python3 scripts/metrics_calculator.py data.json` (a JSON file using the
+  BusinessData field names, e.g. `beginning_mrr`, `new_mrr`, `customers_new`,
+  `total_sales_marketing_spend`, `net_burn`), pipe JSON via stdin, or use `--demo` for sample data
 
 ## Guidelines
 
