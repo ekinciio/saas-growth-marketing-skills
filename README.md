@@ -163,7 +163,7 @@ Install and start auditing in under 60 seconds.
 
 ### Optional API Integrations
 
-7 skills support optional API keys for higher rate limits and richer data. If no keys are set, the free flow works exactly as before.
+8 skills support optional API keys for higher rate limits and richer data. If no keys are set, the free flow works exactly as before.
 
 | Skill | Environment Variable | Service | What It Adds |
 |-------|---------------------|---------|-------------|
