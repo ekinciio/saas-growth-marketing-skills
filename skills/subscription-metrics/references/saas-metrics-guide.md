@@ -86,11 +86,17 @@ Annual Logo Churn  = 1 - (1 - Monthly Logo Churn)^12
 **Formula:**
 ```
 Gross Revenue Churn = (Churned MRR + Contraction MRR) / MRR at start of month x 100
+                    = 100 - monthly GRR
 ```
 
-**Healthy Range:**
-- Monthly: <2% for SMB, <1.5% for mid-market, <1% for enterprise
-- Best-in-class: <0.5% monthly
+**Healthy Range (graded as the mirror of GRR, see section 13):**
+- Monthly gross revenue churn is exactly 100 minus monthly GRR, so it uses
+  the GRR thresholds converted to a month: <=0.87% GREEN (annual GRR 90%+),
+  0.87-1.84% YELLOW (annual GRR 80-90%), >1.84% RED (annual GRR below 80%)
+- Monthly churn compounds: 2% a month is about 78.5% annual GRR, 3% a month
+  about 69%, 5% a month about 54%. A "2% monthly is fine for SMB" rule of
+  thumb therefore sits below the 80% annual GRR line.
+- Best-in-class: <0.5% monthly (annual GRR above 94%)
 
 ### Net Revenue Churn
 
@@ -99,12 +105,14 @@ Gross Revenue Churn = (Churned MRR + Contraction MRR) / MRR at start of month x 
 **Formula:**
 ```
 Net Revenue Churn = (Churned MRR + Contraction MRR - Expansion MRR) / MRR at start of month x 100
+                  = 100 - monthly NRR
 ```
 
-**Healthy Range:**
+**Healthy Range (graded as the mirror of NRR, see section 12):**
 - Negative net revenue churn is the gold standard
-- Best-in-class: -2% to -5% monthly (meaning expansion exceeds churn)
-- Acceptable: 0% to 1% monthly
+- <=-0.80% monthly GREEN (annual NRR 110%+), -0.80% to 0% YELLOW (annual NRR
+  100-110%), above 0% RED (annual NRR below 100%)
+- Best-in-class: -1.5% monthly or better (annual NRR about 120%+)
 
 **How to Improve Churn:**
 - Implement customer health scoring and intervene before churn happens
@@ -174,6 +182,10 @@ Average Customer Lifetime = 1 / Monthly Churn Rate
 Note: the widely used 3:1 LTV:CAC benchmark assumes margin-adjusted LTV
 (gross margin included in the LTV calculation). Comparing revenue-based
 LTV against that benchmark overstates unit economics.
+
+Gross margin input: the calculator accepts 75 or 0.75 (both mean 75%).
+If gross margin is not provided it assumes 70% and says so in the output;
+state that assumption next to LTV and payback in any report.
 
 ### DCF (Discounted Cash Flow) Method
 
@@ -356,15 +368,62 @@ The one-quarter lag accounts for the delay between spending and revenue realizat
 NRR = (Beginning MRR + Expansion MRR - Contraction MRR - Churned MRR) / Beginning MRR x 100
 ```
 
-Measured over 12 months for annual NRR.
+Measured over 12 months for annual NRR: take the customers you had 12
+months ago and compare their MRR today (including expansion) with their MRR
+then. Applied to one month of movements, the same formula gives a MONTHLY
+NRR, which must not be graded on the annual ranges below (see "Monthly vs
+annual retention" at the end of this section).
 
-**Healthy Range:**
+**Healthy Range (annual, 12-month cohort):**
 - Above 120%: best-in-class (GREEN)
 - 110-120%: excellent (GREEN)
 - 100-110%: solid (YELLOW) - at or above the ~101-106% 2025 median
   (sources: SaaS Capital, ChartMogul, Benchmarkit 2025)
 - 90-100%: concerning, customers are shrinking (RED)
 - Below 90%: critical retention problem (RED)
+
+**Monthly equivalents (monthly = annual^(1/12)):**
+- Annual 120% = 101.53% a month
+- Annual 110% = 100.80% a month (GREEN line)
+- Annual 100% = 100.00% a month (YELLOW line)
+- Annual 90% = 99.13% a month
+
+### Monthly vs annual retention
+
+NRR, GRR and revenue churn from one month of MRR movements are monthly
+rates. A monthly rate looks deceptively close to 100%, because retention
+compounds over 12 months:
+
+```
+Monthly-equivalent threshold = annual threshold ^ (1/12)
+Annualized approximation      = monthly rate ^ 12
+```
+
+| Monthly GRR | Annualized (approx) | Grade on annual thresholds |
+|---|---|---|
+| 99.5% | 94.2% | GREEN |
+| 99.0% | 88.6% | YELLOW |
+| 98.5% | 83.4% | YELLOW |
+| 98.0% | 78.5% | RED |
+| 97.0% | 69.4% | RED |
+| 95.0% | 54.0% | RED |
+
+Grading a monthly 95% GRR on the annual 90% line would call it GREEN while
+it actually loses almost half of the revenue base in a year. The calculator
+therefore:
+
+- Labels single-month rows "Monthly NRR", "Monthly GRR", "Monthly Revenue
+  Churn" and "Monthly Net Revenue Churn"
+- Grades them on the monthly-equivalent thresholds above, shown and compared
+  at two decimals (99.13%, 100.80%), so a printed value and its status always
+  agree; the revenue churn rows print 100 minus the graded GRR / NRR
+- Prints the annualized approximation with a caveat: it assumes the month
+  repeats for 12 months, and a single month is noisy (one large churn or
+  upsell swings it)
+- Accepts `ttm_nrr_pct` / `ttm_grr_pct` (trailing 12-month cohort figures,
+  in percent; 0.92 is read as 92% with a warning). When given, these replace
+  the monthly NRR/GRR rows and are graded on the annual ranges. Prefer them
+  whenever the user has 12 months of billing history.
 
 **How to Improve:**
 - Drive product adoption and usage growth
@@ -383,14 +442,22 @@ Measured over 12 months for annual NRR.
 GRR = (Beginning MRR - Contraction MRR - Churned MRR) / Beginning MRR x 100
 ```
 
-GRR is always less than or equal to 100% (capped at 100%).
+GRR is always less than or equal to 100% (capped at 100%). Like NRR, it is
+an annual (12-month cohort) metric; one month of movements gives a monthly
+GRR (see "Monthly vs annual retention" in section 12).
 
-**Healthy Range:**
+**Healthy Range (annual, 12-month cohort):**
 - Above 95%: exceptional (GREEN)
 - 90-95%: good (GREEN)
 - 85-90%: acceptable (YELLOW)
 - 80-85%: needs improvement (YELLOW)
 - Below 80%: serious retention problem (RED)
+
+**Monthly equivalents (monthly = annual^(1/12)):**
+- Annual 95% = 99.57% a month
+- Annual 90% = 99.13% a month (GREEN line; = 0.87% monthly gross revenue churn)
+- Annual 85% = 98.65% a month
+- Annual 80% = 98.16% a month (YELLOW line; = 1.84% monthly gross revenue churn)
 
 **How to Improve:**
 - Focus on reducing cancellations and downgrades
@@ -448,12 +515,21 @@ Expansion MRR Rate = Expansion MRR / Beginning MRR x 100
 
 ## Traffic-Light Summary Table
 
+Metrics that cannot be computed (input not provided, or a zero denominator
+such as no outflows for the Quick Ratio or zero prior-quarter S&M for the
+Magic Number) are N/A and excluded from the grade. Monthly Revenue Churn and
+Monthly Net Revenue Churn mirror GRR and NRR and are counted once, through
+GRR and NRR.
+
 | Metric | GREEN | YELLOW | RED |
 |---|---|---|---|
 | Monthly Logo Churn | <2% | 2-5% | >5% |
-| Monthly Revenue Churn | <2% | 2-4% | >4% |
-| Net Revenue Retention | >110% | 100-110% | <100% |
-| Gross Revenue Retention | >90% | 80-90% | <80% |
+| Monthly Revenue Churn | <=0.87% | 0.87-1.84% | >1.84% |
+| Monthly Net Revenue Churn | <=-0.80% | -0.80% to 0% | >0% |
+| NRR, 12-month cohort (`ttm_nrr_pct`) | >=110% | 100-110% | <100% |
+| Monthly NRR (one month) | >=100.80% | 100-100.80% | <100% |
+| GRR, 12-month cohort (`ttm_grr_pct`) | >=90% | 80-90% | <80% |
+| Monthly GRR (one month) | >=99.13% | 98.16-99.13% | <98.16% |
 | LTV:CAC Ratio | 3:1-5:1 | 2:1-3:1 or >5:1 | <2:1 |
 | CAC Payback | <18 months | 18-24 months | >24 months |
 | Rule of 40 | >40% | 30-40% | <30% |

@@ -98,48 +98,82 @@ def detect_page_language(soup: BeautifulSoup) -> str:
 # Element detection helpers
 # ---------------------------------------------------------------------------
 
+# All module-level patterns use only non-capturing groups (?:...). With a
+# capturing group, re.findall() returns the group text (or a tuple of groups
+# when there are several) instead of the whole match, and joining those
+# tuples crashed the audit. Collect matches with _match_texts() below, which
+# always returns the full matched text. tests/landing_page_cro checks that
+# no pattern here has a capturing group.
+
 CTA_PATTERNS = re.compile(
-    r"(sign\s*up|get\s*started|start|try|buy|subscribe|join|register|"
+    r"(?:sign\s*up|get\s*started|start|try|buy|subscribe|join|register|"
     r"book\s*a?\s*demo|request|download|free\s*trial|create\s*account|"
     r"add\s*to\s*cart|learn\s*more|contact\s*us|schedule)",
     re.IGNORECASE,
 )
 
 WEAK_CTA_PATTERNS = re.compile(
-    r"^(submit|click\s*here|go|next|continue|send)$",
+    r"^(?:submit|click\s*here|go|next|continue|send)$",
     re.IGNORECASE,
 )
 
 # Word boundaries matter: without them "rated" matches "frustrated"/"integrated"
 # and problem-statement copy gets counted as social proof.
 SOCIAL_PROOF_PATTERNS = re.compile(
-    r"(\btestimonials?\b|\breviews?\b|\bcustomers?\b|\bclients?\b|"
-    r"\btrust(ed)?\b|\brated\b|\bratings?\b|"
-    r"\bcase\s*stud(y|ies)|\bsuccess\s*stor|\bloved\s*by|\bused\s*by|"
-    r"companies\s*use|teams\s*use|\d[\d,]*\+?\s*(users|customers|teams|companies))",
+    r"(?:\btestimonials?\b|\breviews?\b|\bcustomers?\b|\bclients?\b|"
+    r"\btrust(?:ed)?\b|\brated\b|\bratings?\b|"
+    r"\bcase\s*stud(?:y|ies)|\bsuccess\s*stor|\bloved\s*by|\bused\s*by|"
+    r"companies\s*use|teams\s*use|\d[\d,]*\+?\s*(?:users|customers|teams|companies))",
     re.IGNORECASE,
 )
 
 TRUST_PATTERNS = re.compile(
-    r"(secure|ssl|encrypt|gdpr|soc\s*2|iso\s*27001|hipaa|"
+    r"(?:secure|ssl|encrypt|gdpr|soc\s*2|iso\s*27001|hipaa|"
     r"money.back|guarantee|refund|privacy|certified|award|badge|"
     r"as\s*seen\s*in|featured\s*in|partner)",
     re.IGNORECASE,
 )
 
+# Word boundaries keep "unlimited" (on almost every SaaS pricing section)
+# from matching "limited". A bare "limited" is not urgency either ("limited
+# history" on a free plan, "limited availability" for a beta feature), so
+# only "limited time" / "limited offer" count.
 URGENCY_PATTERNS = re.compile(
-    r"(limited|hurry|act\s*now|last\s*chance|expires?|deadline|"
-    r"only\s*\d|spots?\s*left|ends?\s*(soon|today|tomorrow)|"
-    r"early.bird|countdown|don.t\s*miss|while\s*supplies)",
+    r"\b(?:limited[\s-]+(?:time|offer)|hurry|"
+    r"act\s+now|last\s+chance|expires?|deadline|"
+    r"only\s+\d+\s+(?:left|spots?|seats?|places?)|\d+\s+(?:spots?|seats?)\s+left|"
+    r"spots?\s+left|ends?\s+(?:soon|today|tomorrow|tonight)|"
+    r"early[\s-]?bird|countdown|don.t\s+miss|while\s+supplies)\b",
     re.IGNORECASE,
 )
 
 OBJECTION_PATTERNS = re.compile(
-    r"(faq|frequently\s*asked|question|pricing|compare|comparison|"
+    r"(?:faq|frequently\s*asked|question|pricing|compare|comparison|"
     r"vs\.?|versus|how\s*it\s*works|guarantee|refund|cancel\s*any\s*time|"
     r"no\s*credit\s*card|risk.free|support|help\s*center)",
     re.IGNORECASE,
 )
+
+
+def _match_texts(pattern: re.Pattern, text: str) -> list[str]:
+    """Return the full text of every match, in page order.
+
+    Uses finditer + group(0) instead of findall so the result is always a
+    list of strings, even if someone later adds a capturing group.
+    """
+    return [m.group(0) for m in pattern.finditer(text)]
+
+
+def _unique_ci(items: list[str]) -> list[str]:
+    """Dedupe strings case-insensitively, keeping first-seen order and casing."""
+    seen: set[str] = set()
+    unique: list[str] = []
+    for item in items:
+        key = " ".join(item.lower().split())
+        if key not in seen:
+            seen.add(key)
+            unique.append(item)
+    return unique
 
 
 def count_ctas(soup: BeautifulSoup) -> tuple[int, int, list[str]]:
@@ -223,7 +257,7 @@ def count_trust_signals(soup: BeautifulSoup) -> tuple[int, list[str]]:
     evidence: list[str] = []
     text = soup.get_text(" ", strip=True)
 
-    matches = TRUST_PATTERNS.findall(text)
+    matches = _match_texts(TRUST_PATTERNS, text)
     for match in matches[:10]:
         evidence.append(f"Trust signal keyword: {match}")
 
@@ -555,9 +589,11 @@ def score_objection_handling(soup: BeautifulSoup) -> DimensionScore:
     dim = DimensionScore(name="Objection handling", score=0)
 
     text = soup.get_text(" ", strip=True).lower()
-    matches = OBJECTION_PATTERNS.findall(text)
+    matches = _match_texts(OBJECTION_PATTERNS, text)
 
-    unique_matches = list(set(m.lower() for m in matches))
+    # dict.fromkeys dedupes like set() but keeps page order, so the evidence
+    # (and which 8 signals are shown) is the same on every run.
+    unique_matches = list(dict.fromkeys(m.lower() for m in matches))
     dim.evidence.append(f"Objection-handling signals: {', '.join(unique_matches[:8])}")
 
     if len(unique_matches) >= 5:
@@ -584,11 +620,12 @@ def score_urgency(soup: BeautifulSoup) -> DimensionScore:
     dim = DimensionScore(name="Urgency and scarcity", score=5)
 
     text = soup.get_text(" ", strip=True)
-    matches = URGENCY_PATTERNS.findall(text)
+    # Case-insensitive dedupe so "Limited time" and "limited time" count once.
+    matches = _unique_ci(_match_texts(URGENCY_PATTERNS, text))
 
     if matches:
         dim.evidence.append(f"Urgency signals found: {', '.join(matches[:5])}")
-        dim.score = min(5 + len(set(matches)), 10)
+        dim.score = min(5 + len(matches), 10)
     else:
         dim.evidence.append("No urgency elements detected (not always negative)")
         dim.score = 5  # Neutral - urgency is optional

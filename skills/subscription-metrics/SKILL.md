@@ -21,40 +21,48 @@ input summary before asking for any data:
 """
 📊 SaaS Metrics Calculator
 
-What I'll ask you (4 data groups, ~13 numbers):
+What I'll ask you (5 data groups, ~14 numbers, all for ONE month
+unless marked yearly):
 
-  Revenue data:
+  Revenue data (this month):
     1. MRR at start of month ($)        → e.g. 100000
     2. New MRR this month ($)           → e.g. 15000
     3. Expansion MRR ($)                → e.g. 3000
     4. Contraction MRR ($)              → e.g. 1000
     5. Churned MRR ($)                  → e.g. 2000
 
-  Customer counts:
+  Customer counts (this month):
     6. Customers at start of month      → e.g. 200
     7. New customers this month         → e.g. 25
     8. Churned customers this month     → e.g. 8
 
-  Costs:
+  Costs (this month):
     9. Total S&M spend this month ($)   → e.g. 30000
-   10. Monthly net burn ($) - optional (needed for burn multiple) → e.g. 40000
-   11. Total operating costs ($) - optional (used to estimate net burn
-       as operating costs − MRR when net burn is not provided) → e.g. 150000
+   10. Gross margin (%)                 → e.g. 75 (70% is assumed if you skip)
+   11. Monthly net burn ($) - optional (needed for burn multiple) → e.g. 40000
+   12. Total operating costs this month ($) - optional (used to estimate
+       net burn as operating costs - MRR when net burn is not provided) → e.g. 150000
 
-  Growth:
-   12. YoY revenue growth rate (%)      → e.g. 80
-   13. EBITDA or profit margin (%)      → e.g. -20
+  Growth (yearly):
+   13. YoY revenue growth rate (%)      → e.g. 80
+   14. EBITDA or profit margin (%)      → e.g. -20
 
-  Type "skip" for any you don't have.
+  Optional, if you track them (12-month cohort figures):
+   15. Trailing 12-month NRR (%)        → e.g. 104
+   16. Trailing 12-month GRR (%)        → e.g. 88
+
+  Type "skip" for any you don't know. Type 0 only if it really was zero
+  (e.g. no downgrades this month).
   Type "demo" to see a sample report with example data first.
 
 What you'll get:
   → MRR, ARR, churn rates, CAC, LTV, LTV:CAC ratio
+  → Monthly NRR/GRR with a yearly estimate (or your 12-month figures)
   → Rule of 40, burn multiple, SaaS Quick Ratio
   → Traffic-light health assessment (GREEN/YELLOW/RED)
   → Saved to SAAS-METRICS-REPORT.md
 
-Ready? Let's start - what's your New MRR this month?
+Ready? Let's start - what was your MRR at the start of the month?
 """
 
 ### Demo Mode
@@ -78,16 +86,43 @@ If the user types "demo", use this data to generate a full sample report:
 }
 ```
 
-Save the demo report as `SAAS-METRICS-REPORT-DEMO.md`.
+Write this JSON to a file and run the script on it (as in `calculate` step 5;
+the script's own `--demo` uses different sample data). Save the demo report as
+`SAAS-METRICS-REPORT-DEMO.md`.
 After showing the summary, ask: "Want to run this with your own numbers now?"
 
 ### Skip Handling
 
-If the user types "skip" for any metric:
-- Mark it as "Not provided" in the report
-- Calculate all metrics that are possible with available data
-- Note which metrics could not be calculated and why
-- Never block the entire report because one input is missing
+If the user types "skip" for any input:
+- Leave the field out of the JSON (or set it to `null` or `"skip"`). Never
+  write 0 for a skipped value: 0 means "it was zero" and gets graded.
+- The script shows every metric that needs the missing input as N/A,
+  excludes it from the grade, and lists the input under "Not provided".
+  Copy that list into the report.
+- Metrics with a zero denominator (no customers at start, no churn or
+  contraction for the Quick Ratio, no prior-quarter S&M for the Magic
+  Number) are also N/A, never "Infinite" or 0.
+- A letter grade needs at least 3 graded metrics; with fewer the grade is N/A.
+- If gross margin is skipped, the script assumes 70% and says so under
+  "Assumptions". Repeat that assumption in the report next to LTV and payback.
+- Never block the entire report because one input is missing.
+
+### Monthly vs Annual (MANDATORY)
+
+NRR, GRR and revenue churn computed from one month of MRR movements are
+MONTHLY rates. The script labels them "Monthly NRR" / "Monthly GRR" and
+grades them on monthly-equivalent thresholds (monthly = annual^(1/12)):
+annual GRR 90% = 99.13% a month, 80% = 98.16%; annual NRR 110% = 100.80%
+a month, 100% = 100%. It also prints an annualized approximation
+(monthly^12, e.g. 95% a month is about 54% a year).
+- Always present these rows as monthly, and quote the annualized
+  approximation with its caveat: it assumes the month repeats for 12 months.
+- Never compare a monthly NRR/GRR with an annual benchmark yourself.
+- If the user has real 12-month cohort NRR/GRR, pass them as `ttm_nrr_pct`
+  / `ttm_grr_pct`; they replace the monthly rows and use annual thresholds.
+- Monthly Revenue Churn and Monthly Net Revenue Churn are 100 minus monthly
+  GRR / NRR. They share the same thresholds (so they always agree) and are
+  counted once in the grade, through GRR and NRR.
 
 ## Commands
 
@@ -96,11 +131,11 @@ Interactive metric calculator. Walk the user through providing their raw busines
 
 **Steps:**
 1. Ask for monthly revenue data (beginning MRR, new MRR, expansion MRR, contraction MRR, churned MRR)
-2. Ask for customer counts (beginning of period, new, churned, end of period)
-3. Ask for cost data (total S&M spend, optional monthly net burn; total operating costs may be provided as a fallback - net burn is then estimated as operating costs − MRR)
-4. Ask for growth data (YoY revenue growth rate, profit margin or EBITDA margin)
-5. Run `scripts/metrics_calculator.py` logic to compute all metrics
-6. Present results in a structured table with traffic-light indicators
+2. Ask for customer counts (beginning of period, new, churned)
+3. Ask for cost data (total S&M spend, gross margin, optional monthly net burn; total operating costs may be provided as a fallback - net burn is then estimated as operating costs - MRR)
+4. Ask for growth data (YoY revenue growth rate, profit margin or EBITDA margin) and, if available, trailing 12-month NRR and GRR
+5. Write the inputs to a JSON file and run `python3 <skill dir>/scripts/metrics_calculator.py input.json`. Never compute the metrics by hand. If the script exits with code 2, show the user the listed input errors and ask for corrected numbers
+6. Present results in a structured table with traffic-light indicators, including the script's "Not provided", "Assumptions" and "Warnings" sections
 7. Provide a short interpretation of each metric
 
 **Output format:**
@@ -110,8 +145,10 @@ Metric                 | Value      | Status  | Benchmark
 MRR                    | $125,000   | GREEN   | -
 ARR                    | $1,500,000 | GREEN   | -
 Monthly Logo Churn     | 2.1%       | YELLOW  | <2%
-Monthly Revenue Churn  | 1.8%       | GREEN   | <2%
-Net Revenue Retention   | 108%       | GREEN   | >100%
+Monthly Revenue Churn  | 0.80%      | GREEN   | <=0.87%/mo (= GRR 90%/yr)
+Monthly NRR            | 101.20%    | GREEN   | >=100.80%/mo (= 110%/yr); ~115.4%/yr annualized
+Monthly GRR            | 99.20%     | GREEN   | >=99.13%/mo (= 90%/yr); ~90.8%/yr annualized
+Rule of 40             | N/A        | N/A     | Not provided: profit margin
 ...
 ```
 
@@ -122,15 +159,15 @@ SaaS health scorecard. Generate a comprehensive health assessment based on provi
 
 **Steps:**
 1. Collect the same inputs as `calculate` (or reuse if already provided)
-2. Compute all metrics
-3. Score each metric as GREEN / YELLOW / RED against industry benchmarks
-4. Produce an overall health grade (A through F)
+2. Run the script exactly as in `calculate` step 5. Never compute the metrics or the grade by hand
+3. Use the script's GREEN / YELLOW / RED status for each metric
+4. Report the script's overall health grade (A through F, or N/A when fewer than 3 metrics could be graded)
 5. List the top 3 strengths and top 3 areas for improvement
 6. Provide specific, actionable recommendations for each RED or YELLOW metric
 
 **Report:** Save output to `SAAS-HEALTH-REPORT.md`
 
-**Health grade scale** (computed over assessed metrics only - ARPU, CAC, LTV, MRR, and ARR are informational and excluded from the grade):
+**Health grade scale** (computed over assessed metrics only - ARPU, CAC, LTV, MRR, and ARR are informational and excluded from the grade; N/A metrics are excluded; Monthly Revenue Churn and Monthly Net Revenue Churn mirror GRR and NRR and are counted once through them; fewer than 3 graded metrics gives grade N/A):
 - A: ≥80% GREEN and 0 RED
 - B: ≥60% GREEN and ≤1 RED
 - C: ≥40% GREEN and ≤1 RED
@@ -213,14 +250,20 @@ NEVER dump the full report in chat. The file is the deliverable.
 
 - `references/saas-metrics-guide.md` - Detailed definitions, formulas, benchmarks, and improvement tactics for every SaaS metric
 - `scripts/metrics_calculator.py` - Python calculator for all metrics with traffic-light assessment.
-  Run it directly: `python3 scripts/metrics_calculator.py data.json` (a JSON file using the
-  BusinessData field names, e.g. `beginning_mrr`, `new_mrr`, `customers_new`,
-  `total_sales_marketing_spend`, `net_burn`), pipe JSON via stdin, or use `--demo` for sample data
+  Run it directly: `python3 <skill dir>/scripts/metrics_calculator.py data.json` (a JSON file using the
+  BusinessData field names: `beginning_mrr`, `new_mrr`, `expansion_mrr`, `contraction_mrr`,
+  `churned_mrr`, `customers_start`, `customers_new`, `customers_churned`,
+  `total_sales_marketing_spend`, `gross_margin_pct`, `net_burn`, `total_operating_costs`,
+  `yoy_revenue_growth_pct`, `profit_margin_pct`, and optional `ttm_nrr_pct`, `ttm_grr_pct`,
+  `prev_quarter_sm_spend`, `current_quarter_net_new_arr`), pipe JSON via stdin, or use `--demo`
+  for sample data. Every field is optional. Numbers may be strings ("15,000", "$15K");
+  `gross_margin_pct` accepts 75 or 0.75. Impossible values (negative MRR, more churned customers
+  than existed, a margin above 100%) stop the run with exit code 2 and a list of what to fix
 
 ## Guidelines
 
-- Always clarify whether numbers are monthly or annual before calculating
-- Use monthly figures as the base and annualize where needed (ARR = MRR x 12)
+- Always clarify whether numbers are monthly or annual before calculating. If the script prints a warning that a value looks annual or quarterly, ask the user before reporting
+- Use monthly figures as the base and annualize where needed (ARR = MRR x 12; retention rates compound: annual = monthly^12)
 - When churn is discussed, always distinguish between logo churn and revenue churn
 - For CAC, prefer blended CAC but note channel-specific if provided
 - LTV calculations should default to the simple method unless the user has detailed cohort data

@@ -1,0 +1,8 @@
+# Acme
+
+> Acme is the connected workspace for teams and AI agents.
+
+## Docs
+
+- [Getting started](https://www.acme.test/help/start): set up a workspace
+- [Pricing](https://www.acme.test/pricing): plans and limits

@@ -62,10 +62,12 @@ After showing the summary, ask: "Want to run this with your own metrics now?"
 ### Skip Handling
 
 If the user types "skip" for any metric:
+- Pass it to the script as `"skip"` (or leave the key out); the script accepts it
 - Mark it as "Not provided" in the report
 - Benchmark and score all available metrics
 - Note which funnel stages could not be assessed
 - Never block the report because one metric is missing
+- With fewer than 4 of the 6 metrics the script reports "Partial - N of 6" instead of a letter grade; use that wording in the report and list the missing metrics
 
 ## Commands
 
@@ -210,13 +212,26 @@ The audit maps to the AARRR (Pirate Metrics) framework:
 
 ## Health Grading Scale
 
-The overall funnel health grade is calculated from the aggregate benchmark performance:
+The script turns each metric into an approximate percentile against the benchmark table (bottom-25% threshold = 25, median = 50, top-25% threshold = 75, straight lines in between and beyond, capped at 0-100) and adds them into a weighted 0-100 **Funnel Score**:
 
-- **A (Excellent)** - 5-6 metrics GREEN, 0 RED
-- **B (Good)** - 3-4 metrics GREEN, 0 RED
-- **C (Fair)** - Everything else: mostly YELLOW, or 1 RED with at most 1 YELLOW
-- **D (Needs Work)** - 2 RED, or 1 RED plus 2+ YELLOW
-- **F (Critical)** - 3+ metrics RED
+| Metric | Weight |
+|--------|--------|
+| Signup-to-Active (activation) | 20 |
+| Free-to-Paid (conversion) | 20 |
+| Monthly Churn (retention) | 15 |
+| NRR (retention) | 15 |
+| Payback Period | 15 |
+| Time-to-Value | 15 |
+
+A metric that is not provided counts as 0. Adding a metric can never lower the score or the grade, and skipping a weak metric can never raise it. When metrics are missing, the script also prints the best-case score (if every missing metric were top-tier); include both numbers in the report.
+
+- **A (Excellent)** - score 70 or more
+- **B (Good)** - 57 to 69.9
+- **C (Fair)** - 43 to 56.9 (all six metrics at the median gives 50)
+- **D (Needs Work)** - 30 to 42.9
+- **F (Critical)** - below 30
+
+A letter grade needs at least 4 of the 6 metrics. With 1-3 metrics the grade is "Partial - N of 6"; with none it is "N/A". Use the grade the script prints; do not recompute it from the GREEN/YELLOW/RED counts.
 
 ## Important Notes
 
@@ -249,7 +264,7 @@ After saving, show a SHORT summary in chat (max 10 lines):
 """
 ✅ Funnel audit complete - saved to PLG-FUNNEL-AUDIT-REPORT.md
 
-Funnel Health: Grade [A-F]
+Funnel Health: Grade [A-F, or "Partial - N of 6"] - Funnel Score [score]/100
 Biggest Leak: [stage] - [metric] is [value] (benchmark: [benchmark])
 
 Assessment:
@@ -274,3 +289,5 @@ NEVER dump the full report in chat. The file is the deliverable.
 Accepts user metrics, runs benchmark comparison with traffic light scoring, detects the biggest funnel leak, and generates prioritized recommendations. Includes standalone demo with example data.
 
 Run it directly: `python3 scripts/funnel_analyzer.py metrics.json` (JSON keys: `signup_to_active`, `free_to_paid`, `monthly_churn`, `nrr`, `time_to_value_days`, `payback_months` - all optional), pipe JSON via stdin, or use `--demo` for sample data.
+
+Values can be numbers or strings: write percents as whole numbers (`25` or `"25%"`, not `0.25`), days for time-to-value (`"2 weeks"`, `"6 hours"` and `"30 minutes"` also work), months for payback (`"1.5 years"` also works), and `"skip"` or `null` for a metric the user does not have. NRR given as a ratio (`1.12`) is converted to 112%. If the script exits with code 2, it prints every invalid value (bad JSON, negative or impossible numbers, values that look like fractions); fix those with the user and run it again. Never invent the score or grade yourself.

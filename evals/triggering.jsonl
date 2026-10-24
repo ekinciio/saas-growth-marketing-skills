@@ -1,0 +1,320 @@
+{"skill": "geo-seo-auditor", "prompt": "Is our SaaS site ready for AI search? Check https://www.flowdesk.io for AI crawler access, llms.txt and citability in one report.", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "We're a SaaS startup and never show up in ChatGPT answers. Audit https://acmebooks.com for AI search readiness.", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "Does our robots.txt block GPTBot, ClaudeBot or PerplexityBot? Our SaaS marketing site is https://shipfast.dev", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "Generate an llms.txt for our SaaS product site and docs at https://docs.tasknest.com", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "Run an AI search readiness check on our SaaS homepage and pricing page and tell me what to fix first so Google AI Overviews cite us.", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "As part of an AI-search audit of our SaaS site, score how citable our feature pages are.", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "Which JSON-LD should our SaaS homepage have so ChatGPT and Google AI Overviews understand what we sell?", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "Can Perplexity and Claude crawl and cite our B2B software website? https://getrelay.io", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "Our SaaS docs and marketing site https://www.example.com get no traffic from AI assistants. What is stopping ChatGPT and Claude from crawling and citing us?", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "SaaS sitemiz yapay zeka aramasında görünmüyor. https://ornek.io için ChatGPT ve Perplexity hazırlık denetimi yap.", "should_trigger": true}
+{"skill": "geo-seo-auditor", "prompt": "Why isn't my landing page converting? https://www.example.com", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "Where is my brand Flowdesk being mentioned on Reddit and Hacker News this month?", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "Analyze our competitor Linear's positioning and pricing and make a battle card.", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "Fix the syntax error in the robots.txt file of my Next.js app so the build passes.", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "Generate a client-ready GEO service proposal with Basic, Standard and Premium packages for my agency prospect.", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "Give me a monthly progress report comparing this month's GEO audit to last month's baseline for my agency client.", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "Add this new lead to my GEO prospect pipeline and move Acme to Proposal Sent.", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "Rewrite these three paragraphs of my blog post so AI assistants are more likely to quote them.", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "Our Google Business Profile isn't showing in the map pack for 'dentist near me'.", "should_trigger": false}
+{"skill": "geo-seo-auditor", "prompt": "help", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "Why isn't my landing page converting? https://www.example.com", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Audit the conversion rate of our homepage https://getrelay.io and tell me the top fixes.", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Our pricing page gets traffic but few people click Start trial. Can you review it for conversion? https://acme.app/pricing", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Give me A/B test ideas for our hero section and CTA on https://tasknest.com", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Here is the HTML I saved from our SPA landing page (landing.html). Do a CRO audit of it.", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Review this landing page copy for clarity and CTA strength: Headline 'Smarter workflows for everyone', subhead 'All-in-one platform', button 'Submit'.", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Score our landing page from 0 to 100 for conversion and show the weakest areas.", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Is the social proof and trust section on our homepage strong enough? Bounce rate is 70%.", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Our homepage converts 1.2% of visitors to trials. Review https://www.example.com and tell me what above the fold is hurting conversion.", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Açılış sayfamız ziyaret alıyor ama kimse deneme başlatmıyor. https://ornek.app sayfasını dönüşüm açısından incele.", "should_trigger": true}
+{"skill": "landing-page-cro", "prompt": "Write the copy for a new landing page for our AI meeting notes app from scratch.", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "Plan the sections for a new SaaS homepage; we haven't built one yet.", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "Our signup form asks for 9 fields and a credit card. Audit the signup flow at https://app.example.com/signup", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "Should we raise our Pro tier from $29 to $39 per month?", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "New users sign up but never finish setup in the product. How should the first-run checklist work?", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "Run a full GEO audit of https://www.example.com", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "Audit https://mysaas.com", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "Optimize our App Store screenshots and subtitle.", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "Compare my site with competitor.com for AI search visibility and citability scores.", "should_trigger": false}
+{"skill": "landing-page-cro", "prompt": "what can you do?", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Write the copy for a new landing page for our AI meeting notes app from scratch.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "Plan the sections for a new SaaS homepage; we haven't built one yet.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "Use the PAS framework to write the hero, problem and solution sections for our invoicing tool's landing page.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "Create a landing page blueprint for the launch of our developer API product.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "Draft a simple HTML prototype of a landing page for our scheduling app so I can see the layout.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "We're rebuilding our homepage. Check which standard sections the current one is missing before we write the new version: https://www.example.com", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "Write a StoryBrand-style homepage for our HR software aimed at small business owners.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "I need a landing page for our new Slack integration feature. Give me a section-by-section structure and copy.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "Write hero headline, subheadline and CTA options for the new homepage of our expense management SaaS for freelancers.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "Yeni ürünümüz için sıfırdan bir SaaS açılış sayfası yapısı ve metni hazırla.", "should_trigger": true}
+{"skill": "saas-landing-builder", "prompt": "Why isn't my landing page converting? https://www.example.com", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Give me A/B test ideas for our hero section and CTA on https://tasknest.com", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Write a 'Notion vs us' comparison page and a 'Notion alternatives' page.", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Write a welcome email sequence for new trial users.", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Improve our App Store title, subtitle and keyword field.", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Audit the signup page friction at https://app.example.com/signup", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Build me a React component for a pricing table with a monthly and annual toggle.", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Our pricing tiers are confusing, help us restructure them.", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "Generate a client-ready GEO report PDF for my agency client.", "should_trigger": false}
+{"skill": "saas-landing-builder", "prompt": "help me", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "Our signup form asks for 9 fields and a credit card. Audit the signup flow at https://app.example.com/signup", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "How much friction is in our signup page? Should we add Google SSO? https://tasknest.com/register", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "Visitors click Start free trial but only 20% finish creating an account. Review https://acme.app/signup", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "Walk through our signup flow up to account creation and list every step and required field: https://getrelay.io/start", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "Compare our signup page to best practices for password rules, SSO options and field count: https://www.example.com/sign-up", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "Audit the signup conversion of our web app; the page is https://app.example.io/join", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "Our B2B web app's sign-up page asks for company size and a phone number. Is that hurting sign-up conversion?", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "Do the CAPTCHA and the email verification step on our signup page cost us signups?", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "List every field, gate and redirect a new user hits between clicking 'Get started' and having an account on https://app.example.com/signup", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "Kayıt sayfamızda çok fazla alan var. https://ornek.io/kayit kayıt akışındaki sürtünmeyi denetle.", "should_trigger": true}
+{"skill": "web-app-growth-engine", "prompt": "Our activation rate is 18%, how do we improve it?", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "New users sign up but never finish setup in the product. How should the first-run checklist work?", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "Why isn't my landing page converting? https://www.example.com", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "Calculate our visitor-to-signup and free-to-paid conversion against PLG benchmarks: 40k visitors, 1,200 signups, 60 paid.", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "Design a referral growth loop for our product.", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "Fix the bug where our signup form's submit button does nothing in Safari.", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "Run a technical SEO check of our web app's signup page: crawlability, indexability and server-side rendering.", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "Audit https://mysaas.com", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "Optimize my Google Play store listing.", "should_trigger": false}
+{"skill": "web-app-growth-engine", "prompt": "what can you help me with?", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "New users sign up but never finish setup in the product. How should the first-run checklist work?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Review our onboarding flow: after signup users see an empty dashboard and a 6-step product tour.", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "How do we shorten time-to-value in the first session of our analytics tool?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Design a welcome flow and setup wizard for our project management app.", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Our product tour has a 15% completion rate. What onboarding pattern should we use instead?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "What should the empty states and onboarding checklist look like for a B2B CRM?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Here are screenshots of our first-run experience after account creation. What would you change?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Give me an onboarding checklist for a developer tool where users must install an SDK first.", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "After signup our users land on a blank workspace. Design the first-run setup steps and empty states so they reach their first finished report fast.", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Kullanıcılar kayıt olduktan sonra ilk oturumda kayboluyor. İlk kullanım deneyimimizi nasıl iyileştiririz?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Our activation rate is 18%, how do we improve it?", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Our signup form asks for 9 fields and a credit card. Audit the signup flow at https://app.example.com/signup", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Write win-back emails for customers who cancelled in the last 90 days.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Calculate our visitor-to-signup and free-to-paid conversion against PLG benchmarks: 40k visitors, 1,200 signups, 60 paid.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Assess the E-E-A-T and content quality of our 'Getting started' help center articles for AI search.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Set up onboarding for a new engineer joining our team: which docs should they read first?", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Write the getting-started section of the README for our open-source library.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Why isn't my landing page converting? https://www.example.com", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Improve our App Store screenshots so the first impression is better.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "help", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "Our activation rate is 18%, how do we improve it?", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Calculate our visitor-to-signup and free-to-paid conversion against PLG benchmarks: 40k visitors, 1,200 signups, 60 paid.", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Where is the biggest leak in our product-led funnel? Signup to active is 25% and active to paid is 4%.", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Design a referral growth loop for our product.", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Is a 3% free-to-paid conversion good for a freemium developer tool?", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Benchmark our PLG funnel against other collaboration tools.", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Which growth loops fit a B2B whiteboard product with a free plan?", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Our trial-to-paid rate dropped from 14% to 9% after we removed the credit card requirement. What's going on in the funnel?", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Here's last month's funnel: 52k visitors, 2,100 signups, 640 activated, 95 paid. Which stage leaks most compared with PLG benchmarks?", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Ücretsiz plandan ücretliye geçiş oranımız %2. Ürün odaklı büyüme hunimizdeki en büyük kaçak nerede?", "should_trigger": true}
+{"skill": "plg-funnel-analyzer", "prompt": "Our signup form asks for 9 fields and a credit card. Audit the signup flow at https://app.example.com/signup", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "New users sign up but never finish setup in the product. How should the first-run checklist work?", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "Our churn is 4% and NRR 95%. Is that healthy?", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "Calculate our MRR, ARR, LTV and CAC payback from these numbers: 220 customers, $95 ARPA, $18k S&M spend, 9 new customers this month.", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "How do we reduce churn among customers in their first 90 days?", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "Build a funnel chart component for our React analytics dashboard.", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "Give me a monthly progress report comparing this month's GEO audit to last month's baseline for my agency client.", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "Should we switch from per-seat to usage-based pricing?", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "Review our sales pipeline: which deals are likely to close this quarter?", "should_trigger": false}
+{"skill": "plg-funnel-analyzer", "prompt": "what can you do", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Our churn is 4% and NRR 95%. Is that healthy?", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "Calculate our MRR, ARR, LTV and CAC payback from these numbers: 220 customers, $95 ARPA, $18k S&M spend, 9 new customers this month.", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "Give me a month-over-month MRR report: new $4k, expansion $1.2k, contraction $0.3k, churned $2.1k.", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "What are our Rule of 40 and burn multiple? Revenue growth 60%, EBITDA margin -35%, net burn $150k a month, net new ARR $90k a month.", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "Is an LTV to CAC ratio of 2.1 good for an SMB SaaS?", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "Compute net revenue retention and gross revenue retention from this Stripe export.", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "Forecast our ARR for the next 12 months with three scenarios and our cash runway.", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "How do our SaaS unit economics compare with benchmarks for a seed-stage company?", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "Starting MRR $82k, new $6k, expansion $2k, contraction $1k, churned $3.5k. What are our net MRR growth, revenue churn and quick ratio this month?", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "Aylık yinelenen gelirimiz 40 bin dolar, aylık müşteri kaybı %3. NRR ve LTV'yi hesapla, bu metrikler sağlıklı mı?", "should_trigger": true}
+{"skill": "subscription-metrics", "prompt": "How do we reduce churn among customers in their first 90 days?", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Design a cancellation flow with save offers for our SaaS.", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Our activation rate is 18%, how do we improve it?", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Should we raise our Pro tier from $29 to $39 per month?", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Give me a full SaaS health review across revenue, funnel, retention and pricing with an overall grade.", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Give me a monthly progress report comparing this month's GEO audit to last month's baseline for my agency client.", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Write a SQL query that sums MRR by month from our subscriptions table.", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Analyze the sentiment of our cancellation survey comments.", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "Set up Stripe webhooks for failed payments in our Node backend.", "should_trigger": false}
+{"skill": "subscription-metrics", "prompt": "help", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "How do we reduce churn among customers in their first 90 days?", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Design a cancellation flow with save offers for our SaaS.", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Write win-back emails for customers who cancelled in the last 90 days.", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Build a customer health score from login frequency, seats used and support tickets.", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Set up a dunning sequence for failed card payments; involuntary churn is 1.5% of MRR.", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Here are the top cancellation reasons from our exit survey. What retention program should we run?", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Which accounts are at risk of churning? Here is usage data for 40 customers.", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Our churn is 6% a month. Give me a plan to get it under 3%.", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Which save offers should our cancel flow show to customers who say 'too expensive' versus 'missing features'?", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Müşteri kaybını azaltmak için bir iptal akışı ve geri kazanma kampanyası tasarla.", "should_trigger": true}
+{"skill": "retention-playbook", "prompt": "Our churn is 4% and NRR 95%. Is that healthy?", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "Compute net revenue retention and gross revenue retention from this Stripe export.", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "Analyze the sentiment of our cancellation survey comments.", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "New users sign up but never finish setup in the product. How should the first-run checklist work?", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "Give me a full SaaS health review across revenue, funnel, retention and pricing with an overall grade.", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "Our activation rate is 18%, how do we improve it?", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "Implement retry logic for failed Stripe webhook deliveries in our backend.", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "Track which of my agency's GEO clients are at risk and update the pipeline.", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "Is a 3% free-to-paid conversion good?", "should_trigger": false}
+{"skill": "retention-playbook", "prompt": "what can you do?", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Should we raise our Pro tier from $29 to $39 per month?", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "Our pricing tiers are confusing, help us restructure them.", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "Should we switch from per-seat to usage-based pricing?", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "Run a Van Westendorp analysis on these survey answers about price sensitivity.", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "Freemium or free trial for our B2B analytics tool? We have 3 tiers at $0, $49 and $199.", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "Which features should we gate behind the Business plan?", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "We have Starter at $19, Team at $49 and a 'Contact sales' tier. Is the gap between the tiers right?", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "How do we roll out a 20% price increase to existing customers without losing too many?", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "What value metric should we charge on for our API product: per call, per seat or per project?", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "Fiyat paketlerimizi gözden geçir: aylık 15, 45 ve 120 dolar. Hangi özellik hangi pakette olmalı?", "should_trigger": true}
+{"skill": "pricing-analyzer", "prompt": "Analyze our competitor Linear's positioning and pricing and make a battle card.", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Our pricing page gets traffic but few people click Start trial. Can you review it for conversion? https://acme.app/pricing", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Generate a client-ready GEO service proposal with Basic, Standard and Premium packages for my agency prospect.", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Build me a React component for a pricing table with a monthly and annual toggle.", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Calculate our LTV and CAC payback.", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Our churn is 4% and NRR 95%. Is that healthy?", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Map the competitive landscape for AI note-taking apps.", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Set up Stripe Checkout for annual plans in our Next.js app.", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "Optimize our in-app purchase names and App Store keywords.", "should_trigger": false}
+{"skill": "pricing-analyzer", "prompt": "help", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Analyze our competitor Linear's positioning and pricing and make a battle card.", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "Map the competitive landscape for AI note-taking apps.", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "Create a battle card against HubSpot for our sales team.", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "What channels and content strategy is Airtable using to acquire customers?", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "Write a 'Notion vs us' comparison page and a 'Notion alternatives' page.", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "Profile our top 3 competitors: https://competitor-a.com, https://competitor-b.com and https://competitor-c.com", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "How should we position against cheaper competitors in the invoicing software market?", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "Track what changed on our competitor's homepage and pricing page since last month.", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "What are Intercom's main messages and target segments, and where can we position against them?", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "Rakibimiz Asana'nın konumlandırmasını, fiyatlarını ve mesajlarını analiz edip satış ekibi için bir karşılaştırma kartı hazırla.", "should_trigger": true}
+{"skill": "competitor-intel", "prompt": "Compare my site with competitor.com for AI search visibility and citability scores.", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Who are my competitors in ChatGPT and Perplexity answers? Discover them for https://www.example.com", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Should we raise our Pro tier from $29 to $39 per month?", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Analyze the App Store reviews of our top competitor's app.", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Compare our App Store listing with the top 5 competing apps.", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Analyze what a competitor does well for AI search so we can match their approach.", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Is anyone talking about our brand on Hacker News?", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Compare two versions of our CSV export function and tell me which one is faster.", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "Give me a monthly progress report comparing this month's GEO audit to last month's baseline for my agency client.", "should_trigger": false}
+{"skill": "competitor-intel", "prompt": "what can you do", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Where is my brand Flowdesk being mentioned on Reddit and Hacker News this month?", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Find recent conversations mentioning our product name on Reddit, HN and GitHub that we haven't replied to.", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Monitor mentions of 'Tasknest' online and flag threads worth replying to.", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Is anyone on Hacker News talking about last week's launch of Relay, our product?", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Scan GitHub issues and discussions that mention our SDK by name.", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "How often was our brand mentioned compared with our main competitor over the last 30 days?", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Our app is called Clover. Find mentions of our app, not the plant or the payments company.", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Set up social listening for our brand name and filter out unrelated uses of the word.", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Find the latest Reddit and Hacker News threads that mention our product Pagewise by name, and skip the ones about the word in general.", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Markamız Ornekapp'in Reddit ve Hacker News'te son bir ayda nerede konuşulduğunu bul.", "should_trigger": true}
+{"skill": "brand-mention-scanner", "prompt": "Find Reddit threads where people ask for a tool to automate invoice reminders.", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Analyze the sentiment of these 200 tweets I exported about our product.", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Scan brand mentions across AI-cited platforms like Wikipedia and YouTube and give me a Brand Authority Score.", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Analyze our competitor Linear's positioning and pricing and make a battle card.", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Find leads on Reddit for our CRM by searching problem keywords.", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Analyze our App Store reviews for common complaints.", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Grep our codebase for every mention of the old brand name and replace it.", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Add this new lead to my GEO prospect pipeline and move Acme to Proposal Sent.", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "Is ChatGPT recommending our product when people ask for the best tools in our category?", "should_trigger": false}
+{"skill": "brand-mention-scanner", "prompt": "help", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Find Reddit threads where people ask for a tool to automate invoice reminders.", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Find leads on Reddit for our CRM by searching problem keywords.", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Which subreddits discuss the problem our time-tracking app solves, and which threads are worth answering?", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Search Reddit for people frustrated with spreadsheets for inventory management in the last month.", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Draft helpful, disclosed replies to the top Reddit threads asking for the best alternative to Trello.", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Find older Reddit threads that rank on Google for 'best CRM for freelancers' so we can join the conversation.", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Check r/SaaS and r/startups every week for posts asking for an onboarding tool.", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "How can we do Reddit marketing for our developer tool without getting banned?", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Find Reddit posts from the last week where small agencies complain that client reporting takes too long.", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Reddit'te ürünümüzün çözdüğü sorunu yaşayan insanların açtığı başlıkları bul ve hangilerine cevap vermeye değer, sırala.", "should_trigger": true}
+{"skill": "reddit-opportunity-finder", "prompt": "Where is my brand Flowdesk being mentioned on Reddit and Hacker News this month?", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Add this new lead to my GEO prospect pipeline and move Acme to Proposal Sent.", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Analyze the sentiment of these Reddit comments I copied about our app.", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Write a Python script that downloads every post from a subreddit with PRAW.", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Is our brand being talked about on Reddit? Find mentions of 'Tasknest'.", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Check whether Reddit and YouTube mention my brand, for AI visibility.", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Find B2B leads on LinkedIn with the job title Head of Growth.", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Analyze our competitor's marketing channels.", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "Find the backlinks pointing to our website.", "should_trigger": false}
+{"skill": "reddit-opportunity-finder", "prompt": "what can you do?", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "Analyze our App Store reviews for common complaints.", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Analyze the sentiment of these 200 tweets I exported about our product.", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Here's our G2 reviews export as a CSV. What themes and feature requests come up?", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Analyze the sentiment of our cancellation survey comments.", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Summarize these NPS verbatims: what do detractors complain about?", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Analyze the App Store reviews of our top competitor's app.", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Mine our Play Console review export for bugs and feature requests.", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Categorize these 50 support tickets by theme and sentiment.", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "I pasted 120 Trustpilot reviews of our product below. Group the complaints by theme and tell me which ones hurt us most.", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Uygulama mağazası yorumlarımızı analiz et: kullanıcılar en çok neden şikayet ediyor?", "should_trigger": true}
+{"skill": "review-sentiment", "prompt": "Where is my brand Flowdesk being mentioned on Reddit and Hacker News this month?", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "Improve our App Store title, subtitle and keyword field.", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "How do we get more 5-star ratings? Should we only ask happy users to review?", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "Our Google Business Profile has 12 reviews; how do we get more local reviews?", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "Review my pull request for bugs.", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "Train a sentiment classifier in Python with transformers on our labelled dataset.", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "Check our presence on Trustpilot, G2 and Product Hunt, the platforms AI models cite, and give us a brand authority score.", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "Find Reddit threads where people ask for a tool to automate invoice reminders.", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "Score the testimonials and trust signals on my landing page.", "should_trigger": false}
+{"skill": "review-sentiment", "prompt": "help", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "Improve our App Store title, subtitle and keyword field.", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "Optimize my Google Play store listing.", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "Compare our App Store listing with the top 5 competing apps.", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "Validate this metadata against App Store limits: title 'FocusFlow: Deep Work Timer', subtitle 'Pomodoro and focus sessions'.", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "How do we get more 5-star ratings? Should we only ask happy users to review?", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "Which keywords should our meditation app target in the App Store?", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "Review our App Store screenshots and suggest a better first three.", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "Analyze the ASO of app id 1234567890 and tell me what to fix.", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "Our Android app's Play Store short description is 80 characters of fluff. Rewrite it and the first lines of the full description for search.", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "iOS uygulamamızın App Store başlığını, alt başlığını ve anahtar kelimelerini optimize et.", "should_trigger": true}
+{"skill": "aso-optimizer", "prompt": "Analyze our App Store reviews for common complaints.", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "Why isn't my landing page converting? https://www.example.com", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "Fix the Xcode build error we get when archiving our app for App Store submission.", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "New users sign up but never finish setup in the product. How should the first-run checklist work?", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "Write the release notes for version 2.3 of our iOS app.", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "Our churn is 4% and NRR 95%. Is that healthy?", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "Optimize our Google Business Profile listing.", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "Is ChatGPT citing our website?", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "Plan the launch of our mobile app next month with a timeline.", "should_trigger": false}
+{"skill": "aso-optimizer", "prompt": "what can you do", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Our Google Business Profile isn't showing in the map pack for 'dentist near me'.", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "Optimize our Google Business Profile listing.", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "Audit the local SEO of our bakery in Austin: Google Business Profile, citations and NAP consistency.", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "Our business name and address differ across Yelp, Apple Maps and Google. How do we fix NAP consistency?", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "Our Google Business Profile has 12 reviews; how do we get more local reviews?", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "We sell salon booking software. Audit a prospect salon's Google Business Profile as a free scorecard.", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "Which local citation sites should a plumbing company in Manchester be listed on?", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "How do we rank in Google Maps for our two clinic locations?", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "Our gym has three locations in Denver. Check that each Google Business Profile is complete and that the NAP matches our website.", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "Kadıköy'deki kafemiz Google Haritalar'da görünmüyor. Google İşletme Profilimizi denetle.", "should_trigger": true}
+{"skill": "local-seo-optimizer", "prompt": "Is our SaaS site ready for AI search? Check https://www.flowdesk.io for AI crawler access, llms.txt and citability in one report.", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Analyze our App Store reviews for common complaints.", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Our SaaS has no physical office. How do we rank for 'project management software'?", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Add a Google Maps embed to the contact page of our React site.", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Where is my brand Flowdesk being mentioned on Reddit and Hacker News this month?", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Improve our App Store title, subtitle and keyword field.", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Generate a GEO proposal for a local dentist client of my agency.", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Analyze our competitor Linear's positioning and pricing and make a battle card.", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "Translate our website into Spanish for the Mexican market.", "should_trigger": false}
+{"skill": "local-seo-optimizer", "prompt": "help", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "Which growth skill should I use to figure out why our trials don't convert?", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "What can this SaaS growth marketing toolkit do?", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "I installed the SaaS growth marketing skills. Which one handles churn and which one handles pricing?", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "List the growth marketing skills from this toolkit that I have installed.", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "Audit https://mysaas.com", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "I have a SaaS site at https://acme.app. Where should I start improving growth?", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "Which of the growth skills can work with our Stripe data?", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "Show me the growth skills index with example commands.", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "Which tools in this growth pack fit a pre-launch SaaS startup?", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "Bu büyüme pazarlaması beceri setinde hangi beceriler var, hangisiyle başlamalıyım?", "should_trigger": true}
+{"skill": "growth-skills", "prompt": "help", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "what can you do?", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "Help me fix this failing unit test.", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "Why isn't my landing page converting? https://www.example.com", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "List all the skills available in this session.", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "Run a full GEO audit of https://www.example.com", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "Give me a 90-day growth plan across acquisition, activation and retention.", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "Show me the skills from the geo suite.", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "What can you do with PDFs?", "should_trigger": false}
+{"skill": "growth-skills", "prompt": "Our churn is 4% and NRR 95%. Is that healthy?", "should_trigger": false}

@@ -1,0 +1,14 @@
+{
+  "tiers": [
+    {"name": "Free", "price": 0, "features": ["3 projects", "1 user", "basic reports"]},
+    {"name": "Pro", "price": 29, "features": ["unlimited projects", "5 users", "advanced reports", "integrations"]},
+    {"name": "Business", "price": 99, "features": ["everything in Pro", "unlimited users", "SSO", "priority support"]}
+  ],
+  "avg_deal_size": 45,
+  "most_popular_tier": "Pro",
+  "free_to_paid_pct": 4,
+  "competitors": [
+    {"name": "Competitor A", "prices": [0, 19, 79]},
+    {"name": "Competitor B", "prices": [15, 49, 149]}
+  ]
+}

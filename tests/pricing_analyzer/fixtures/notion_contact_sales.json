@@ -1,0 +1,24 @@
+{
+  "_comment": "Notion, Linear and Asana list prices as published on their pricing pages on 24 Oct 2026 (per seat, monthly). Each has a Contact sales Enterprise tier, which used to crash the script.",
+  "tiers": [
+    {"name": "Free", "price": 0, "features": ["Basic pages", "Limited block trial for 2+ members"]},
+    {"name": "Plus", "price": 10, "features": ["Unlimited blocks", "File uploads", "30 day page history"]},
+    {"name": "Business", "price": 20, "features": ["Everything in Plus", "Notion AI", "SAML SSO", "Private teamspaces"]},
+    {"name": "Enterprise", "price": "Contact sales", "features": ["Everything in Business", "SCIM", "Audit log", "Advanced security"]}
+  ],
+  "plg_motion": "true",
+  "competitors": [
+    {"company": "Linear", "tiers": [
+      {"name": "Free", "price": 0, "features": ["Unlimited members", "250 issues"]},
+      {"name": "Basic", "price": "$10", "features": ["Unlimited issues", "Admin roles"]},
+      {"name": "Business", "price": "16", "features": ["Private teams", "Insights"]},
+      {"name": "Enterprise", "price": null, "features": ["SAML", "SCIM"]}
+    ]},
+    {"company": "Asana", "tiers": [
+      {"name": "Personal", "price": 0},
+      {"name": "Starter", "price": "10.99"},
+      {"name": "Advanced", "price": "24.99"},
+      {"name": "Enterprise", "price": "custom"}
+    ]}
+  ]
+}
