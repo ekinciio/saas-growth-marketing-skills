@@ -30,6 +30,18 @@ class CleanTextTests(unittest.TestCase):
         soup = html.parse("<p>Price: $10 <span>/ month</span><span>, billed yearly</span> .</p>")
         self.assertEqual(html.clean_text(soup.p), "Price: $10 / month, billed yearly.")
 
+    def test_leading_dot_words_keep_their_space(self):
+        cases = {
+            "<p>Built with <b>.NET</b> and Node</p>": "Built with .NET and Node",
+            "<p>Import <code>.csv</code> or <code>.xlsx</code> files</p>": "Import .csv or .xlsx files",
+            "<p>It costs <span>.5</span> cents</p>": "It costs .5 cents",
+            "<p>Hello <b>world</b> !</p>": "Hello world!",
+            "<p>Save <b>50</b> %</p>": "Save 50%",
+        }
+        for markup, expected in cases.items():
+            with self.subTest(markup=markup):
+                self.assertEqual(html.clean_text(html.parse(markup).p), expected)
+
     def test_whitespace_and_newlines_collapse(self):
         self.assertEqual(html.clean_text("  a\n\n  b\t c  "), "a b c")
         self.assertEqual(html.clean_text(None), "")
@@ -77,8 +89,33 @@ class DecodeTests(unittest.TestCase):
     def test_header_charset_wins_over_meta(self):
         raw = '<meta charset="utf-8"><p>\xe9</p>'.encode("latin-1")
         text, encoding = html.decode_bytes(raw, "ISO-8859-1")
-        self.assertEqual(encoding, "iso-8859-1")
+        # ISO-8859-1 is decoded as Windows-1252, as browsers do.
+        self.assertEqual(encoding, "cp1252")
         self.assertIn("\xe9", text)
+
+    def test_latin1_label_keeps_cp1252_curly_quotes(self):
+        raw = "<p>\u201cHello\u201d \u2026 caf\xe9</p>".encode("cp1252")
+        text, _ = html.decode_bytes(raw, "iso-8859-1")
+        self.assertIn("\u201cHello\u201d", text)
+        self.assertNotIn("\x93", text)
+
+    def test_utf8_body_with_a_latin1_label_is_read_as_utf8(self):
+        raw = "<p>M\xfcnchen caf\xe9</p>".encode("utf-8")
+        text, encoding = html.decode_bytes(raw, "ISO-8859-1")
+        self.assertEqual(encoding, "utf-8")
+        self.assertIn("M\xfcnchen caf\xe9", text)
+
+    def test_one_stray_byte_does_not_garble_a_declared_utf8_page(self):
+        raw = "<p>Caf\xe9 M\xfcnchen</p><p>w".encode("utf-8") + b"\xff" + b"rd</p>"
+        text, encoding = html.decode_bytes(raw, "utf-8")
+        self.assertEqual(encoding, "utf-8")
+        self.assertIn("Caf\xe9 M\xfcnchen", text)
+        self.assertIn("\ufffd", text)
+
+    def test_undeclared_non_utf8_falls_back_to_cp1252(self):
+        text, encoding = html.decode_bytes("<p>caf\xe9</p>".encode("cp1252"), None)
+        self.assertEqual(encoding, "cp1252")
+        self.assertIn("caf\xe9", text)
 
     def test_bom_and_unknown_charset(self):
         text, encoding = html.decode_bytes(b"\xef\xbb\xbfUser-agent: *", None, is_html=False)
@@ -329,6 +366,16 @@ class PageFactsTests(unittest.TestCase):
         self.assertEqual(forms[2]["kind"], "search")
         self.assertEqual(sum(1 for f in forms if f["primary_candidate"]), 1)
 
+    def test_visible_website_field_with_autocomplete_off_is_a_question(self):
+        markup = ("<main><section><h1>Talk to our sales team</h1><form action='/demo' autocomplete='off'>"
+                  "<label for='n'>Name</label><input id='n' name='name' autocomplete='off' required>"
+                  "<label for='w'>Company website</label><input id='w' name='website' autocomplete='off' required>"
+                  "<input name='url' tabindex='-1'>"
+                  "<button type='submit'>Request demo</button></form></section></main>")
+        form = html.page_facts(markup, "https://acme.test/")["forms"][0]
+        self.assertEqual([q["name"] for q in form["fields"]], ["name", "website"])
+        self.assertEqual(form["dropped"]["honeypot"], 1)  # the tabindex=-1 "url" trap
+
     def test_embedded_forms(self):
         self.assertEqual([f["provider"] for f in self.facts["embedded_forms"]], ["hubspot"])
 
@@ -394,6 +441,81 @@ class PageFactsTests(unittest.TestCase):
         self.assertEqual(facts["outline"][0]["heading"], "Payroll for small teams done in minutes")
         start = [c for c in facts["ctas"] if c["text"] == "Start free"][0]
         self.assertEqual(start["zone"], "hero")
+
+    def test_content_sections_are_not_mistaken_for_chrome(self):
+        # "trusted-by" contains "truste" (a consent vendor), AEM components use
+        # "cmp-", a GDPR feature section is not a cookie banner, and a
+        # <header> inside a <section> is that section's heading, not site nav.
+        markup = (
+            "<body><header><nav><a href='/pricing'>Pricing</a></nav></header><main>"
+            "<section class='hero'><h1>Payroll for small teams done fast</h1>"
+            "<a class='btn' href='/signup'>Start free</a></section>"
+            "<section class='trusted-by'><h2>Trusted by 5,000 teams</h2><p>Alpha, Beta and Gamma.</p></section>"
+            "<section class='cmp-container'><h2>Features that matter</h2><p>Docs and projects.</p>"
+            "<a class='cmp-button' href='/demo'>Book a demo</a></section>"
+            "<section id='gdpr-compliance'><h2>GDPR ready</h2><p>Data stays in the EU.</p></section>"
+            "<section><header><h2>Pricing that scales</h2><p>Simple plans.</p></header>"
+            "<a href='/pricing'>See plans</a></section>"
+            "</main><div id='onetrust-banner-sdk'><p>We use cookies.</p><button>Accept all</button></div>"
+            "<div class='consent-bar'><p>This site uses cookies to improve your visit.</p>"
+            "<a href='/privacy'>Learn more</a></div></body>")
+        facts = html.page_facts(markup, "https://acme.test/")
+        self.assertEqual(facts["headings"]["h2"], [
+            "Trusted by 5,000 teams", "Features that matter", "GDPR ready", "Pricing that scales"])
+        self.assertEqual([b["heading"] for b in facts["outline"]], [
+            "Payroll for small teams done fast", "Trusted by 5,000 teams", "Features that matter",
+            "GDPR ready", "Pricing that scales"])
+        zones = {c["text"]: c["zone"] for c in facts["ctas"]}
+        self.assertEqual(zones["Book a demo"], "body")
+        self.assertEqual(zones["See plans"], "body")
+        self.assertEqual(zones["Pricing"], "nav")
+        self.assertNotIn("Learn more", zones)  # the consent bar's link
+        self.assertNotIn("We use cookies", facts["main_text"])
+        self.assertNotIn("uses cookies", facts["main_text"])
+
+    def test_wrapper_of_sections_is_split_into_blocks(self):
+        # hubspot.com shape: hero and every later section share one wrapper, so
+        # the outline had 2 blocks and later CTAs were labelled "hero".
+        markup = (
+            "<main><div class='page'>"
+            "<section class='hero'><div class='left'><h1>Plan and ship together fast</h1>"
+            "<a class='btn' href='/signup'>Start free</a></div>"
+            "<div class='right'><h2>Start your trial</h2><form><input type='email' name='email'>"
+            "<button type='submit'>Start trial</button></form></div></section>"
+            "<div class='module'><h2>Docs</h2><p>Write things down.</p><a href='/demo'>Book a demo</a></div>"
+            "<div class='module'><h2>Projects</h2><p>Plan the work.</p></div>"
+            "</div><section class='cta'><h2>Ready to start?</h2><p>Join today.</p></section></main>")
+        facts = html.page_facts(markup, "https://acme.test/")
+        self.assertEqual([b["heading"] for b in facts["outline"]], [
+            "Plan and ship together fast", "Docs", "Projects", "Ready to start?"])
+        zones = {c["text"]: c["zone"] for c in facts["ctas"]}
+        self.assertEqual(zones["Start free"], "hero")
+        self.assertEqual(zones["Book a demo"], "body")
+        # A split hero (headline left, form with its own <h2> right) stays one block.
+        self.assertEqual(zones["Start trial"], "hero")
+        self.assertEqual(facts["forms"][0]["zone"], "hero")
+
+    def test_responsive_duplicates_stay_fast_on_large_pages(self):
+        # Many sibling cards that each carry a mobile-only twin used to make
+        # remove_responsive_duplicates quadratic (10 s for 500 KB).
+        import time
+        cards = "".join(
+            "<section><h2>Card %d</h2><p>%s</p><div class='md:hidden'>Card %d</div>"
+            "<div class='md:hidden'>Only on mobile %d</div></section>" % (i, "lorem ipsum " * 40, i, i)
+            for i in range(800))
+        markup = "<html><body><main>%s</main></body></html>" % cards
+        started = time.monotonic()
+        soup = html.parse(markup)
+        removed = html.remove_responsive_duplicates(soup)
+        self.assertLess(time.monotonic() - started, 5.0)
+        self.assertEqual(removed, 800)  # each "Card N" twin; "Only on mobile N" has no twin
+        self.assertEqual(html.clean_text(soup).count("Only on mobile 7 "), 1)
+
+    def test_json_ld_nan_becomes_null(self):
+        facts = html.page_facts('<script type="application/ld+json">{"@type": "Product", "rating": NaN}</script>'
+                                "<h1>Product page</h1>")
+        self.assertIsNone(facts["json_ld"]["items"][0]["rating"])
+        json.dumps(facts, allow_nan=False)
 
     def test_logo_h1_in_header_is_chrome(self):
         markup = ("<body><header><h1><a href='/'>Acme</a></h1><nav><a href='/pricing'>Pricing</a></nav></header>"

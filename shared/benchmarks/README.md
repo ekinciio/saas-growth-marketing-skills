@@ -11,12 +11,12 @@ Last verified: **2026-10-24**. Freshness rule: a row whose `verified_on` is more
 3. **Cite every number in the report**: value, source name, year and segment, for example "median NRR 102% (Aleph x Benchmarkit 2026, FY2025 data, n=230)".
 4. **Never grade against a row with `"verified": false`.** It can be mentioned as context with its caveat.
 5. **`thresholds` rows are rules of thumb**, not distributions. Say "rule of thumb from <name>", not "top quartile".
-6. **When two sources disagree, show both.** Example: B2B median NRR is 102% in the Aleph x Benchmarkit survey but 82% in ChartMogul's billing-data panel, because the ChartMogul panel holds many small self-serve companies.
+6. **When two sources disagree, show both.** Example: B2B median NRR is 102% in the Aleph x Benchmarkit survey but 82% in ChartMogul's billing-data panel. The panels differ (survey respondents vs every ChartMogul customer above $250K ARR, likely with more small self-serve companies), so say which one you used. The same metric can also have different formulas: Aleph's magic number (annual new ARR / prior-period S&M) is not Scale's quarterly one.
 7. **Activation and time-to-value depend on the user's own definition.** Ask what event counts as "activated" and in what window before comparing. Mark the comparison low-confidence if the definition differs.
 
 ## Reading the file
 
-The file is about 180 KB. Do not read it whole into context. Each row is on one line, so grep or filter it:
+The file is about 200 KB. Do not read it whole into context. Each row is on one line, so grep or filter it:
 
 ```bash
 grep '"metric": "nrr"' shared/benchmarks/saas-benchmarks.json
@@ -73,11 +73,11 @@ Row fields:
 | Field | Values used today |
 |---|---|
 | `motion` | `all`, `plg`, `sales_led`, `hybrid`, `freemium`, `freemium_self_serve`, `freemium_sales_assist`, `free_trial` (card requirement not split), `trial_opt_in` (no credit card), `trial_opt_out` (credit card required) |
-| `arr_band` | `all`, `<$300K`, `>=$250K`, `>=$1M`, `$1M-$3M`, `$3M-$5M`, `<$5M`, `$5M-$10M`, `$10M-$20M`, `$3M-$20M`, `$20M-$50M`, `>$100M` |
+| `arr_band` | `all`, `<$300K`, `>=$250K`, `>=$1M`, `$1M-$3M`, `$3M-$5M`, `<$5M`, `$5M-$10M`, `$10M-$20M`, `$3M-$20M`, `$20M-$50M`, `$20M-$100M`, `>$100M` |
 | `acv_band` | `all`, `<$5K`, `<$12K`, `$12K-$25K`, `$25K-$50K`, `$50K-$100K`, `$100K-$250K`, `>$250K` |
-| `pricing_model` | `all`, `seat`, `usage` |
+| `pricing_model` | `all`, `seat`, `usage`, `hybrid` (subscription + usage), `non_seat_subscription` |
 | `ai_native` | `true`, `false`, `"mixed"` (sample blends SaaS and AI-native), `null` (not reported) |
-| `extra` | Any other cut: `funding` (`bootstrapped`, `equity_backed`), `growth_band`, `contract_term`, `price_point`, `arpa_band`, `company_type` (`b2b_saas`, `b2c_saas`, `public_cloud`), `industry`, `traffic_source` (`organic`, `paid`), `form_type`, `tour_type`, `auth_method`, `vertical` |
+| `extra` | Any other cut: `funding` (`bootstrapped`, `equity_backed`), `growth_band`, `contract_term`, `price_point`, `arpa_band`, `company_type` (`b2b_saas`, `b2c_saas`, `public_cloud`), `cohort` (`top_decile`: the figure describes the top 10% of the sample, not a percentile cut-off), `industry`, `traffic_source` (`organic`, `paid`), `form_type`, `tour_type`, `auth_method`, `vertical` |
 
 Add new values only when a source uses them, and document them here.
 
@@ -88,7 +88,7 @@ Add new values only when a source uses them, and document them here.
 3. Among equal matches prefer the newer `year`, then higher `confidence`.
 4. Fall back to the `all` row and say which segment was used.
 
-## Coverage (139 rows)
+## Coverage (155 rows)
 
 | Metric | Sources | Notes |
 |---|---|---|
@@ -96,15 +96,15 @@ Add new values only when a source uses them, and document them here.
 | GRR | Same as NRR | Overall quartiles, GTM motion (sales-led 88, hybrid 80, PLG 79), ACV, AI-native |
 | Logo churn (monthly) | ChartMogul 2022 | By ARPA and ARR band; older data, `confidence` medium/low |
 | CAC payback | Aleph x Benchmarkit 2026, David Skok | Quartiles, ACV, growth band, horizontal vs vertical |
-| LTV:CAC | David Skok | Rule of thumb only (>3) |
-| Rule of 40 / Rule of X | SaaS Capital 2025, Bessemer 2024 | Private medians by ARR band and funding; public index average |
-| Burn multiple | David Sacks 2020 | Rule-of-thumb bands |
-| Magic number | Scale Venture Partners 2020 | 0.7 baseline |
+| LTV:CAC | Aleph x Benchmarkit 2026, David Skok | Quartiles (1.1x / 4.1x / 7.8x), vertical vs horizontal, ARR band, growth band; Skok's >3 rule of thumb |
+| Rule of 40 / Rule of X | Aleph x Benchmarkit 2026, SaaS Capital 2025, Bessemer 2024 | All-company quartiles (7 / 25 / 43), growth band, pricing model; private medians by ARR band and funding; public index average and top decile |
+| Burn multiple | David Sacks 2020 | Rule-of-thumb bands (no verified distribution) |
+| Magic number | Aleph x Benchmarkit 2026, Scale Venture Partners 2020 | Quartiles (0.68 / 1.37 / 2.14) on Aleph's annual new-ARR formula; Scale's 0.7 baseline on the quarterly formula |
 | Quick ratio | Mamoon Hamid (SaaStr) | 4+ desirable |
-| Free-to-paid / trial-to-paid | Lenny Rachitsky and Kyle Poyar 2023, First Page Sage 2025 | By motion; opt-in (no card) vs opt-out (card required); organic vs paid traffic |
+| Free-to-paid / trial-to-paid | Lenny Rachitsky and Kyle Poyar 2023, First Page Sage 2025 | By motion; opt-in (no card) vs opt-out (card required); organic vs paid traffic (First Page Sage figures are averages, stored in `mean`) |
 | Visitor-to-signup | First Page Sage 2025, Lenny/Poyar 2023 | By motion |
 | SaaS landing page conversion | Unbounce 2024 | SaaS median 3.8% vs 6.6% all industries |
-| Signup form conversion | Zuko (2022-2025 data) | Registration forms: 46.6% view-to-completion, 60.7% starter-to-completion |
+| Signup form conversion | Zuko (2022-2025 data) | Registration forms: 46.6% view-to-completion, 60.7% starter-to-completion (table averages, stored in `mean`) |
 | Passkeys | FIDO Passkey Index 2026 | 36% of sign-ins; 93% vs 78% success |
 | Activation rate | Lenny/Timen 2022, Userpilot 2024 and 2025 | Overall, SaaS-only, PLG vs sales-led |
 | Time to value | Userpilot 2024 and 2025 | Hours |
@@ -120,10 +120,13 @@ Add new values only when a source uses them, and document them here.
 | NRR, all B2B SaaS | 92% | 102% | 108% | 100.17% | `nrr.aleph2026.all` |
 | NRR, <$5M ARR | - | 94% | - | 99.49% | `nrr.aleph2026.arr_lt5m` |
 | NRR, seat / usage pricing | - | 98% / 108% | - / 155% | 99.83% / 100.64% | `nrr.aleph2026.seat`, `nrr.aleph2026.usage` |
-| NRR, B2B self-serve panel | - | 82% | 97% | 98.36% | `nrr.chartmogul2025.b2b` |
+| NRR, B2B SaaS (ChartMogul billing panel, >=$250K ARR) | - | 82% | 97% | 98.36% | `nrr.chartmogul2025.b2b` |
 | NRR, AI-native | - | 48% | - | - | `nrr.chartmogul2025.ai_native` |
 | GRR, all B2B SaaS | 76% | 84% | 91% | 98.56% | `grr.aleph2026.all` |
 | CAC payback (months, lower is better) | 10 | 16 | 24 | - | `cac_payback.aleph2026.all` |
+| LTV:CAC | 1.1x | 4.1x | 7.8x | - | `ltv_to_cac.aleph2026.all` |
+| Magic number (Aleph formula) | 0.68 | 1.37 | 2.14 | - | `magic_number.aleph2026.all` |
+| Rule of 40 (points) | 7 | 25 | 43 | - | `rule_of_40.aleph2026.all` |
 
 ## Monthly-equivalent thresholds
 
@@ -170,7 +173,9 @@ The full anchor lists are in `retention_conversions` in the JSON.
 | Claim | Why it is not in the file |
 |---|---|
 | Recurly churn benchmarks (SaaS 3.22%, all industries 3.60%, July 2026 data) | The page does not say whether the rates are monthly or annual and gives two different SaaS figures (3.04% and 3.22%). |
-| Median burn multiple, magic number or Rule of 40 from KeyBanc 2024-2025 and Aleph x Benchmarkit 2026 (for example "Rule of 40 median 25%", "magic number 0.68") | Only secondary blog summaries were found; the primary reports are gated. |
+| Median burn multiple from KeyBanc 2024-2025 or any other survey (for example "median 1.8x, top quartile 1.1x") | Only secondary blog summaries were found; the KeyBanc report is gated and Aleph publishes no burn-multiple page. (Aleph's Rule of 40, magic number and LTV:CAC pages are public and are in the file.) |
+| Aleph Rule of 40 margin basis | The page does not say whether the 25% median uses EBITDA, operating or free-cash-flow margin; the row says so. |
+| Aleph LTV:CAC for "low-growth companies" (3.2x) | The page does not name the growth band. |
 | ARR growth by ARR band from Benchmarkit (for example "<$1M ARR grows 85%") | Secondary source only. |
 | Userpilot 2025 PLG vs sales-led splits for activation and TTV | Shown only in charts on the page; the 2024 report's text values are used instead. |
 | Chameleon completion for 3- and 4-step tours | Not stated in the 2024 report text (only the five-step 21.6%). |
@@ -178,7 +183,7 @@ The full anchor lists are in `retention_conversions` in the JSON.
 
 ## Known conflicts to migrate
 
-These thresholds are hard-coded in skills today and disagree with each other or with this file. Line numbers are against commit `c6eb6b2` (HEAD when this file was written). Several of these files are being edited by other batches in the same working tree (subscription-metrics, plg-funnel-analyzer and pricing-analyzer had uncommitted changes on 2026-10-24, and the working copy of `saas-metrics-guide.md` already grades monthly NRR/GRR on 100.80% / 99.13%), so re-grep the quoted text before editing. Migration means: read the row from this file, cite it, and delete the local copy of the number.
+These thresholds are hard-coded in skills today and disagree with each other or with this file. Line numbers are against commit `c6eb6b2`. The next commit, `7340be2`, already changed several of these files (subscription-metrics B02/B19, plg-funnel-analyzer B20, pricing-analyzer B18, landing-page-cro B01; for example `saas-metrics-guide.md` now grades monthly NRR/GRR on 100.80% / 99.13%), and other batches keep editing them, so re-grep the quoted text before editing. Migration means: read the row from this file, cite it, and delete the local copy of the number.
 
 ### Retention and churn
 
@@ -203,7 +208,7 @@ These thresholds are hard-coded in skills today and disagree with each other or 
 | `skills/plg-funnel-analyzer/SKILL.md:122-123` | Same churn and NRR table | As above | as above |
 | `skills/plg-funnel-analyzer/references/funnel-benchmarks.md:11-12, 49-51, 71, 111-112` | Monthly churn SMB 8/5/3, mid-market 5/3/1.5, annual churn 40/25/15, NRR 95/105/120, NRR by stage 90-130 | As above; no verified source for the churn or stage tables | as above |
 | `skills/plg-funnel-analyzer/references/plg-metrics.md:181` | "NRR above 120% ... best-in-class (not merely top-quartile)" | Consistent with Aleph (120%+ best-in-class); keep but cite | `nrr.aleph2026.all` |
-| `skills/retention-playbook/SKILL.md:59-61` | Demo: monthly logo churn 6.5%, monthly revenue churn 4.2%, NRR 97 | 4.2%/mo revenue churn = 59.8% annual GRR, which cannot coexist with 97% annual NRR at that churn level | `retention_conversions` |
+| `skills/retention-playbook/SKILL.md:59-61` | Demo: monthly logo churn 6.5%, monthly revenue churn 4.2%, NRR 97 | 4.2%/mo revenue churn = 59.8% annual GRR, so a 97% annual NRR would need about 37 points of expansion a year; implausible for a demo and teaches the wrong relationship | `retention_conversions` |
 | `skills/retention-playbook/SKILL.md:241-243` | NRR >100% "gold standard"; 3% monthly = about 31% annual; involuntary churn 20-40% of churn | 3% = 30.6% (correct). Median NRR is 102%, so >100% is roughly median, not gold standard. No verified source for 20-40% involuntary | `nrr.aleph2026.all` |
 | `agents/metrics-analyst.md:80` | Monthly churn benchmark "<5%" | Conflicts with metrics_calculator (<2% GREEN) and plg-funnel-analyzer (5% = median) | `logo_churn.*` |
 
@@ -211,23 +216,23 @@ These thresholds are hard-coded in skills today and disagree with each other or 
 
 | File:line (c6eb6b2) | Hard-coded today | Benchmark file says | Rows |
 |---|---|---|---|
-| `skills/subscription-metrics/scripts/metrics_calculator.py:94` | LTV:CAC GREEN >=3, YELLOW >=2, >5 "over-invest" | Skok: >3 is good, the best reach 7-8; no source for treating >5 as a penalty | `ltv_to_cac.skok.rule` |
+| `skills/subscription-metrics/scripts/metrics_calculator.py:94` | LTV:CAC GREEN >=3, YELLOW >=2, >5 "over-invest" | Aleph 2026: p25 1.1x / median 4.1x / p75 7.8x; 3x minimum, 4-5x healthy, 7x+ top-tier, only "far above 8x" may signal under-investment. Skok: >3 is good, the best reach 7-8. No source treats >5 as a penalty | `ltv_to_cac.aleph2026.all`, `ltv_to_cac.skok.rule` |
 | `skills/subscription-metrics/scripts/metrics_calculator.py:95` | Payback GREEN <18 months, YELLOW <24 | p25 10 / median 16 / p75 24 months; plg-funnel-analyzer calls <6 "top 25%" | `cac_payback.aleph2026.all` |
-| `skills/subscription-metrics/scripts/metrics_calculator.py:96` | Rule of 40 GREEN >=40, YELLOW >=30 | Private medians 7-45.5 by ARR band and funding (equity-backed all: 15; bootstrapped all: 34.5); public index average about 31 | `rule_of_40.*` |
+| `skills/subscription-metrics/scripts/metrics_calculator.py:96` | Rule of 40 GREEN >=40, YELLOW >=30 | Aleph 2026 (all companies): p25 7 / median 25 / p75 43, and the page says it only becomes meaningful from about $20M ARR. SaaS Capital private medians 7-45.5 by ARR band and funding (equity-backed all: 15; bootstrapped all: 34.5); public index average about 31 | `rule_of_40.aleph2026.all`, `rule_of_40.saascap2025.*` |
 | `skills/subscription-metrics/scripts/metrics_calculator.py:97` | Burn multiple GREEN <1.5, YELLOW <3 | Sacks: <1 amazing, 1-1.5 great, 1.5-2 good, 2-3 suspect, >3 bad | `burn_multiple.sacks.rule` |
 | `skills/subscription-metrics/scripts/metrics_calculator.py:98` | Quick ratio GREEN >=4, YELLOW >=2 | Hamid: 4+ desirable, near 2 warning, 1 critical (consistent) | `quick_ratio.hamid.rule` |
-| `skills/subscription-metrics/scripts/metrics_calculator.py:99` | Magic number GREEN >=0.75, YELLOW >=0.5 | Scale: 0.7 is a healthy baseline; no source found for 0.75 / 0.5 | `magic_number.scale.rule` |
-| `skills/subscription-metrics/references/saas-metrics-guide.md:146, 191, 212-216` | LTV:CAC bands (5:1+ YELLOW) | See line 94 above | `ltv_to_cac.skok.rule` |
+| `skills/subscription-metrics/scripts/metrics_calculator.py:99` | Magic number GREEN >=0.75, YELLOW >=0.5 | Aleph 2026: <0.75 audit GTM, 0.75-1.0 acceptable, >1.0 strong; p25 0.68 / median 1.37 / p75 2.14 (annual new-ARR formula). Scale: 0.7 is a healthy baseline (quarterly formula). No source found for 0.5. The script's formula must match the row it grades against | `magic_number.aleph2026.all`, `magic_number.scale.rule` |
+| `skills/subscription-metrics/references/saas-metrics-guide.md:146, 191, 212-216` | LTV:CAC bands (5:1+ YELLOW) | See line 94 above | `ltv_to_cac.aleph2026.all`, `ltv_to_cac.skok.rule` |
 | `skills/subscription-metrics/references/saas-metrics-guide.md:234-238` | Payback bands (<12 excellent, 12-18 good, 18-24 YELLOW) | See line 95 above | `cac_payback.*` |
 | `skills/subscription-metrics/references/saas-metrics-guide.md:260-263` | Rule of 40: 20-30% YELLOW (script says <30 RED) | Internal conflict; see line 96 above | `rule_of_40.*` |
 | `skills/subscription-metrics/references/saas-metrics-guide.md:289-293` | Burn multiple: 1.5-2x YELLOW | Sacks calls 1.5-2x "good" | `burn_multiple.sacks.rule` |
 | `skills/subscription-metrics/references/saas-metrics-guide.md:313-316` | Quick ratio 2-4 "healthy (GREEN)" (script and summary table: YELLOW) | Internal conflict | `quick_ratio.hamid.rule` |
-| `skills/subscription-metrics/references/saas-metrics-guide.md:337-340` | Magic number bands 1.0 / 0.75 / 0.5 | See line 99 above | `magic_number.scale.rule` |
+| `skills/subscription-metrics/references/saas-metrics-guide.md:337-340` | Magic number bands 1.0 / 0.75 / 0.5 | 1.0 and 0.75 match Aleph 2026; 0.5 has no source. See line 99 above | `magic_number.aleph2026.all` |
 | `skills/subscription-metrics/references/saas-metrics-guide.md:457-463` | Summary table for LTV:CAC, payback, Rule of 40, burn, quick ratio, magic number, expansion | As above | as above |
 | `skills/plg-funnel-analyzer/scripts/funnel_analyzer.py:85-91` | Payback 24 / 16 / 6, comment "Benchmarkit 2025" | Figure is from the 2026 Aleph x Benchmarkit report (FY2025 data); explicit p25 is 10, the "<=6 top quartile" line conflicts with the same page | `cac_payback.aleph2026.all` |
-| `skills/plg-funnel-analyzer/SKILL.md:125` and `references/funnel-benchmarks.md:14, 16, 74-75` | Payback table, "Benchmarkit 2025" citation, LTV/CAC 2 / 3-4 / 6 | As above; no source for the LTV/CAC percentiles | `cac_payback.*`, `ltv_to_cac.skok.rule` |
+| `skills/plg-funnel-analyzer/SKILL.md:125` and `references/funnel-benchmarks.md:14, 16, 74-75` | Payback table, "Benchmarkit 2025" citation, LTV/CAC 2 / 3-4 / 6 | As above; LTV:CAC quartiles are 1.1x / 4.1x / 7.8x (Aleph 2026) | `cac_payback.*`, `ltv_to_cac.aleph2026.all` |
 | `skills/plg-funnel-analyzer/references/funnel-benchmarks.md:22-23` | CAC (SMB) $200-300 median, mid-market $2,000-3,000 | No verified source | none |
-| `agents/metrics-analyst.md:83-84` | LTV:CAC ">3:1", Rule of 40 ">40%" | Rule of thumb vs private medians; cite the rows | `ltv_to_cac.skok.rule`, `rule_of_40.*` |
+| `agents/metrics-analyst.md:83-84` | LTV:CAC ">3:1", Rule of 40 ">40%" | Both are rules of thumb: median LTV:CAC is 4.1x and median Rule of 40 is 25 (Aleph 2026); cite the rows | `ltv_to_cac.aleph2026.all`, `rule_of_40.aleph2026.all` |
 
 ### Conversion, activation and onboarding
 

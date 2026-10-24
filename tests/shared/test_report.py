@@ -137,6 +137,20 @@ class WriteReportTests(InTempDir):
         saved = report.write_report("s", "acme.test", "a", data={"score": 1}, date="2026-10-01")
         self.assertIn("No tracked values changed since 2026-09-01.", self.read(saved["markdown_path"]))
 
+    def test_runs_without_values_never_claim_no_change(self):
+        report.write_report("s", "acme.test", "a", data={"score": 1}, date="2026-09-01")
+        saved = report.write_report("s", "acme.test", "a", data=None, date="2026-09-02")
+        text = self.read(saved["markdown_path"])
+        self.assertNotIn("No tracked values changed", text)
+        self.assertIn("This run saved no values", text)
+        # Previous run saved nothing: no table of every value "changed" from "-".
+        report.write_report("t", "acme.test", "a", data=None, date="2026-09-01")
+        saved = report.write_report("t", "acme.test", "a", data={"x": 1, "y": 2}, date="2026-09-02")
+        text = self.read(saved["markdown_path"])
+        self.assertNotIn("| x |", text)
+        self.assertIn("The previous run saved no values", text)
+        self.assertEqual(saved["changes"], [])
+
     def test_previous_without_sidecar(self):
         os.makedirs("growth-reports")
         with open(os.path.join("growth-reports", "2026-09-01-s-acme-test.md"), "w", encoding="utf-8") as handle:
@@ -220,13 +234,19 @@ class CommandLineTests(InTempDir):
             handle.write("# Draft\n")
         with open("facts.json", "w", encoding="utf-8") as handle:
             json.dump({"score": 5}, handle)
+        # A date far in the past, so "previous" (default: before today) finds it
+        # whatever day the suite runs on.
         code, out, _ = self.run_main("save", "--skill", "pricing-analyzer", "--subject", "https://acme.test",
-                                     "--markdown", "draft.md", "--data", "facts.json", "--date", "2026-10-24")
+                                     "--markdown", "draft.md", "--data", "facts.json", "--date", "2001-10-24")
         self.assertEqual(code, 0)
         result = json.loads(out)
-        self.assertEqual(result["markdown_path"], os.path.join("growth-reports", "2026-10-24-pricing-analyzer-acme-test.md"))
+        self.assertEqual(result["markdown_path"], os.path.join("growth-reports", "2001-10-24-pricing-analyzer-acme-test.md"))
         code, out, _ = self.run_main("previous", "--skill", "pricing-analyzer", "--subject", "acme.test")
         self.assertEqual(json.loads(out)["previous_run"]["data"], {"score": 5})
+        # Same rule as write_report(): only runs from an earlier day count.
+        code, out, _ = self.run_main("previous", "--skill", "pricing-analyzer", "--subject", "acme.test",
+                                     "--date", "2001-10-24")
+        self.assertIsNone(json.loads(out)["previous_run"])
         code, out, _ = self.run_main("path", "--skill", "pricing-analyzer", "--subject", "acme.test",
                                      "--date", "2026-11-01")
         self.assertTrue(json.loads(out)["markdown"].endswith("2026-11-01-pricing-analyzer-acme-test.md"))

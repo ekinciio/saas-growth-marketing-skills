@@ -110,6 +110,7 @@ class ResolveInputTests(unittest.TestCase):
         with self.assertRaises(cli.UsageError) as ctx:
             cli.resolve_input("missing-page.html")
         self.assertIn("File not found", str(ctx.exception))
+        self.assertNotIn("https://", str(ctx.exception))  # no "website" hint for a file name
         with self.assertRaises(cli.UsageError):
             cli.resolve_input(self.tmp.name)  # a folder
 
@@ -216,6 +217,15 @@ class RunTests(unittest.TestCase):
         _, out, _ = capture(run.emit, {"title": "Caf\xe9 \u2192 Men\xfc"})
         self.assertEqual(json.loads(out)["title"], "Caf\xe9 \u2192 Men\xfc")
 
+    def test_nan_and_infinity_become_null(self):
+        run = cli.Run("tool", json_mode=True)
+        _, out, _ = capture(run.emit, {"ratio": float("nan"), "nested": {"x": [float("inf"), 1.5]}})
+        self.assertNotIn("NaN", out)
+        self.assertNotIn("Infinity", out)
+        envelope = json.loads(out)
+        self.assertIsNone(envelope["ratio"])
+        self.assertEqual(envelope["nested"]["x"], [None, 1.5])
+
     def test_non_json_values_are_serialized(self):
         import datetime
         run = cli.Run("tool", json_mode=True)
@@ -247,8 +257,27 @@ class ParserTests(unittest.TestCase):
                     parser.parse_args(["--json", "--bogus"])
         envelope = json.loads(out.getvalue())
         self.assertEqual(envelope["status"], "usage_error")
+        self.assertIs(envelope["demo"], False)
         self.assertIn("--bogus", envelope["errors"][0])
         self.assertIn("usage:", err.getvalue())
+
+    def test_usage_error_uses_the_parsed_args_not_sys_argv(self):
+        parser = cli.build_parser("x", prog="tool")
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.object(sys, "argv", ["tool"]):  # no --json here
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                with self.assertRaises(SystemExit):
+                    parser.parse_args(["--json", "--bogus"])
+        self.assertEqual(json.loads(out.getvalue())["status"], "usage_error")
+
+    def test_timeout_must_be_positive(self):
+        parser = cli.build_parser("x", prog="tool")
+        for bad in ("0", "-1", "abc", "nan"):
+            with self.subTest(timeout=bad):
+                with contextlib.redirect_stderr(io.StringIO()):
+                    with self.assertRaises(SystemExit) as ctx:
+                        parser.parse_args(["linear.app", "--timeout", bad])
+                self.assertEqual(ctx.exception.code, 2)
 
     def test_import_or_exit(self):
         out, err = io.StringIO(), io.StringIO()
@@ -279,6 +308,10 @@ class FetchOutcomeTests(unittest.TestCase):
                 self.assertEqual(status, expected)
                 if expected != "ok":
                     self.assertTrue(message)
+        status, message = cli.fetch_outcome({"status": "not_html", "http_status": 200, "bytes": 0,
+                                              "content_type": "text/html", "url": "https://x.test/"})
+        self.assertEqual(status, "nothing_to_analyze")
+        self.assertIn("empty body", message)
         status, message = cli.fetch_outcome({"status": "blocked", "http_status": 403,
                                               "bot_protection": {"vendor": "datadome"}, "url": "https://g2.test/"})
         self.assertIn("datadome", message)
@@ -361,6 +394,9 @@ class CoercionTests(unittest.TestCase):
         self.assertEqual(cli.to_percent(0.25, assume_fraction=True), 25.0)
         self.assertEqual(cli.to_percent("0.25", assume_fraction=True), 25.0)
         self.assertEqual(cli.to_percent("0.25%", assume_fraction=True), 0.25)
+        # "percent" spelled out counts as a percent sign, never as a fraction.
+        self.assertEqual(cli.to_percent("0.5 percent", assume_fraction=True), 0.5)
+        self.assertEqual(cli.to_percent("25 percent"), 25.0)
         with self.assertRaises(cli.CoercionError):
             cli.to_percent("120%", maximum=100)
 

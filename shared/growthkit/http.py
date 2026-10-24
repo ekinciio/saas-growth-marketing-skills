@@ -50,7 +50,6 @@ from __future__ import annotations
 
 import gzip
 import re
-import socket
 import time
 import zlib
 from html import unescape
@@ -331,9 +330,14 @@ _COOKIE_SIGNALS: List[Tuple[str, str]] = [
 # Strict markers only ever appear on challenge pages, so they are trusted on
 # a near-empty 200 page too. Non-strict markers (scripts some vendors also
 # inject into normal pages) are trusted only on an error status or 202.
+#
+# Cloudflare's "JavaScript detections" inject /cdn-cgi/challenge-platform/
+# .../scripts/jsd/main.js (older form: /h/b/scripts/jsd/...) into NORMAL
+# pages, so only the challenge-page "orchestrate" path counts; otherwise a
+# client-rendered app behind Cloudflare would be reported as blocked.
 _BODY_CHALLENGE: List[Tuple[str, re.Pattern, bool]] = [
     ("cloudflare", re.compile(
-        r"<title>\s*just a moment\.{0,3}\s*</title>|_cf_chl_opt|/cdn-cgi/challenge-platform/h/|"
+        r"<title>\s*just a moment\.{0,3}\s*</title>|_cf_chl_opt|/cdn-cgi/challenge-platform/(?:h/[a-z]/)?orchestrate/|"
         r"cf-browser-verification|attention required! \| cloudflare|sorry, you have been blocked|"
         r"checking your browser before accessing|enable javascript and cookies to continue",
         re.I), True),
@@ -543,6 +547,12 @@ def fetch(
             except requests.exceptions.RequestException as exc:
                 result["error"] = _describe_exception(exc)
                 return result
+            except Exception as exc:  # noqa: BLE001 - the "never raises" promise
+                # requests/urllib3 occasionally leak non-RequestException
+                # errors (IDNA UnicodeError, ValueError for a bad timeout or
+                # header, raw OSError). A script must still get a result.
+                result["error"] = "Request failed: %s" % _describe_exception(exc)
+                return result
         try:
             deadline = started + max(float(timeout or DEFAULT_TIMEOUT), 1.0) * 3
             raw, truncated = _read_capped(response, limit, deadline)
@@ -550,7 +560,7 @@ def fetch(
             result["error"] = "Timed out while reading the response body"
             result["http_status"] = response.status_code
             return result
-        except (requests.exceptions.RequestException, OSError, socket.timeout) as exc:
+        except Exception as exc:  # noqa: BLE001 - RequestException, OSError, socket.timeout and leaks
             result["error"] = "Failed while reading the response body: %s" % _describe_exception(exc)
             result["http_status"] = response.status_code
             return result
@@ -633,6 +643,13 @@ def _classify(result: Dict[str, Any], response: Any, raw: bytes, truncated: bool
         return
 
     if kind == "html":
+        if not raw:
+            # Still not_html (exit 5, nothing to analyze), but say why: the
+            # content type alone ("got text/html") would read as a contradiction.
+            result["status"] = STATUS_NOT_HTML
+            result["error"] = "The server returned an empty body (HTTP %d, %s)" % (
+                status_code, mime or "no content type")
+            return
         if binary or not body_is_html:
             result["status"] = STATUS_NOT_HTML
             result["error"] = "Expected an HTML page, got %s" % (mime or "an unknown content type")

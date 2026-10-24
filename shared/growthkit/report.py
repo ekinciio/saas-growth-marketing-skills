@@ -319,8 +319,13 @@ def change_section(
     previous: Optional[Dict[str, Any]],
     changes: List[Dict[str, Any]],
     current_date: str,
+    current_data: Any = True,
 ) -> str:
-    """Markdown for '## Change since last run'."""
+    """Markdown for '## Change since last run'.
+
+    current_data is this run's data (only its emptiness matters): a run
+    that saved no values cannot claim that "no tracked values changed".
+    """
     lines = [CHANGE_HEADING, ""]
     if not previous:
         lines.append("First run for this subject. The next run will compare against this one.")
@@ -330,6 +335,12 @@ def change_section(
     lines.append("")
     if previous.get("data") is None:
         lines.append("The previous run has no JSON sidecar, so values could not be compared automatically.")
+        return "\n".join(lines) + "\n"
+    if not previous.get("data"):
+        lines.append("The previous run saved no values, so nothing could be compared automatically.")
+        return "\n".join(lines) + "\n"
+    if not current_data:
+        lines.append("This run saved no values, so nothing could be compared automatically.")
         return "\n".join(lines) + "\n"
     if not changes:
         lines.append("No tracked values changed since %s." % previous["date"])
@@ -394,12 +405,14 @@ def write_report(
     ensure_reports_dir(base_dir)
     previous = find_previous_run(skill, subject, before=paths["date"], base_dir=base_dir)
     changes: List[Dict[str, Any]] = []
-    if previous and previous.get("data") is not None and data is not None:
+    # Only diff when both runs saved values: against an empty side every
+    # value would show up as "changed" from or to nothing.
+    if previous and previous.get("data") and data:
         changes = diff_data(previous["data"], data, compare_paths)
 
     body = strip_footer(markdown or "")
     if add_change_section and CHANGE_HEADING.lower() not in body.lower():
-        body = body + "\n\n" + change_section(previous, changes, paths["date"]).rstrip()
+        body = body + "\n\n" + change_section(previous, changes, paths["date"], data).rstrip()
     text = body.strip("\n") + "\n\n" + footer(paths["skill"])
     _atomic_write(paths["markdown"], text)
 
@@ -450,12 +463,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     for name, text in (
         ("save", "write the report, the JSON sidecar and the footer"),
         ("path", "print where the report would be written"),
-        ("previous", "print the previous run of this skill and subject"),
+        ("previous", "print the latest run of this skill and subject from a day before --date"),
     ):
         command = sub.add_parser(name, help=text)
         command.add_argument("--skill", required=True)
         command.add_argument("--subject", required=True, help="URL or name the report is about")
-        command.add_argument("--date", help="YYYY-MM-DD (default: today)")
+        command.add_argument("--date", help="YYYY-MM-DD of this run (default: today)")
         if name == "save":
             command.add_argument("--markdown", required=True, help="report text file, or '-' for stdin")
             command.add_argument("--data", help="JSON file with the values to keep and compare")
@@ -471,7 +484,9 @@ def main(argv: Optional[List[str]] = None) -> int:
                               "json": _display_path(paths["json"])}))
             return 0
         if args.command == "previous":
-            previous = find_previous_run(args.skill, args.subject, before=args.date)
+            # Same rule as write_report(): the latest run from an EARLIER day
+            # (a same-day rerun replaces today's report, it is not history).
+            previous = find_previous_run(args.skill, args.subject, before=args.date or _date.today())
             print(json.dumps({"status": "ok", "previous_run": previous}, ensure_ascii=False, default=str))
             return 0
         markdown = _read_text_arg(args.markdown)

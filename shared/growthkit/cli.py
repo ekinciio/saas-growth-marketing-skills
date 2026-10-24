@@ -131,8 +131,24 @@ def _json_default(value: Any) -> Any:
     return str(value)
 
 
+def _finite(value: Any) -> Any:
+    """Replace NaN and +/-Infinity with None, recursively.
+
+    json.dumps writes them as bare NaN / Infinity, which is not JSON: jq
+    and JavaScript reject the whole document.
+    """
+    if isinstance(value, float):
+        return value if math.isfinite(value) else None
+    if isinstance(value, dict):
+        return {key: _finite(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_finite(item) for item in value]
+    return value
+
+
 def to_json(data: Any, compact: bool = True) -> str:
-    """Serialize to JSON. Compact by default to save the model's tokens."""
+    """Serialize to strict JSON. Compact by default to save the model's tokens."""
+    data = _finite(data)
     if compact:
         return json.dumps(data, ensure_ascii=False, separators=(",", ":"), default=_json_default)
     return json.dumps(data, ensure_ascii=False, indent=2, default=_json_default)
@@ -161,18 +177,36 @@ class ArgumentParser(argparse.ArgumentParser):
     nothing.
     """
 
+    def parse_known_args(self, args: Any = None, namespace: Any = None) -> Any:  # type: ignore[override]
+        # Remember the real argument list: parse_args(["--json", ...]) in a
+        # test or wrapper must decide JSON mode from it, not from sys.argv.
+        self._argv = list(sys.argv[1:] if args is None else args)
+        return super().parse_known_args(args, namespace)
+
     def error(self, message: str) -> None:  # type: ignore[override]
         self.print_usage(sys.stderr)
         print("%s: error: %s" % (self.prog, message), file=sys.stderr)
-        if _wants_json():
+        if _wants_json(getattr(self, "_argv", None)):
             _write_stdout(to_json({
                 "tool": self.prog,
                 "version": __version__,
                 "status": STATUS_USAGE,
+                "demo": False,  # same keys as Run.envelope()
                 "errors": [message],
                 "notes": ["Run with --help to see the arguments."],
             }))
         raise SystemExit(EXIT_USAGE)
+
+
+def _positive_float(text: str) -> float:
+    """argparse type for --timeout: requests rejects 0 or a negative timeout."""
+    try:
+        value = float(text)
+    except ValueError:
+        raise argparse.ArgumentTypeError("expected a number of seconds, got %r" % text)
+    if not math.isfinite(value) or value <= 0:
+        raise argparse.ArgumentTypeError("must be greater than 0, got %r" % text)
+    return value
 
 
 def build_parser(
@@ -211,7 +245,7 @@ def build_parser(
         )
     if timeout:
         parser.add_argument(
-            "--timeout", type=float, default=15.0, metavar="SECONDS",
+            "--timeout", type=_positive_float, default=15.0, metavar="SECONDS",
             help="network timeout per request (default: 15)",
         )
     parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
@@ -313,7 +347,8 @@ def resolve_input(
         raise UsageError("%s is a folder; pass a file inside it." % value)
     if allow_file:
         hint = ""
-        if allow_url and "." in value and "/" not in value:
+        extension = value.rsplit(".", 1)[-1].lower() if "." in value else ""
+        if allow_url and extension and "/" not in value and extension not in _FILE_EXTENSIONS:
             hint = " If you meant a website, pass it as https://%s" % value
         raise UsageError("File not found: %s.%s" % (value, hint))
     raise UsageError("Not a valid URL: %s" % value)
@@ -505,6 +540,8 @@ def fetch_outcome(result: Dict[str, Any]) -> Tuple[str, str]:
             % (url, signals.get("visible_words", 0))
         )
     if status == "not_html":
+        if not result.get("bytes") and result.get("http_status") is not None:
+            return STATUS_NOTHING, "%s returned an empty body (HTTP %s)." % (url, code)
         return STATUS_NOTHING, "%s returned %s, not an HTML page." % (
             url, result.get("content_type") or "an unknown content type")
     if status == "blocked":
@@ -622,7 +659,7 @@ def _parse_number_text(text: str, field: Optional[str], original: Any) -> Tuple[
     token = text.strip().lower()
     token = token.replace("\u2212", "-")  # unicode minus
     token = re.sub(r"^(?:~|approx\.?|about|around|ca\.?)\s*", "", token)
-    had_percent = "%" in token
+    had_percent = "%" in token or "percent" in token
     token = token.replace("%", "").replace("percent", "")
     token = _CURRENCY_RE.sub("", token)
     token = token.replace("_", "").replace(" ", "")

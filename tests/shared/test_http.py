@@ -224,6 +224,30 @@ class FetchTests(unittest.TestCase):
         result, _ = self.fetch(html_response(fixture("cloudflare_challenge.html"), 200))
         self.assertEqual(result["status"], "blocked")
 
+    def test_spa_behind_cloudflare_js_detections_is_a_js_shell_not_blocked(self):
+        # Cloudflare injects its JS-detection script into normal pages; the
+        # older path even lives under /cdn-cgi/challenge-platform/h/b/.
+        jsd = ("<script>(function(){var a=document.createElement('script');"
+               "a.src='/cdn-cgi/challenge-platform/h/b/scripts/jsd/e0c90b6a/main.js';"
+               "document.head.appendChild(a);})();</script>")
+        body = fixture("spa_shell.html").replace("</body>", jsd + "</body>")
+        result, _ = self.fetch(html_response(body, headers={"Server": "cloudflare", "CF-RAY": "8f00-AMS"}))
+        self.assertEqual(result["status"], "js_shell")
+        self.assertEqual(result["bot_protection"]["vendor"], "cloudflare")
+        self.assertFalse(result["bot_protection"]["challenge"])
+
+    def test_empty_200_page_says_empty(self):
+        result, _ = self.fetch(html_response(b""))
+        self.assertEqual(result["status"], "not_html")
+        self.assertIn("empty body", result["error"])
+
+    def test_unexpected_library_errors_never_escape(self):
+        for exc in (UnicodeError("label too long"), ValueError("Invalid header value"), OSError("socket")):
+            with self.subTest(exc=type(exc).__name__):
+                result, _ = self.fetch(exc, retries=0)
+                self.assertEqual(result["status"], "unreachable")
+                self.assertIn("Request failed", result["error"])
+
     def test_plain_429_is_blocked(self):
         result, _ = self.fetch(make_response(429, "slow down", {"Content-Type": "text/plain"}, reason="Too Many Requests"))
         self.assertEqual(result["status"], "blocked")

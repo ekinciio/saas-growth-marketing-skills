@@ -54,8 +54,12 @@ def decode_bytes(
 
     Order follows the HTML spec: byte-order mark, then the Content-Type
     charset, then <meta charset>, then UTF-8, then Windows-1252 (which
-    never fails). requests' response.text skips the meta step and falls
-    back to ISO-8859-1, which garbles UTF-8 pages served without a charset.
+    never fails). ISO-8859-1 and ASCII labels mean Windows-1252, as in
+    browsers, and a body with such a label that is valid UTF-8 is read as
+    UTF-8. When no candidate decodes cleanly, the first declared charset is
+    used with replacement characters. requests' response.text skips the
+    meta step and falls back to ISO-8859-1, which garbles UTF-8 pages
+    served without a charset.
     """
     if content is None:
         return "", "utf-8"
@@ -67,20 +71,54 @@ def decode_bytes(
     for bom, encoding in boms:
         if content.startswith(bom):
             return content.decode(encoding, "replace"), encoding
-    candidates: List[str] = []
+    declared: List[str] = []
     if header_charset:
-        candidates.append(header_charset.strip().strip("\"'").lower())
+        declared.append(_charset_label(header_charset))
     if is_html:
         meta = sniff_meta_charset(content)
         if meta:
-            candidates.append(meta)
-    candidates.append("utf-8")
-    for encoding in candidates:
+            declared.append(_charset_label(meta))
+    order: List[str] = []
+    for encoding in declared:
+        # A legacy single-byte label on a body that is valid UTF-8 (with
+        # non-ASCII bytes) is a mislabelled UTF-8 page: real cp1252 text
+        # almost never forms valid UTF-8 sequences, so try UTF-8 first.
+        if encoding in _SINGLE_BYTE_LABELS and _HIGH_BYTE_RE.search(content):
+            order.append("utf-8")
+        order.append(encoding)
+    order.append("utf-8")
+    for encoding in order:
         try:
             return content.decode(encoding), encoding
         except (LookupError, UnicodeDecodeError):
             continue
+    # Nothing decoded cleanly. A declared charset still wins (browsers use it
+    # with replacement characters), so one stray byte in a UTF-8 page does
+    # not turn every accented letter into mojibake. Only an undeclared body
+    # falls back to Windows-1252, which never fails.
+    for encoding in declared:
+        try:
+            return content.decode(encoding, "replace"), encoding
+        except LookupError:
+            continue
     return content.decode("cp1252", "replace"), "cp1252"
+
+
+# The HTML standard decodes these labels as Windows-1252: pages labelled
+# ISO-8859-1 routinely contain cp1252 curly quotes and dashes in 0x80-0x9F,
+# which Python's latin-1 codec would turn into invisible control characters.
+_CP1252_ALIASES = {
+    "iso-8859-1", "iso8859-1", "iso_8859-1", "latin-1", "latin1", "l1",
+    "us-ascii", "ascii", "ansi_x3.4-1968", "cp819", "ibm819",
+}
+_SINGLE_BYTE_LABELS = {"cp1252", "windows-1252", "x-cp1252"}
+_HIGH_BYTE_RE = re.compile(rb"[\x80-\xff]")
+
+
+def _charset_label(label: str) -> str:
+    """Normalize a declared charset label (quotes, case, WHATWG aliases)."""
+    value = label.strip().strip("\"'").lower()
+    return "cp1252" if value in _CP1252_ALIASES else value
 
 
 def parse(markup: Union[str, bytes, None]) -> BeautifulSoup:
@@ -95,7 +133,10 @@ def parse(markup: Union[str, bytes, None]) -> BeautifulSoup:
 # ---------------------------------------------------------------------------
 
 _WS_RE = re.compile(r"\s+")
-_SPACE_BEFORE_PUNCT_RE = re.compile(r"\s+([,.;:!?%)\]}])")
+# Only punctuation that ends a word ("together ." -> "together."): the mark
+# must be followed by a space, the end, or more punctuation, so ".NET",
+# ".csv" and ".5" keep their leading space.
+_SPACE_BEFORE_PUNCT_RE = re.compile(r"\s+([,.;:!?%)\]}])(?=$|\s|[,.;:!?%)\]}\"'])")
 _SPACE_AFTER_OPEN_RE = re.compile(r"([(\[{])\s+")
 _CJK_RE = re.compile(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 _ALNUM_RE = re.compile(r"[^\W_]", re.UNICODE)
@@ -175,11 +216,12 @@ def dedupe_texts(items: Iterable[str], containment: bool = False) -> List[str]:
     """
     kept: List[str] = []
     keys: List[str] = []
+    seen = set()  # same keys as `keys`, for O(1) exact-duplicate checks
     for item in items:
         key = _key(item)
         if not key:
             continue
-        if key in keys:
+        if key in seen:
             continue
         if containment:
             if any(key in k for k in keys):
@@ -188,13 +230,16 @@ def dedupe_texts(items: Iterable[str], containment: bool = False) -> List[str]:
             for idx, existing in enumerate(keys):
                 if existing in key:
                     kept[idx] = item
+                    seen.discard(existing)
                     keys[idx] = key
+                    seen.add(key)
                     replaced = True
                     break
             if replaced:
                 continue
         kept.append(item)
         keys.append(key)
+        seen.add(key)
     return kept
 
 
@@ -293,6 +338,35 @@ def remove_responsive_duplicates(soup: Tag) -> int:
     desktop variant is kept; a mobile-only element without a twin nearby
     (sibling, or child of a sibling of its parent) is kept too.
     """
+    # "Nearby" is every element grandchild of the grandparent (siblings plus
+    # the uncles' children). The text keys of those elements are computed
+    # once per container and cached, because comparing every mobile-only
+    # element against every nearby element re-reads the same text and is
+    # quadratic: a 500 KB page with 800 cards took over 10 seconds.
+    child_keys: Dict[int, set] = {}
+    grandchild_keys: Dict[int, set] = {}
+
+    def keys_of_children(node: Tag) -> set:
+        cached = child_keys.get(id(node))
+        if cached is None:
+            cached = {
+                _key(child.get_text(" ", strip=True))
+                for child in node.find_all(True, recursive=False)
+                if not _mobile_only(child)
+            }
+            cached.discard("")
+            child_keys[id(node)] = cached
+        return cached
+
+    def keys_of_grandchildren(node: Tag) -> set:
+        cached = grandchild_keys.get(id(node))
+        if cached is None:
+            cached = set()
+            for child in node.find_all(True, recursive=False):
+                cached |= keys_of_children(child)
+            grandchild_keys[id(node)] = cached
+        return cached
+
     removed = 0
     for tag in soup.find_all(True):
         if tag.parent is None or not _mobile_only(tag):
@@ -301,16 +375,11 @@ def remove_responsive_duplicates(soup: Tag) -> int:
         if not key:
             continue
         parent = tag.parent
-        nearby: List[Tag] = [s for s in parent.find_all(True, recursive=False) if s is not tag]
-        if parent.parent is not None:
-            for uncle in parent.parent.find_all(True, recursive=False):
-                if uncle is not parent:
-                    nearby.extend(uncle.find_all(True, recursive=False))
-        for other in nearby:
-            if not _mobile_only(other) and _key(other.get_text(" ", strip=True)) == key:
-                tag.extract()
-                removed += 1
-                break
+        grandparent = parent.parent
+        nearby = keys_of_grandchildren(grandparent) if grandparent is not None else keys_of_children(parent)
+        if key in nearby:
+            tag.extract()
+            removed += 1
     return removed
 
 
@@ -564,16 +633,24 @@ def extract_meta(soup: Tag) -> Dict[str, Any]:
 
 
 def _parse_json_ld_text(raw: str) -> Any:
-    """json.loads with fallbacks for comments, CDATA and raw control characters."""
+    """json.loads with fallbacks for comments, CDATA and raw control characters.
+
+    NaN and Infinity (which Python's json accepts) become None, so
+    page_facts() output stays valid JSON for strict parsers such as jq.
+    """
     try:
-        return json.loads(raw)
+        return json.loads(raw, parse_constant=_no_constant)
     except ValueError:
         pass
     cleaned = raw.strip()
     cleaned = re.sub(r"^\s*(?:<!--|//\s*<!\[CDATA\[|<!\[CDATA\[)", "", cleaned)
     cleaned = re.sub(r"(?:-->|//\s*\]\]>|\]\]>)\s*$", "", cleaned)
     cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)  # trailing commas
-    return json.loads(cleaned, strict=False)
+    return json.loads(cleaned, strict=False, parse_constant=_no_constant)
+
+
+def _no_constant(_name: str) -> None:
+    return None
 
 
 def _flatten_ld(data: Any, out: List[Dict[str, Any]]) -> None:
@@ -619,7 +696,7 @@ def extract_json_ld(soup: Tag, max_items: int = 50) -> Dict[str, Any]:
             continue
         try:
             _flatten_ld(_parse_json_ld_text(raw), items)
-        except ValueError as exc:
+        except (ValueError, RecursionError) as exc:  # RecursionError: absurdly deep nesting
             errors.append({"block": blocks, "error": str(exc)[:160]})
     types: List[str] = []
     for item in items:
@@ -930,13 +1007,37 @@ def classify_cta_text(text: str) -> Optional[str]:
 # Page structure: chrome, blocks, zones
 # ---------------------------------------------------------------------------
 
-_COOKIE_RE = re.compile(
-    r"(?:^|[-_\s])(?:cookie|cookies|consent|gdpr)(?:[-_\s]|$)|onetrust|cookiebot|osano|truste|"
-    r"cookieyes|iubenda|didomi|usercentrics|cmp-",
+# Cookie banners: consent-platform ids and classes, matched as whole tokens.
+# Loose substrings misfire on real content: "truste" is inside "trusted-by"
+# (the social-proof logo wall) and "cmp-" prefixes every Adobe Experience
+# Manager component ("cmp-container", "cmp-teaser").
+_COOKIE_VENDOR_RE = re.compile(
+    r"onetrust|cookiebot|cookieyes|cookie-?law|osano|iubenda|didomi|usercentrics|trustarc|termly|"
+    r"(?:^|[-_\s])(?:truste|qc-cmp2?|cmpbox|cmpwrapper|cc-window|cc-banner)(?:[-_\s]|$)",
     re.I,
 )
+_COOKIE_WORD_RE = re.compile(r"(?:^|[-_\s])cookies?(?:[-_\s]|$)", re.I)
+# "consent" and "gdpr" also name ordinary content ("gdpr-compliance" on a
+# security page, a form's consent checkbox), so they only count when the
+# element is short and talks about cookies.
+_CONSENT_WORD_RE = re.compile(r"(?:^|[-_\s])(?:consent|gdpr)(?:[-_\s]|$)", re.I)
+_COOKIE_TEXT_RE = re.compile(r"\bcookies?\b", re.I)
 _SECTIONING_PARENTS = {"article", "section", "aside", "blockquote", "figure", "li"}
 _HEADING_RE = re.compile(r"^h[1-6]$")
+
+
+def _in_sectioning(tag: Tag) -> bool:
+    """True inside article/section/aside/blockquote/figure/li.
+
+    Per the HTML spec a <header> or <footer> there belongs to that section
+    (a card or section heading), not to the page, so it is not chrome.
+    """
+    parent = tag.parent
+    while isinstance(parent, Tag):
+        if parent.name in _SECTIONING_PARENTS:
+            return True
+        parent = parent.parent
+    return False
 
 
 def _chrome_kind(tag: Tag) -> Optional[str]:
@@ -945,7 +1046,7 @@ def _chrome_kind(tag: Tag) -> Optional[str]:
     name = tag.name
     if name == "nav" or role == "navigation":
         return "nav"
-    if name == "header" or role == "banner":
+    if role == "banner" or (name == "header" and not _in_sectioning(tag)):
         # A header that holds the real headline is the hero, not chrome. A
         # one- or two-word <h1> around the logo does not count.
         h1 = tag.find("h1")
@@ -954,18 +1055,18 @@ def _chrome_kind(tag: Tag) -> Optional[str]:
         return "nav"
     if role == "contentinfo":
         return "footer"
-    if name == "footer":
-        parent = tag.parent
-        while isinstance(parent, Tag):
-            if parent.name in _SECTIONING_PARENTS:
-                return None
-            parent = parent.parent
+    if name == "footer" and not _in_sectioning(tag):
         return "footer"
     if role in ("dialog", "alertdialog") or str(tag.get("aria-modal") or "").lower() == "true" or name == "dialog":
         return "dialog"
     ident = " ".join([str(tag.get("id") or "")] + _classes(tag))
-    if ident and _COOKIE_RE.search(ident):
-        return "cookie"
+    if ident:
+        if _COOKIE_VENDOR_RE.search(ident) or _COOKIE_WORD_RE.search(ident):
+            return "cookie"
+        if _CONSENT_WORD_RE.search(ident):
+            text = tag.get_text(" ", strip=True)
+            if _COOKIE_TEXT_RE.search(text) and word_count(text) <= 200:
+                return "cookie"
     return None
 
 
@@ -1035,6 +1136,7 @@ class _Layout:
                 continue
             break
         blocks = children if children else ([node] if _has_content(node) else [])
+        blocks = self._expand_wrappers(blocks)
         # When <main> starts below a hero that sits outside it (for example
         # <header><h1>..</h1></header><main>..</main>), put that hero first.
         h1 = self._first_content_h1()
@@ -1045,6 +1147,29 @@ class _Layout:
             if hero is not self.root and not _contains(hero, self.root):
                 blocks = [hero] + blocks
         return blocks
+
+    def _expand_wrappers(self, blocks: List[Tag], depth: int = 0) -> List[Tag]:
+        """Replace a wrapper that holds several sections by those sections.
+
+        CMS pages often put every section after the hero into one container
+        (hubspot.com: hero + one module wrapper with 8 h2 sections), which
+        made the outline 2 blocks long and could put all of the page's CTAs
+        in the "hero" zone. A block is split when two or more of its
+        children each contain an <h2> (a heading child itself does not
+        count, so "<h2>Features</h2> + card grid" stays one section).
+        """
+        out: List[Tag] = []
+        for block in blocks:
+            children = self._significant_children(block) if depth < 6 else []
+            sectioned = sum(
+                1 for child in children
+                if not _HEADING_RE.match(child.name or "") and child.find("h2") is not None
+            )
+            if sectioned >= 2:
+                out.extend(self._expand_wrappers(children, depth + 1))
+            else:
+                out.append(block)
+        return out
 
     def _first_content_h1(self) -> Optional[Tag]:
         for h1 in self.body.find_all("h1"):
@@ -1257,8 +1382,10 @@ def _is_honeypot(tag: Tag) -> bool:
     if name and _HONEYPOT_NAME_RE.match(name):
         return True
     tabindex = str(tag.get("tabindex") or "").strip()
-    autocomplete = str(tag.get("autocomplete") or "").strip().lower()
-    sneaky = tabindex == "-1" or autocomplete in ("off", "nope", "new-off", "false") or _offscreen(tag)
+    # autocomplete="off" is not evidence: many real forms set it on every
+    # field, and a visible, labelled "Company website" question is real.
+    # A honeypot is unreachable by keyboard (tabindex=-1) or pushed off-screen.
+    sneaky = tabindex == "-1" or _offscreen(tag)
     if name.lower() in _SOFT_HONEYPOT_NAMES and sneaky:
         return True
     return tabindex == "-1" and _offscreen(tag)

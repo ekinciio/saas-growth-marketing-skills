@@ -34,11 +34,11 @@ Type: `training` = collects data for model training; `search` = builds an index 
 | Google | `Google-Extended` | control | Whether crawled content may be used to train Gemini models and for grounding. No separate user agent (uses Googlebot). Does not affect Search inclusion or ranking and does not remove a site from AI Overviews or AI Mode (use the Search Console control in section 2) | Yes (robots token) | n/a | same as above (page updated 2026-10-15) | 2026-10-24 | verified |
 | Google | `Google-CloudVertexBot` | other | Crawls that site owners request to build Vertex AI Agents; no effect on Search | Yes | Not checked | same as above | 2026-10-24 | verified |
 | Google | `GoogleOther` | other | Generic crawler for internal research; no product effect | Yes | Not checked | same as above | 2026-10-24 | verified |
-| Google | `Google-Agent` | user-fetch | Agents hosted on Google infrastructure that browse and act on a user's request | Generally ignores robots.txt | Not checked | https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers | 2026-10-24 | verified |
+| Google | `Google-Agent` | user-fetch | Agents hosted on Google infrastructure that browse and act on a user's request | Generally ignores robots.txt | https://developers.google.com/static/crawling/ipranges/user-triggered-agents.json | https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers | 2026-10-24 | verified |
 | Google | `Google-GeminiNotebook` | user-fetch | URLs that Gemini Notebook users add as sources. Former token `Google-NotebookLM` was supported until August 2026 | Generally ignores robots.txt | Not checked | same as above (page updated 2026-08-19) | 2026-10-24 | verified |
 | Google | `Google-Read-Aloud` | user-fetch | Reads pages aloud on user request (former token `google-speakr` is deprecated) | Generally ignores robots.txt | Not checked | same as above | 2026-10-24 | verified |
-| Perplexity | `PerplexityBot` | search | Surfacing and linking sites in Perplexity results; not used to train foundation models | Yes | https://www.perplexity.com/perplexitybot.json | https://docs.perplexity.ai/guides/bots | 2026-10-24 | verified |
-| Perplexity | `Perplexity-User` | user-fetch | Visiting pages to answer a user's question; not crawling or training | Generally ignores robots.txt | https://www.perplexity.com/perplexity-user.json | https://docs.perplexity.ai/guides/bots | 2026-10-24 | verified |
+| Perplexity | `PerplexityBot` | search | Surfacing and linking sites in Perplexity results; not used to train foundation models | Yes | https://www.perplexity.com/perplexitybot.json | https://docs.perplexity.ai/docs/resources/perplexity-crawlers | 2026-10-24 | verified |
+| Perplexity | `Perplexity-User` | user-fetch | Visiting pages to answer a user's question; not crawling or training | Generally ignores robots.txt | https://www.perplexity.com/perplexity-user.json | https://docs.perplexity.ai/docs/resources/perplexity-crawlers | 2026-10-24 | verified |
 | Apple | `Applebot` | search | Spotlight, Siri and Safari search features; Apple says the data may also be used to train Apple foundation models | Yes | Not checked | https://support.apple.com/en-us/119829 (published 2026-09-04) | 2026-10-24 | verified |
 | Apple | `Applebot-Extended` | control | Disallow to opt out of Applebot data being used to train Apple's generative foundation models; does not crawl; no effect on search inclusion or ranking | Yes (robots token) | n/a | https://support.apple.com/en-us/119829 | 2026-10-24 | verified |
 | Meta | `Meta-ExternalAgent` | training | Training foundation AI models and improving products by indexing content | Yes (block with a disallow rule) | Not checked | https://developers.facebook.com/docs/sharing/webmasters/web-crawlers | 2026-10-24 | verified |
@@ -132,7 +132,7 @@ Values between Good and Poor are "needs improvement". A page passes only when al
 
 | Fact | Value | Source | Last verified | Status |
 |---|---|---|---|---|
-| Current Chrome stable major | **156** (first stable 2026-10-07; 156.0.8078.48 serving to 100% of Windows and Mac stable on 2026-10-20). Chrome 157 started an early-stable rollout to 0.5% on 2026-10-22 | https://versionhistory.googleapis.com/v1/chrome/platforms/win/channels/stable/versions/all/releases?filter=endtime=none | 2026-10-24 | verified |
+| Current Chrome stable major | **156** (early-stable rollout from 2026-10-07; 156.0.8078.48 at fraction 1.0 in one Windows/Mac rollout group since 2026-10-20, while another group still served 155 to about 74% on 2026-10-24). Chrome 157 (157.0.8103.15) started an early-stable rollout to 0.5% on 2026-10-22. Use the newest major that is broadly serving, not the 0.5% early-stable one | https://versionhistory.googleapis.com/v1/chrome/platforms/win/channels/stable/versions/all/releases?filter=endtime=none | 2026-10-24 | verified |
 | Release cadence | A new major every two weeks since Chrome 153 (stable 2026-09-08); Extended Stable stays on an eight-week cycle | https://developer.chrome.com/blog/chrome-two-week-release (2026-03-03) | 2026-10-24 | verified |
 | Reduced UA format | `Mozilla/5.0 (<platform>) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/<major>.0.0.0 Safari/537.36`, platform `Windows NT 10.0; Win64; x64` or `Macintosh; Intel Mac OS X 10_15_7` | https://www.chromium.org/updates/ua-reduction/ | 2026-10-24 | verified |
 
@@ -142,17 +142,19 @@ Current desktop string to use in one shared constant:
 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36
 ```
 
-To re-check the major version:
+To re-check the major version, list the stable releases that are serving now to at least half of a rollout group:
 
 ```bash
-curl -s "https://versionhistory.googleapis.com/v1/chrome/platforms/win/channels/stable/versions?pageSize=1"
+curl -s "https://versionhistory.googleapis.com/v1/chrome/platforms/win/channels/stable/versions/all/releases?filter=endtime=none,fraction%3E=0.5"
 ```
+
+On 2026-10-24 this returned only `156.0.8078.48` (fraction 1). Do not use `.../stable/versions?pageSize=1`: it returns the newest stable version even while it is a 0.5% early-stable rollout (it returned `157.0.8103.15` the same day).
 
 A current UA string is hygiene, not a way past bot protection: in the 2026-10 audit, sites that returned 403 (for example GitHub and Canva) blocked every UA tested. Report a 403 as "blocked by bot protection", not as a rendering problem.
 
 ## 9. Where these facts are hard-coded today
 
-Line numbers are against commit `c6eb6b2`; other batches are editing some of these files, so re-grep before changing them. Each of these should read from this registry (or from the shared library constant built from it).
+Line numbers are against commit `c6eb6b2`; commit `7340be2` and later batches change some of these files (for example `cro_auditor.py`), so re-grep before changing them. Each of these should read from this registry (or from the shared library constant built from it).
 
 | Fact | File:line (c6eb6b2) | Problem |
 |---|---|---|
