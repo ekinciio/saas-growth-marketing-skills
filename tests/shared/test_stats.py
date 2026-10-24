@@ -147,6 +147,20 @@ class TrafficPlanningTests(unittest.TestCase):
         lift = stats.plan_test(0.05, weekly_visitors=1000, mde=0.20)
         self.assertIn("relative increase", lift["verdict"])
 
+    def test_default_limit_is_the_report_contract_4_weeks(self):
+        # report-contract.md section 6: no A/B test that needs more than 4 weeks.
+        self.assertEqual(stats.DEFAULT_MAX_WEEKS, 4)
+        # 3.5 weeks of traffic needed: testable by default ...
+        n = stats.sample_size_per_arm(0.05, 0.20)
+        weekly = n * 2 / 3.5
+        self.assertTrue(stats.plan_test(0.05, weekly, 0.20)["feasible"])
+        self.assertEqual(stats.plan_test(0.05, weekly, 0.20)["max_weeks"], 4)
+        # ... 5 weeks needed: not testable by default, testable with a 6-week limit.
+        weekly = n * 2 / 5.0
+        self.assertFalse(stats.plan_test(0.05, weekly, 0.20)["feasible"])
+        self.assertIn("not testable in 4 weeks", stats.plan_test(0.05, weekly, 0.20)["verdict"])
+        self.assertTrue(stats.plan_test(0.05, weekly, 0.20, max_weeks=6)["feasible"])
+
     def test_plan_rejects_bad_traffic(self):
         with self.assertRaises(ValueError):
             stats.plan_test(0.05, 0, 0.1)

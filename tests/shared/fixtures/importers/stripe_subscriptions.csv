@@ -1,0 +1,15 @@
+id,Customer ID,Customer Email,Customer Description,Plan,Product,Quantity,Currency,Interval,Amount,Status,Created (UTC),Start (UTC),Current Period Start (UTC),Current Period End (UTC),Trial Start (UTC),Trial End (UTC),Canceled At (UTC),Cancel At Period End,Ended At (UTC),Cancellation Reason
+sub_1A001,cus_A001,ana@example.com,Example Co A,Pro Monthly,Pro,1,usd,month,49.00,active,2025-06-10 09:12,2025-06-10 09:12,2026-09-10 09:12,2026-10-10 09:12,,,,false,,
+sub_1B001,cus_B001,ben@example.com,Example Co B,Team Monthly,Team,3,usd,month,20.00,active,2025-08-01 14:00,2025-08-01 14:00,2026-09-01 14:00,2026-10-01 14:00,,,,false,,
+sub_1C001,cus_C001,cem@example.com,Example Co C,Pro Annual,Pro,1,usd,year,468.00,active,2025-09-15 08:30,2025-09-15 08:30,2026-09-15 08:30,2027-09-15 08:30,,,,false,,
+sub_1D001,cus_D001,dee@example.com,Example Co D,Pro Monthly,Pro,1,usd,month,49.00,canceled,2025-07-01 10:00,2025-07-01 10:00,2026-03-01 10:00,2026-04-01 10:00,,,2026-03-10 16:40,false,2026-03-10 16:40,cancellation_requested
+sub_1E001,cus_E001,eli@example.com,Example Co E,Pro Monthly,Pro,1,usd,month,49.00,canceled,2025-10-01 12:00,2025-10-01 12:00,2026-05-01 12:00,2026-06-01 12:00,,,2026-05-20 03:00,false,2026-05-20 03:00,payment_failed
+sub_1F001,cus_F001,fay@example.com,Example Co F,Pro Monthly,Pro,1,usd,month,49.00,trialing,2026-09-20 11:00,2026-09-20 11:00,2026-09-20 11:00,2026-10-04 11:00,2026-09-20 11:00,2026-10-04 11:00,,false,,
+sub_1G001,cus_G001,gus@example.com,Example Co G,Pro Monthly,Pro,1,usd,month,49.00,past_due,2026-01-05 07:45,2026-01-05 07:45,2026-09-05 07:45,2026-10-05 07:45,,,,false,,
+sub_1H001,cus_H001,hal@example.com,Example Co H,Starter Monthly,Starter,1,usd,month,19.00,incomplete_expired,2026-08-02 18:20,2026-08-02 18:20,2026-08-02 18:20,2026-09-02 18:20,,,,false,,
+sub_1I001,cus_I001,ida@example.com,Example Co I,Pro Monthly EUR,Pro,1,eur,month,45.00,active,2025-11-01 09:00,2025-11-01 09:00,2026-09-01 09:00,2026-10-01 09:00,,,,false,,
+sub_1J001,cus_J001,jon@example.com,Example Co J,Pro Monthly,Pro,1,usd,month,49.00,active,2026-02-01 10:00,2026-02-01 10:00,2026-09-15 10:00,2026-10-15 10:00,2026-02-01 10:00,2026-02-15 10:00,,false,,
+sub_1K001,cus_K001,kai@example.com,Example Co K,Pro Monthly,Pro,1,usd,month,49.00,canceled,2026-04-01 10:00,2026-04-01 10:00,2026-04-01 10:00,2026-04-15 10:00,2026-04-01 10:00,2026-04-15 10:00,2026-04-15 10:00,false,2026-04-15 10:00,cancellation_requested
+sub_1A002,cus_A001,ana@example.com,Example Co A,Addon Monthly,Addon,1,usd,month,10.00,active,2026-07-01 09:00,2026-07-01 09:00,2026-09-01 09:00,2026-10-01 09:00,,,,false,,
+sub_1L001,cus_L001,lia@example.com,Example Co L,Pro Monthly,Pro,1,usd,month,49.00,canceled,2025-06-01 09:00,2025-06-01 09:00,2025-12-01 09:00,2025-12-31 09:00,,,2025-12-31 09:00,false,2025-12-31 09:00,
+sub_1L002,cus_L001,lia@example.com,Example Co L,Pro Monthly,Pro,1,usd,month,49.00,active,2026-06-10 13:00,2026-06-10 13:00,2026-09-10 13:00,2026-10-10 13:00,,,,false,,

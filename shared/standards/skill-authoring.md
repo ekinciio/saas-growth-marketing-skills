@@ -8,9 +8,12 @@ sections marked "agents too". Pair this file with:
 - `routing-map.md` - which skill owns which intent, and the "Not for" lines
 - `browser-fallback.md` - what to do when a page is blocked, empty or needs visual judgment
 
-`tools/sync_shared.py` copies these standards into each skill as `skills/<name>/_shared/`
-so every installed skill stays self-contained. Edit the files in `shared/standards/`, never
-the `_shared/` copies.
+`tools/sync_shared.py` copies `report-contract.md`, `growth-context.md`,
+`browser-fallback.md`, `volatile-facts.md` and `shared/benchmarks/saas-benchmarks.json` into
+every skill folder as `skills/<name>/references/_shared/`, and the growthkit library into
+`skills/<name>/scripts/_growthkit/` for every skill that has a `scripts/` folder, so every
+installed skill stays self-contained. Edit the files in `shared/`, never the
+`references/_shared/` or `scripts/_growthkit/` copies.
 
 ## Contents
 
@@ -103,8 +106,8 @@ Every SKILL.md body uses these sections, in this order:
 2. `## When to use` - 3-6 bullets of situations, then `Not for:` bullets copied from
    `routing-map.md`, each naming the skill to use instead.
 3. `## Output contract` - 5-8 lines: the report path pattern, the JSON sidecar, the scoring
-   mode rule ("scores follow `_shared/report-contract.md`"), the report language, the 5-line
-   chat summary. This is the old "Output Rules (MANDATORY)" block, moved to the top.
+   mode rule ("scores follow `references/_shared/report-contract.md`"), the report language,
+   the 5-line chat summary. This is the old "Output Rules (MANDATORY)" block, moved to the top.
 4. `## Inputs` - what the skill needs, which `growth-context.md` fields matter most, how to get
    each input (read the context file, infer from the site, or ask), and what is optional.
 5. `## Workflow` - numbered steps with the exact commands (section 3). One subsection per
@@ -216,17 +219,18 @@ Rules that hold for every exit code:
 - Tie each reference to the step that needs it: "Read `references/rubric.md` before scoring."
   Do not list references only at the end with no trigger.
 - Keep references one level deep from SKILL.md. A reference must not send the model to a
-  third file. The one exception is the `_shared/` standards, which name each other; a SKILL.md
-  that needs two of them links both directly, so the model never has to follow a chain.
+  third file. The one exception is the `references/_shared/` standards, which name each
+  other; a SKILL.md that needs two of them links both directly, so the model never has to
+  follow a chain.
 - A reference longer than 100 lines starts with a `## Contents` list.
 - Each reference that holds facts that go stale carries a `Last verified: YYYY-MM` line near
   the top. Volatile facts (crawler tokens, store limits, API limits, Core Web Vitals) are
   listed in `volatile-facts.md`; verify any that are older than 6 months with WebSearch before
   stating them.
 - Shared standards are read from the synced copy:
-  `Read "${CLAUDE_SKILL_DIR}/_shared/report-contract.md" before writing the report.`
-- Benchmarks come from the shared benchmark file through the scripts, not from numbers typed
-  into SKILL.md.
+  `Read "${CLAUDE_SKILL_DIR}/references/_shared/report-contract.md" before writing the report.`
+- Benchmarks come from the shared benchmark file (`references/_shared/saas-benchmarks.json`)
+  through the scripts, not from numbers typed into SKILL.md.
 
 ## 6. "Not for" lines and descriptions
 

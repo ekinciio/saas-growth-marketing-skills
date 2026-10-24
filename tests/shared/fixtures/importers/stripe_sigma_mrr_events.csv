@@ -1,0 +1,8 @@
+event_timestamp,local_event_timestamp,currency,mrr_change,quantity_change,event_type,product_id,price_id,customer_id,subscription_id,subscription_item_id
+2026-01-05 10:00:00,2026-01-05 05:00:00,usd,4900,1,ACTIVE_START,prod_1,price_1,cus_X001,sub_X001,si_X001
+2026-01-15 09:00:00,2026-01-15 04:00:00,usd,0,0,TRIAL_START,prod_1,price_1,cus_Z001,sub_Z001,si_Z001
+2026-01-20 16:00:00,2026-01-20 11:00:00,usd,9900,1,ACTIVE_START,prod_2,price_2,cus_Y001,sub_Y001,si_Y001
+2026-02-01 12:00:00,2026-02-01 07:00:00,usd,2900,1,ACTIVE_START,prod_3,price_3,cus_Z001,sub_Z001,si_Z001
+2026-02-01 12:00:00,2026-02-01 07:00:00,jpy,5000,1,ACTIVE_START,prod_4,price_4,cus_J001,sub_J001,si_J001
+2026-03-02 08:00:00,2026-03-02 03:00:00,usd,5000,0,ACTIVE_UPGRADE,prod_2,price_2,cus_X001,sub_X001,si_X001
+2026-04-10 20:00:00,2026-04-10 15:00:00,usd,-9900,-1,ACTIVE_END,prod_2,price_2,cus_Y001,sub_Y001,si_Y001

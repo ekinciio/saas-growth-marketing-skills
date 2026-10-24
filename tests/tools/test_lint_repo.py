@@ -340,6 +340,20 @@ class FrontmatterTests(FakeRepo):
                  '\nThen `python3 "${CLAUDE_SKILL_DIR}/scripts/missing.py"`.\n')
         self.assertOneError("frontmatter", "skills/alpha/SKILL.md", "runs scripts/missing.py")
 
+    def test_body_file_references_must_exist(self):
+        base = GOOD_SKILL.format(name="alpha")
+        self.put("skills/alpha/references/rubric.md", "# Rubric\n")
+        self.put("skills/alpha/references/_shared/report-contract.md", "# Contract\n")
+        self.put("skills/alpha/SKILL.md", base + "\nRead `references/rubric.md` before scoring.\n"
+                 'Read "${CLAUDE_SKILL_DIR}/references/_shared/report-contract.md" first.\n')
+        self.assertEqual(self.errors("frontmatter"), [])
+        self.put("skills/alpha/SKILL.md", base + "\nRead `references/missing.md` when stuck.\n")
+        self.assertOneError("frontmatter", "skills/alpha/SKILL.md", "names references/missing.md")
+        self.put("skills/alpha/SKILL.md", base + '\nRead "${CLAUDE_SKILL_DIR}/_shared/report-contract.md".\n')
+        self.assertOneError("frontmatter", "skills/alpha/SKILL.md", "synced to references/_shared/")
+        self.put("skills/alpha/SKILL.md", base + "\nRead `references/_shared/volatile-facts.md`.\n")
+        self.assertOneError("frontmatter", "skills/alpha/SKILL.md", "run python3 tools/sync_shared.py")
+
     def test_skill_too_long(self):
         self.put("skills/alpha/SKILL.md", GOOD_SKILL.format(name="alpha") + "line\n" * 490)
         self.assertOneError("frontmatter", "skills/alpha/SKILL.md", "lines; keep it at 500 or less")

@@ -2,7 +2,7 @@
 
 Facts in this file change often: AI crawler tokens, store metadata limits, API access policies, Google Business Profile features, Core Web Vitals and the current Chrome version. Skills and agents must take these facts from here instead of hard-coding them, and must keep this file current.
 
-Benchmarks (NRR, churn, conversion rates and so on) live in `../benchmarks/saas-benchmarks.json`.
+Benchmarks (NRR, churn, conversion rates and so on) live in `saas-benchmarks.json` (`shared/benchmarks/` in this repo, `references/_shared/` in an installed skill).
 
 ## Rules
 

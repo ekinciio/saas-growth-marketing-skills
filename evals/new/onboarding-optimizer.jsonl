@@ -1,0 +1,20 @@
+{"skill": "onboarding-optimizer", "prompt": "New users create an account but most never finish setting up their first workspace. Here are screenshots of every screen after signup. What should we change?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Here is our PostHog export of onboarding events. Where do new accounts drop off before they connect their first data source?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Our in-app product tour has 7 steps and almost nobody finishes it. How should we guide new users instead?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Design the first-run experience for our new invoicing SaaS: what should someone see right after creating an account?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "What should the empty dashboard say the first time someone opens our analytics tool after signing up?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "We ask new users four survey questions right after signup. Are they worth it, and how should the answers change what they see next?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Write a getting-started checklist for our project management app that leads new users to their first shared board.", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "How long do our new users take to reach their first report? I have a Mixpanel CSV of events with user id, event name and timestamp.", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Trial users land in an empty app, click around and leave. Review our first-session experience; I can share screenshots of the screens behind login.", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Kayıt olan kullanıcılar ilk oturumda boş ekranda kalıyor; ilk kullanım deneyimini ve kurulum adımlarını nasıl yeniden tasarlarız?", "should_trigger": true}
+{"skill": "onboarding-optimizer", "prompt": "Our activation rate is 18% and free-to-paid is 3%. How do we compare with PLG benchmarks?", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Audit our signup form at https://app.example.com/signup: it asks for 8 fields and a credit card before the account exists.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Customers cancel after three months. Design a cancellation flow with save offers and a win-back email.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Create an onboarding plan for a new sales hire who joins next Monday.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Write the quick-start section of the README for our open-source API client.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Why isn't our homepage converting visitors into trials? https://www.example.com", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Run a GEO audit of our getting-started docs so ChatGPT and Perplexity cite them.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Score the AI citability of our onboarding guide page and rewrite the weak paragraphs.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "Build a React component for a multi-step onboarding wizard with a progress bar and unit tests.", "should_trigger": false}
+{"skill": "onboarding-optimizer", "prompt": "help", "should_trigger": false}

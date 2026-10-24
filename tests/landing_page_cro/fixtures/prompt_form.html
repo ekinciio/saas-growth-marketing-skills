@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><head><title>Build sites with AI</title></head><body>
+<!-- Regression fixture: framer.com's prompt box has 1 visible textarea and
+     inputs marked aria-hidden; the old script reported a 13-field form. -->
+<main><section><h1>Describe your site and the agent builds it</h1>
+<p>Type a prompt to start. Every page stays editable on a real design canvas.</p>
+<form><textarea name="prompt" placeholder="Describe your site" required></textarea>
+<input aria-hidden="true" name="website" tabindex="-1"><input aria-hidden="true" name="company">
+<input aria-hidden="true" name="message"><input aria-hidden="true" name="subject">
+<input aria-hidden="true" name="phone"><input aria-hidden="true" name="first"><input aria-hidden="true" name="last">
+<input aria-hidden="true" name="country"><input aria-hidden="true" name="role"><input aria-hidden="true" name="size">
+<input aria-hidden="true" name="budget"><input type="hidden" name="utm">
+<button type="submit">Start building</button></form></section></main></body></html>

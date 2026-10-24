@@ -1,0 +1,154 @@
+{
+  "version": "2026-10",
+  "note": "Section sets per page type for saas-landing-builder. House guidance written for this toolkit, not a benchmark: a slot is a job the page must do, and any of its labels fills it. references/page-types.md explains each set in prose and must list the same page type ids; references/section-labels.md defines every label.",
+  "levels": ["required", "recommended", "optional"],
+  "labels": {
+    "hero": "First block with the main headline (usually the H1), subheadline and primary CTA.",
+    "social_proof": "Logo bar, customer counts, ratings, awards or press, without a named person's quote.",
+    "problem": "Names the pain, cost or status quo the visitor lives with today.",
+    "solution": "Short answer to the problem: what the product is and the outcome it gives.",
+    "features": "Benefit-led capability blocks or a feature grid.",
+    "how_it_works": "Numbered steps from start to outcome, or what happens after the CTA.",
+    "product_demo": "Interactive demo, video walkthrough or click-through product tour.",
+    "testimonials": "Named quotes, case studies or customer stories tied to a person or company.",
+    "pricing": "Plans and prices, a plan comparison table, or a pricing teaser that links to the pricing page.",
+    "faq": "Questions and answers, usually an accordion, that handle objections.",
+    "integrations": "Tools the product connects with, the API, or the ecosystem it fits into.",
+    "security": "Security, compliance, privacy or reliability proof (for example SOC 2, GDPR, uptime).",
+    "comparison": "Side-by-side with alternatives or the old way of doing the job.",
+    "use_cases": "Blocks by role, team, industry or job to be done.",
+    "final_cta": "Closing block whose main job is the conversion ask, near the end of the page.",
+    "lead_form": "An inline form on the page (demo request, waitlist, contact).",
+    "footer": "Site footer, labelled from the chrome facts: legal links, navigation, contact.",
+    "other": "Anything else: changelog, blog or event teasers, careers, newsletter, announcements."
+  },
+  "page_types": {
+    "plg-homepage": {
+      "label": "PLG homepage (self-serve free trial or freemium)",
+      "conversion": "self-serve signup",
+      "nav": "full",
+      "slots": [
+        {"id": "hero", "level": "required", "any_of": ["hero"], "why": "States what the product does, for whom, and the first step."},
+        {"id": "proof", "level": "required", "any_of": ["social_proof", "testimonials"], "why": "A visitor needs evidence that teams like theirs use it."},
+        {"id": "product", "level": "required", "any_of": ["solution", "features", "product_demo", "how_it_works"], "why": "Shows what the product actually does."},
+        {"id": "final_cta", "level": "required", "any_of": ["final_cta"], "why": "Gives visitors who read to the end a clear next step."},
+        {"id": "named_proof", "level": "recommended", "any_of": ["testimonials"], "why": "Named, specific stories persuade more than logos alone."},
+        {"id": "see_it_work", "level": "recommended", "any_of": ["how_it_works", "product_demo"], "why": "Self-serve buyers want to see the product before they sign up."},
+        {"id": "objections", "level": "recommended", "any_of": ["faq", "security", "comparison"], "why": "Answers the doubts that stop a signup."},
+        {"id": "integrations", "level": "recommended", "any_of": ["integrations"], "why": "Shows the product fits the visitor's current tools."},
+        {"id": "footer", "level": "recommended", "any_of": ["footer"], "why": "Legal links, contact and navigation for visitors who look for them."},
+        {"id": "problem", "level": "optional", "any_of": ["problem"], "why": "Useful when visitors do not yet see the problem clearly."},
+        {"id": "use_cases", "level": "optional", "any_of": ["use_cases"], "why": "Helps when several roles or industries buy the product."},
+        {"id": "pricing", "level": "optional", "any_of": ["pricing"], "why": "A teaser helps price-sensitive visitors; a nav link to pricing is often enough."}
+      ]
+    },
+    "sales-led-homepage": {
+      "label": "Sales-led homepage (demo or contact-sales first)",
+      "conversion": "demo request",
+      "nav": "full",
+      "slots": [
+        {"id": "hero", "level": "required", "any_of": ["hero"], "why": "States the outcome for the buyer's company and the next step."},
+        {"id": "proof", "level": "required", "any_of": ["social_proof", "testimonials"], "why": "Buyers check who else trusts the vendor before they talk to sales."},
+        {"id": "product", "level": "required", "any_of": ["solution", "features", "product_demo"], "why": "Shows what the platform does."},
+        {"id": "next_step", "level": "required", "any_of": ["final_cta", "lead_form"], "why": "A clear demo or contact path at the end of the page."},
+        {"id": "named_proof", "level": "recommended", "any_of": ["testimonials"], "why": "Case studies with named companies and outcomes carry the sale."},
+        {"id": "use_cases", "level": "recommended", "any_of": ["use_cases"], "why": "Committees want to see their team or industry."},
+        {"id": "security", "level": "recommended", "any_of": ["security"], "why": "Security and compliance questions block enterprise deals."},
+        {"id": "integrations", "level": "recommended", "any_of": ["integrations"], "why": "Fit with the existing stack is a common blocker."},
+        {"id": "see_it_work", "level": "recommended", "any_of": ["how_it_works", "product_demo"], "why": "Lets a buyer see the product before booking a call."},
+        {"id": "footer", "level": "recommended", "any_of": ["footer"], "why": "Legal links, contact and navigation."},
+        {"id": "problem", "level": "optional", "any_of": ["problem"], "why": "Useful for a new category or an unaware audience."},
+        {"id": "objections", "level": "optional", "any_of": ["faq", "comparison"], "why": "Answers common questions before the call."},
+        {"id": "pricing", "level": "optional", "any_of": ["pricing"], "why": "A price anchor or 'starts at' can qualify leads."}
+      ]
+    },
+    "paid-signup-lp": {
+      "label": "Paid-traffic landing page to a self-serve signup",
+      "conversion": "self-serve signup",
+      "nav": "minimal",
+      "slots": [
+        {"id": "hero", "level": "required", "any_of": ["hero"], "why": "Must match the ad or keyword that brought the visitor."},
+        {"id": "proof", "level": "required", "any_of": ["social_proof", "testimonials"], "why": "Cold paid visitors need early evidence."},
+        {"id": "product", "level": "required", "any_of": ["solution", "features", "how_it_works", "product_demo"], "why": "Shows how the product delivers the ad's promise."},
+        {"id": "final_cta", "level": "required", "any_of": ["final_cta"], "why": "One repeated ask, the same as the hero CTA."},
+        {"id": "problem", "level": "recommended", "any_of": ["problem"], "why": "Paid visitors are often problem-aware, not product-aware."},
+        {"id": "named_proof", "level": "recommended", "any_of": ["testimonials"], "why": "A named story from a similar customer."},
+        {"id": "objections", "level": "recommended", "any_of": ["faq", "comparison", "security"], "why": "Handles the doubts that stop a cold visitor."},
+        {"id": "see_it_work", "level": "recommended", "any_of": ["how_it_works", "product_demo"], "why": "Lowers the perceived effort of starting."},
+        {"id": "pricing", "level": "optional", "any_of": ["pricing"], "why": "Useful when price is the main objection."},
+        {"id": "integrations", "level": "optional", "any_of": ["integrations"], "why": "Useful when the ad targets users of a specific tool."},
+        {"id": "footer", "level": "optional", "any_of": ["footer"], "why": "Keep it to legal links."}
+      ]
+    },
+    "demo-lp": {
+      "label": "Demo-request landing page (paid, outbound or event traffic)",
+      "conversion": "demo request",
+      "nav": "minimal",
+      "slots": [
+        {"id": "hero", "level": "required", "any_of": ["hero"], "why": "States the outcome and what the demo gives the visitor."},
+        {"id": "proof", "level": "required", "any_of": ["social_proof", "testimonials"], "why": "Buyers check peers before giving contact details."},
+        {"id": "product", "level": "required", "any_of": ["solution", "features", "product_demo"], "why": "Shows what they will see in the demo."},
+        {"id": "next_step", "level": "required", "any_of": ["lead_form", "final_cta"], "why": "The form or booking step itself."},
+        {"id": "named_proof", "level": "recommended", "any_of": ["testimonials"], "why": "A case study from the visitor's segment."},
+        {"id": "what_happens_next", "level": "recommended", "any_of": ["how_it_works"], "why": "Says what happens after the form: who calls, how long, what they get."},
+        {"id": "objections", "level": "recommended", "any_of": ["faq", "security"], "why": "Handles security and switching questions before the call."},
+        {"id": "problem", "level": "recommended", "any_of": ["problem"], "why": "Outbound and event traffic often needs the problem framed first."},
+        {"id": "integrations", "level": "optional", "any_of": ["integrations"], "why": "Useful when stack fit is a known blocker."},
+        {"id": "use_cases", "level": "optional", "any_of": ["use_cases"], "why": "Useful when the campaign targets one role or industry."},
+        {"id": "footer", "level": "optional", "any_of": ["footer"], "why": "Keep it to legal links."}
+      ]
+    },
+    "feature-page": {
+      "label": "Feature, use-case or integration page",
+      "conversion": "signup or demo, same as the main site",
+      "nav": "full",
+      "slots": [
+        {"id": "hero", "level": "required", "any_of": ["hero"], "why": "Names the feature or use case and its outcome."},
+        {"id": "product", "level": "required", "any_of": ["features", "solution", "how_it_works", "product_demo"], "why": "Shows how the feature works."},
+        {"id": "final_cta", "level": "required", "any_of": ["final_cta"], "why": "A next step for visitors convinced by the feature."},
+        {"id": "proof", "level": "recommended", "any_of": ["social_proof", "testimonials"], "why": "Proof that teams use this feature."},
+        {"id": "use_cases", "level": "recommended", "any_of": ["use_cases"], "why": "Concrete jobs the feature does."},
+        {"id": "see_it_work", "level": "recommended", "any_of": ["how_it_works", "product_demo"], "why": "Feature pages convert on seeing the workflow."},
+        {"id": "objections", "level": "recommended", "any_of": ["faq"], "why": "Feature-specific questions (limits, plans, setup)."},
+        {"id": "footer", "level": "recommended", "any_of": ["footer"], "why": "Site navigation and legal links."},
+        {"id": "problem", "level": "optional", "any_of": ["problem"], "why": "Useful when the feature solves a pain visitors search for."},
+        {"id": "integrations", "level": "optional", "any_of": ["integrations"], "why": "Required in practice on an integration page."},
+        {"id": "pricing", "level": "optional", "any_of": ["pricing"], "why": "Useful when the feature is a paid add-on or plan-gated."}
+      ]
+    },
+    "waitlist": {
+      "label": "Pre-launch waitlist or launch page",
+      "conversion": "waitlist signup",
+      "nav": "minimal",
+      "slots": [
+        {"id": "hero", "level": "required", "any_of": ["hero"], "why": "Says what is coming and for whom."},
+        {"id": "product", "level": "required", "any_of": ["solution", "features", "how_it_works", "product_demo"], "why": "Shows enough of the product to make joining worth it."},
+        {"id": "signup", "level": "required", "any_of": ["lead_form", "final_cta"], "why": "The waitlist form or signup link."},
+        {"id": "problem", "level": "recommended", "any_of": ["problem"], "why": "A clear problem makes an unknown product relevant."},
+        {"id": "credibility", "level": "recommended", "any_of": ["social_proof", "testimonials"], "why": "Only real proof: founder track record, design partners, beta users who agreed to be named."},
+        {"id": "objections", "level": "recommended", "any_of": ["faq"], "why": "Launch date, price expectations, data and access questions."},
+        {"id": "final_cta", "level": "recommended", "any_of": ["final_cta"], "why": "A second chance to join at the end."},
+        {"id": "see_it_work", "level": "optional", "any_of": ["how_it_works", "product_demo"], "why": "A short demo video if one exists."},
+        {"id": "use_cases", "level": "optional", "any_of": ["use_cases"], "why": "Useful when several audiences are invited."},
+        {"id": "pricing", "level": "optional", "any_of": ["pricing"], "why": "Only if pricing is decided; early-bird offers must be real."},
+        {"id": "footer", "level": "optional", "any_of": ["footer"], "why": "Privacy link for the form."}
+      ]
+    },
+    "pricing-page": {
+      "label": "Pricing page (layout and copy; price levels belong to pricing-analyzer)",
+      "conversion": "plan selection, signup or contact sales",
+      "nav": "full",
+      "slots": [
+        {"id": "plans", "level": "required", "any_of": ["pricing"], "why": "Plans, prices and what each plan includes."},
+        {"id": "objections", "level": "required", "any_of": ["faq"], "why": "Billing, limits, cancellation and plan-choice questions."},
+        {"id": "proof", "level": "recommended", "any_of": ["social_proof", "testimonials"], "why": "Reassurance at the moment of paying."},
+        {"id": "hero", "level": "recommended", "any_of": ["hero"], "why": "A short headline that frames the plans."},
+        {"id": "security", "level": "recommended", "any_of": ["security"], "why": "Data and compliance questions from larger buyers."},
+        {"id": "next_step", "level": "recommended", "any_of": ["final_cta", "lead_form"], "why": "A closing ask, often contact sales for larger plans."},
+        {"id": "footer", "level": "recommended", "any_of": ["footer"], "why": "Legal links, terms of service and refund policy."},
+        {"id": "comparison", "level": "optional", "any_of": ["comparison"], "why": "Useful when buyers compare against a named alternative."},
+        {"id": "integrations", "level": "optional", "any_of": ["integrations"], "why": "Useful when integrations are plan-gated."}
+      ]
+    }
+  }
+}

@@ -13,8 +13,11 @@ Checks (all run by default; pick some with --check NAME):
                characters and has no XML tags, description + when_to_use is
                at most 1,536 characters, metadata.version equals growthkit
                __version__, allowed-tools grants only the skill's own scripts,
-               and the file is at most 500 lines. House targets (500 and 900
-               characters) and a missing metadata.version are warnings.
+               the file is at most 500 lines, and every scripts/, references/ or
+               assets/ file the body names exists in the skill folder (shared
+               standards live in references/_shared/, written by
+               tools/sync_shared.py). House targets (500 and 900 characters)
+               and a missing metadata.version are warnings.
   lists        uninstall.sh SKILLS / AGENTS / TEMPLATES_LIST arrays and the
                install.sh skill menu match skills/, agents/ and templates/.
   python       Every .py file compiles (py_compile) and has nothing Python 3.9
@@ -85,6 +88,12 @@ ALLOWED_TOOL_RE = re.compile(
     r'^Bash\(python3 "\$\{CLAUDE_SKILL_DIR\}/scripts/([A-Za-z0-9_][A-Za-z0-9_./-]*\.py)"(?: \*)?\)$'
 )
 SCRIPT_REF_RE = re.compile(r"\$\{CLAUDE_SKILL_DIR\}/scripts/([A-Za-z0-9_][A-Za-z0-9_./-]*\.py)")
+# Files a SKILL.md tells the model to read, with or without ${CLAUDE_SKILL_DIR}/:
+# references/rubric.md, references/_shared/report-contract.md, assets/x.html.
+FILE_REF_RE = re.compile(
+    r"(?:\$\{CLAUDE_SKILL_DIR\}/|(?<![\w/.-]))"
+    r"((?:references|_shared|assets|templates)/[A-Za-z0-9_./-]*[A-Za-z0-9_-]\.(?:md|json|csv|txt|html))"
+)
 
 # ---------------------------------------------------------------------------
 # Dash characters, written as chr() codes so this file passes its own check
@@ -791,6 +800,17 @@ class Linter:
                     line = text[:body_offset].count("\n") + (_line_of(body, ref) or 1)
                     self.add(ERROR, "frontmatter", rel, line,
                              "SKILL.md runs scripts/%s, which does not exist" % ref)
+            for ref in sorted(set(FILE_REF_RE.findall(body))):
+                if os.path.isfile(self.abspath("skills/%s/%s" % (skill, ref))):
+                    continue
+                line = text[:body_offset].count("\n") + (_line_of(body, ref) or 1)
+                hint = ""
+                if ref.startswith("_shared/"):
+                    hint = "; shared standards are synced to references/_shared/"
+                elif ref.startswith("references/_shared/"):
+                    hint = "; run python3 tools/sync_shared.py"
+                self.add(ERROR, "frontmatter", rel, line,
+                         "SKILL.md names %s, which does not exist in skills/%s/%s" % (ref, skill, hint))
         if self._no_metadata:
             self.add(WARNING, "frontmatter", "skills", None,
                      "metadata.version (required by skill-authoring.md, equal to growthkit __version__ "

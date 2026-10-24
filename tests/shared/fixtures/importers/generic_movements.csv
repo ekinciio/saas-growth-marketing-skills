@@ -1,0 +1,5 @@
+date,customer_id,type,mrr_change,currency
+2026-01-10,acct-1,new,1000,USD
+2026-01-22,acct-2,new,500,USD
+2026-02-14,acct-1,expansion,250,USD
+2026-03-03,acct-2,churn,500,USD

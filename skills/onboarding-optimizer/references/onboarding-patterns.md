@@ -1,222 +1,258 @@
-# Onboarding Patterns Library
+# Onboarding Pattern Library
 
-Five proven onboarding patterns for SaaS products, with guidance on when to use each, when to avoid, real-world examples, and metrics to track.
+First-run patterns for SaaS products, with when to use each, when to avoid it, how to build it
+and what to measure. Use it to pick the pattern fit (a primary pattern plus one or two
+supporting ones) and to shape the bets. Product type keys match `references/rubric.md`.
 
----
+Last verified: 2026-10
 
-## 1. Product Tour
+Evidence rule for this file: company examples are described only as their own pages describe
+them, with the source and the date it was checked. Benchmark numbers are not typed here; get
+them with `onboarding_scorer.py benchmarks` (rows from `references/_shared/saas-benchmarks.json`).
 
-A guided walkthrough that highlights key features and UI elements using tooltips, spotlights, or coach marks. Typically triggered on first login and walks users through the main interface.
+## Contents
 
-### Best For
-- Products with a visual interface where users need to learn where things are
-- Low-to-medium complexity products with a clear primary workflow
-- Products where the UI is the main value driver (design tools, dashboards, editors)
-- B2C or prosumer SaaS with a broad user base
-- Products where users already understand the problem but need to learn the tool
-
-### Avoid When
-- The product requires significant data import or setup before it becomes useful
-- The interface is highly customizable and the tour would not match every user's layout
-- Users have very different roles and workflows (a single tour will not fit all)
-- The product is API-first or developer-focused with minimal UI
-
-### Examples
-- Canva: highlights key tools in the editor on first use
-- Figma: brief tour of the design canvas, layers panel, and collaboration features
-- Notion: walkthrough of page creation, blocks, and navigation
-
-### Implementation Tips
-- Keep tours under 5 steps; longer tours see steep drop-off after step 3
-- Allow users to skip and replay the tour from settings
-- Use progressive tooltips that appear contextually rather than all at once
-- Highlight the single most important action first
-- Do not block the UI - let users interact during the tour
-
-### Metrics to Track
-- Tour completion rate (target: >60%)
-- Tour skip rate (if >40%, the tour is too long or poorly timed)
-- Feature adoption rate for toured features vs. non-toured features
-- Time to first key action after tour completion
-- 7-day retention for users who completed tour vs. skipped
+1. Pattern selection by product type
+2. Value before signup
+3. AI starter workspace
+4. Personalization survey with routing
+5. Template gallery
+6. Sample data or demo workspace
+7. Educational empty states
+8. Activation checklist
+9. Just-in-time setup wizard
+10. Short, user-launched product tour
+11. Progressive disclosure
+12. Invite-led onboarding
+13. Reverse trial
+14. Behavior-triggered nudges
+15. Combining patterns
+16. Sources
 
 ---
 
-## 2. Progressive Disclosure
+## 1. Pattern selection by product type
 
-Reveals features and complexity gradually as users become more experienced. Starts with a simplified view and unlocks advanced capabilities over time based on usage signals.
+Start from the product type's row, then adjust to the evidence: a pattern the product already
+does well stays; the bet goes where the biggest drop or the lowest-scoring dimension is.
 
-### Best For
-- Complex products with many features that would overwhelm new users
-- Products serving both beginners and power users
-- Platforms where users grow into advanced functionality over weeks or months
-- Enterprise tools with deep feature sets
-- Products where different features matter at different lifecycle stages
+| Key | Primary pattern | Supporting patterns | Why |
+|---|---|---|---|
+| `visual` | Template gallery | Value before signup; short, user-launched tour | The blank canvas is the main obstacle; value can appear in session one. |
+| `content` | AI starter workspace | Template gallery; personalization survey | A first draft from the user's own prompt or a template beats an empty page. |
+| `data` | Sample data or demo workspace | Educational empty states; just-in-time setup wizard | Real value waits on a connection; sample data shows the payoff while it lands. |
+| `developer` | Just-in-time setup wizard | Sample data (test keys, sandbox); educational empty states | The first API call or event is the aha moment; copy-paste setup with the user's own keys. |
+| `collaboration` | Activation checklist | Invite-led onboarding; template gallery | Solo value first, then the invite at the moment work is shared. |
+| `communication` | Invite-led onboarding | Educational empty states; sample data | A chat or inbox has no value alone; seeded content bridges the wait for teammates. |
+| `business_ops` | Just-in-time setup wizard | Sample data; activation checklist | Imports and integrations are unavoidable; ask for each one only when it is needed. |
+| `ecommerce` | Activation checklist | Template gallery (store themes); sample data (demo products) | Launch needs several tasks (products, payments, domain); a checklist keeps them in order. |
+| `other` | Judge from the description | - | Pick by value horizon: first_session favors templates or AI drafts, after_connection favors sample data, after_team favors invites. |
 
-### Avoid When
-- The product is simple enough that all features should be visible from the start
-- Users are technical experts who expect full access immediately
-- The core value requires access to advanced features on day one
-- Hiding features would confuse users who saw them in marketing materials
+Cross-cutting patterns that fit any type when the evidence supports them: personalization survey
+with routing (several personas or jobs), reverse trial (a freemium product whose paid features
+drive retention), behavior-triggered nudges (users who stall between sessions).
 
-### Examples
-- Slack: starts with basic messaging, gradually introduces channels, apps, workflows, and admin features
-- HubSpot: surfaces basic CRM first, reveals marketing automation and reporting as usage grows
-- GitHub: basic repo and code features first, then actions, packages, and security features emerge with use
+## 2. Value before signup
 
-### Implementation Tips
-- Define 3-4 maturity levels (beginner, intermediate, advanced, power user)
-- Tie feature unlocks to meaningful usage milestones, not just time
-- Always give an option to "show all features" for power users who want full control
-- Use subtle UI cues (badges, gentle prompts) to introduce new capabilities
-- Track which features users discover organically vs. which need nudging
+Let visitors use the product, or a real slice of it, before creating an account; ask for the
+account when there is something to save or share.
 
-### Metrics to Track
-- Feature discovery rate by maturity level
-- Time between maturity level transitions
-- Activation rate at each level (what percentage of users reach level 2, 3, etc.)
-- Drop-off rate at each transition point
-- Power user conversion rate (percentage reaching the highest maturity level)
+- Best for: first_session products where value appears in minutes (editors, generators, AI
+  assistants, calculators).
+- Avoid when: value needs the user's data or a connection, or abuse and cost make anonymous
+  use unsafe (expensive AI generation without limits).
+- Build: keep the anonymous work and carry it into the new account; ask to sign up at the
+  moment of saving, sharing or exporting; state what the account adds.
+- Measure: share of anonymous sessions that create something, signup rate after creation,
+  activation of users who created before signup versus after.
+- Example: OpenAI announced on 2024-04-01 that ChatGPT can be used without signing up, with some
+  features (saving and sharing chats) reserved for accounts (source 1).
 
----
+## 3. AI starter workspace
 
-## 3. Checklist/Wizard
+The user describes the goal in plain words and the product builds an editable first version
+(workspace, document, app, dashboard).
 
-A structured, step-by-step setup process with a visible checklist or wizard interface. Users complete required setup tasks in a defined sequence with clear progress tracking.
+- Best for: content, collaboration and business tools where a structure (fields, pages,
+  workflows) is the blank-page problem.
+- Avoid when: output quality on a first prompt is unreliable, or the generated structure is
+  hard to edit or undo.
+- Build: one prompt box with 3-4 example prompts from the user's job; show the result as
+  editable, never final; keep "start blank" and "use a template" visible; cap cost per anonymous
+  or free user.
+- Measure: prompt submit rate, share of generated workspaces edited within the first session,
+  activation of AI-started versus template-started users.
+- Example: Airtable's product page says you can build apps with its Omni builder in plain
+  language and keep editing the result in Airtable (source 2, checked 2026-10).
 
-### Best For
-- Products that require meaningful configuration before delivering value
-- Products with a clear sequence of setup tasks (connect accounts, import data, invite team)
-- B2B products where the admin needs to set up the workspace for their team
-- Products where skipping setup would result in a broken or empty experience
-- Tools that integrate with external systems and need credentials or permissions
+## 4. Personalization survey with routing
 
-### Avoid When
-- The product can deliver value immediately without setup
-- There are fewer than 3 setup steps (a checklist feels heavy for simple flows)
-- Users are exploring the product casually and commitment to a wizard feels premature
-- The setup requires information users may not have handy (API keys, billing details)
+One to three questions at the start whose answers change what the user sees next: template,
+checklist, default view or sample data.
 
-### Examples
-- Stripe: step-by-step business verification, bank account connection, and API setup
-- Asana: create first project, invite team, set up first task, choose a view
-- Calendly: set availability, connect calendar, create first event type, share link
+- Best for: products with several personas or jobs (marketing versus engineering, solo versus
+  team).
+- Avoid when: one path fits most users, or the answers would only feed sales or marketing.
+- Build: every question maps to a routing rule (write the table); offer "Not sure" or skip;
+  infer what you can from signup data (email domain, invite context); let the user change the
+  choice later; avoid long free-text questions.
+- Measure: completion and skip rate per question, activation by answer, share of answers that
+  actually change the next screen.
 
-### Implementation Tips
-- Show progress clearly (3 of 5 steps complete, progress bar)
-- Allow saving progress and returning later
-- Mark truly required steps vs. recommended steps
-- Celebrate completion of each step with micro-interactions
-- Pre-fill data where possible (from signup info, OAuth, or defaults)
-- Provide a "skip for now" option with a persistent reminder to complete setup
+## 5. Template gallery
 
-### Metrics to Track
-- Wizard completion rate (target: >70%)
-- Drop-off rate by step (identify the step that loses the most users)
-- Time to complete full wizard
-- Activation rate for users who complete wizard vs. those who skip
-- Return rate for users who abandoned the wizard mid-way
+Pre-built starting points organized by use case.
 
----
+- Best for: visual, content, collaboration and e-commerce products where output varies by use.
+- Avoid when: the product has one fixed workflow, or templates with fake data would mislead
+  about the user's own results.
+- Build: a small set of strong templates grouped by job, matched to the survey answer when there
+  is one, with a visible "start blank"; templates should show off the core value, not every
+  feature.
+- Measure: template pick rate, edits to the template in session one, activation of template
+  users versus blank starts.
 
-## 4. Template Gallery
+## 6. Sample data or demo workspace
 
-Presents users with pre-built templates, examples, or starter content they can use immediately. Reduces the blank-canvas problem by giving users a starting point.
+The product opens with realistic example data so the user sees the payoff before connecting
+their own.
 
-### Best For
-- Creative tools where starting from scratch is intimidating (design, writing, websites)
-- Products where the output varies significantly by use case
-- Tools where templates demonstrate the range of what is possible
-- Products targeting non-technical users who benefit from examples
-- Platforms where showing the finished output inspires adoption
+- Best for: after_connection products (analytics, CRM, BI, monitoring, developer tools).
+- Avoid when: sample data would be confused with real data, or the product is useless until
+  the user's data arrives and sample data would only delay the connection.
+- Build: label sample data clearly, put "connect your data" next to every sample view, remove
+  the sample in one click, and keep the first real data view one step away.
+- Measure: share who explore sample data, then connect; time from signup to first real data.
+- Example: Metabase's setup guide says it ships with a Sample Database to explore before
+  connecting your own data (source 3, checked 2026-10).
 
-### Avoid When
-- The product has a single fixed workflow (templates would all look the same)
-- Templates would not accurately represent the user's real data or use case
-- Users are developers or technical users who prefer building from scratch
-- The product is data-driven and templates with fake data would be misleading
+## 7. Educational empty states
 
-### Examples
-- Webflow: website templates organized by industry and type
-- Airtable: base templates for project management, CRM, content calendar, and more
-- Mailchimp: email templates by campaign type (welcome, promotion, newsletter)
+Each empty screen says what belongs there, why it matters and the one action that fills it.
 
-### Implementation Tips
-- Organize templates by use case or industry, not by feature
-- Show previews that look realistic and professional
-- Include 5-10 high-quality templates rather than 50 mediocre ones
-- Make it easy to customize a template after selection
-- Feature templates that showcase your most powerful and differentiating features
-- Add a "start from scratch" option for users who prefer it
-- Track which templates are most popular and promote them prominently
+- Best for: every product, as the minimum layer; especially data-dependent sections that start
+  empty.
+- Avoid when: the screen can be pre-filled (templates or sample data are better).
+- Build: one headline about the outcome, one sentence, one primary CTA, an optional link to a
+  short guide; replace the state once the first item exists; never use an empty state to
+  advertise an upgrade.
+- Measure: CTA click rate per empty state, sections still empty after 7 days.
 
-### Metrics to Track
-- Template selection rate (percentage of new users who pick a template)
-- Most popular templates (indicates what use cases resonate)
-- Customization depth (how much users modify the template)
-- Activation rate for template users vs. blank-start users
-- Time to first meaningful output (template vs. no template)
+## 8. Activation checklist
 
----
+A short, persistent list of the actions that lead to the activation event.
 
-## 5. Empty State Education
+- Best for: products where activation needs several actions across sessions (collaboration,
+  e-commerce, business tools).
+- Avoid when: there are only one or two actions (just guide them directly), or the list would
+  be a tour of features rather than the activation path.
+- Build: about 3-5 items, the first already done (account created) or done in one click, each
+  item a link to the exact screen; the last item is the activation event; progress persists and
+  the list hides when done. Items can launch a short tour (see section 10).
+- Measure: item completion by position, checklist completion, activation of checklist users.
+  Context row: `checklist_completion.userpilot2025.b2b`.
 
-Uses empty states as teaching moments instead of showing blank screens. When a section has no data yet, the empty state explains what belongs there, why it matters, and how to populate it.
+## 9. Just-in-time setup wizard
 
-### Best For
-- Data-dependent products that start empty (analytics, CRM, project management)
-- Products where the value emerges after data is added
-- Products with multiple sections or modules that get populated over time
-- Tools where users need to understand what each section does before adding data
+Setup that cannot be avoided (connect, import, install), asked at the moment it is needed and
+done in the fewest screens.
 
-### Avoid When
-- The product can pre-populate with sample data instead
-- Empty states would appear only briefly before real data flows in
-- The product has a wizard that populates everything during setup
-- Users are migrating from a competitor and will import data immediately
+- Best for: developer, data, business-ops and e-commerce products.
+- Avoid when: setup could wait until after a first value moment.
+- Build: copy-paste snippets with the user's own keys filled in; a live "waiting for your first
+  event" check; "do this later" for anything optional; progress shown when there are 3 or more
+  steps; resume where the user left off.
+- Measure: completion by step, time per step, share who reach the first real data or call.
 
-### Examples
-- Mixpanel: empty dashboards explain what events to track and show example charts
-- Linear: empty project views explain how to create issues and organize work
-- Intercom: empty inbox shows what conversations will look like and how to set up the messenger
+## 10. Short, user-launched product tour
 
-### Implementation Tips
-- Every empty state should include: a clear explanation, a visual (illustration or example), and a single primary CTA
-- Use conversational, encouraging language ("You are all set up - create your first project to get started")
-- Show what the section will look like once populated (example screenshots or illustrations)
-- Include links to help docs or video tutorials for complex sections
-- Remove empty state education once the user has added their first item
-- Do not use empty states as advertising for premium features
+A few tooltips that point at the core action, started by the user from a checklist or a help
+menu rather than forced on first load.
 
-### Metrics to Track
-- Empty state CTA click rate (target: >30%)
-- Time from first seeing empty state to populating it
-- Sections that remain empty after 7 days (indicates confusion or low value perception)
-- Activation rate for users who interact with empty state CTAs vs. those who do not
-- Help article click-through rate from empty states
+- Best for: visual interfaces where users must find one key control.
+- Avoid when: the product is API-first, or the tour covers features instead of the first
+  action, or it plays over an empty screen with nothing to point at.
+- Build: few steps (completion falls off after four in Chameleon's 2024 data), each step asks
+  the user to do the action, not just read; always dismissible and replayable.
+- Measure: start rate, completion, the action rate after the tour. Context rows:
+  `tour_completion.chameleon2024.all`, `.self_launched`, `.five_step`.
 
----
+## 11. Progressive disclosure
 
-## Pattern Selection Guide
+A simple first interface that reveals advanced features as usage grows.
 
-| Product Type | Primary Pattern | Secondary Pattern |
-|---|---|---|
-| Visual/design tool | Product Tour | Template Gallery |
-| Data/analytics platform | Empty State Education | Progressive Disclosure |
-| Collaboration tool | Checklist/Wizard | Product Tour |
-| Developer tool/API | Progressive Disclosure | Empty State Education |
-| Business operations (CRM, ERP) | Checklist/Wizard | Progressive Disclosure |
-| Content/creative tool | Template Gallery | Product Tour |
-| Communication tool | Product Tour | Empty State Education |
-| E-commerce platform | Checklist/Wizard | Template Gallery |
+- Best for: deep products serving beginners and power users.
+- Avoid when: users are experts who expect everything at once, or the core value needs an
+  advanced feature on day one.
+- Build: tie reveals to usage milestones; keep a "show everything" option; announce new
+  capabilities in context, once.
+- Measure: feature discovery by cohort, time between milestones.
 
-## Combining Patterns
+## 12. Invite-led onboarding
 
-Most successful onboarding flows combine two or three patterns:
+The first user brings in teammates at the moment the work benefits from them; invitees land in
+context.
 
-- **Wizard + Product Tour:** Complete setup first, then tour the now-populated interface
-- **Template Gallery + Product Tour:** Pick a template, then get a brief tour of how to customize it
-- **Progressive Disclosure + Empty State Education:** Show a simplified view with educational empty states that guide feature discovery
-- **Checklist + Empty State Education:** Use a checklist for required setup, empty states for optional sections
+- Best for: collaboration and communication products (after_team value horizon).
+- Avoid when: the product is single-player, or the invite is demanded before the user has
+  anything to share.
+- Build: offer the invite next to a result worth sharing; preview what the invitee sees; send
+  invitees straight to the shared item with their own short first run; remind the inviter when
+  an invite is pending.
+- Measure: invites sent per activated account, invite acceptance, activation of invited users.
 
-Avoid combining more than three patterns - it creates a disjointed experience. Choose one primary pattern and one or two supporting patterns.
+## 13. Reverse trial
+
+New users start with the paid features for a limited time, then choose to buy or drop to a
+free plan that keeps their work.
+
+- Best for: freemium products whose paid features drive retention and which already have a
+  working free plan.
+- Avoid when: there is no viable free plan, or paid features need setup that will not happen
+  inside the trial window.
+- Build: show which features are paid while the user uses them; show days left; at the end,
+  keep the work and downgrade rather than lock out.
+- Measure: trial-to-paid, free-plan retention after the downgrade, paid-feature usage in the
+  trial. Size any change with the `trial` and `plan` commands.
+- Source: Kyle Poyar's Growth Unhinged guide defines the model and describes Airtable as an
+  early adopter (source 4, 2022).
+
+## 14. Behavior-triggered nudges
+
+Email and in-app messages sent because of what a new user did or did not do, with a link back to
+the exact step.
+
+- Best for: every product with a multi-session path to activation.
+- Avoid when: messages would fire on time alone, or continue after activation.
+- Build: one trigger per stall point on the activation path (set the delay from the user's own
+  time-to-activation p75 when the export gives it); one action per message; stop on activation;
+  hold out a small control group to measure.
+- Measure: return rate within 48 hours of the message, activation of messaged versus held-out
+  users.
+
+## 15. Combining patterns
+
+Pick one primary pattern and at most two supporting ones; more creates a disjointed first run.
+Common pairs:
+
+- Personalization survey -> template gallery or AI starter workspace (the answer picks the
+  starting point).
+- Sample data + just-in-time setup wizard (show the payoff, then connect).
+- Activation checklist + short, user-launched tours (each item opens its own short tour).
+- Value before signup + template gallery (start from a template without an account).
+- Invite-led onboarding + educational empty states (explain what teammates will add).
+
+## 16. Sources
+
+1. OpenAI, "Start using ChatGPT instantly", 2024-04-01:
+   https://openai.com/index/start-using-chatgpt-instantly/ (checked 2026-10-24)
+2. Airtable, "Omni: the expert app builder for every business":
+   https://www.airtable.com/platform/app-building (checked 2026-10-24)
+3. Metabase documentation, "Setting up Metabase" (Sample Database):
+   https://www.metabase.com/docs/latest/configuring-metabase/setting-up-metabase (checked 2026-10-24)
+4. Kyle Poyar, "Your guide to reverse trials", Growth Unhinged, 2022:
+   https://www.growthunhinged.com/p/your-guide-to-reverse-trials (checked 2026-10-24)
+5. Chameleon Benchmark Report 2024 (tour completion; data 2023):
+   https://www.chameleon.io/benchmark-report-24 (rows in the shared benchmark file)
+6. Userpilot, SaaS Product Metrics Benchmark Report 2025 (checklist completion, activation, time
+   to value): https://userpilot.com/saas-product-metrics/ (rows in the shared benchmark file)

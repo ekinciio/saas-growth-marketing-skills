@@ -1,181 +1,113 @@
-# PLG Metrics Reference
+# PLG Metric Definitions
 
-Definitions, measurement guidance, and optimization strategies for Product-Led Growth metrics using the AARRR framework.
+Last verified: 2026-10
 
-## AARRR Framework (Pirate Metrics)
+How each funnel number is defined and measured, so the user's figure and the benchmark
+describe the same thing. No benchmark values here: they come from
+`references/_shared/saas-benchmarks.json` through the scripts.
 
-The AARRR framework organizes growth metrics into five sequential stages. Each stage feeds into the next, and a leak at any stage limits overall growth.
+## Contents
 
-### 1. Acquisition
+1. The funnel the skill models
+2. Definitions and the questions to ask
+3. Cohort rates versus period ratios
+4. Activation and the aha moment
+5. Retention curves and the flattening signal
+6. Trial and free-offer motions
+7. Sources
 
-**Definition:** How users discover and sign up for your product.
+---
 
-**Key Metrics:**
-- **Signup volume** - Total new signups per period
-- **Customer Acquisition Cost (CAC)** - Total spend to acquire one customer
-- **Channel breakdown** - Signups by source (organic, paid, referral, direct)
-- **Signup completion rate** - Percentage of users who start and finish registration
+## 1. The funnel the skill models
 
-**Measurement Notes:**
-- Track CAC per channel to identify the most efficient acquisition sources
-- Separate organic vs. paid acquisition to understand true unit economics
-- Monitor signup abandonment at each step of the registration flow
+```
+visitors --visitor-to-signup--> signups --activation--> activated --free-to-paid--> paying
+paying customers --monthly logo churn / NRR--> revenue kept and expanded
+```
 
-### 2. Activation
+AARRR (acquisition, activation, retention, revenue, referral) is still a useful checklist, but
+the skill ranks stages by money: the impact model asks what each stage is worth if it reached
+its segment's benchmark. Referral is treated as a loop (`references/growth-loops.md`), not as
+a funnel stage.
 
-**Definition:** The moment a new user experiences the core value of your product for the first time.
+## 2. Definitions and the questions to ask
 
-**Key Metrics:**
-- **Signup-to-Active rate** - Percentage of signups who reach "activated" status
-- **Time-to-Value (TTV)** - Duration from signup to first value experience
-- **Aha moment completion** - Percentage of users who reach the key activation event
-- **Onboarding completion rate** - Percentage of users who finish the setup flow
+| Metric | Definition | Ask before comparing |
+|---|---|---|
+| Visitor-to-signup | New accounts / unique visitors in the same period | Which visitors (all pages or the marketing site), which period, bots filtered? |
+| Activation rate | Signups who reach the activation event within N days / signups of that cohort | What event, within how many days? Cohorts younger than N days excluded? |
+| Time to value | Time from signup to the activation event (median, plus the spread) | Same event as activation? Median or average? |
+| Free-to-paid | Signups (or trial starts) that start paying within a window / that cohort | Freemium or trial? Card required? Window (Lenny/Poyar use 6 months)? |
+| Monthly logo churn | Customers lost in the month / paying customers at the start of the month | Customers or revenue? Monthly or annual? Excludes customers who joined that month? |
+| GRR (12 months) | Revenue kept from a cohort after 12 months, without expansion | Cohort-based or one month annualized? |
+| NRR (12 months) | Revenue from the same cohort after 12 months, including expansion | Same as GRR; NRR can never be below GRR for the same cohort |
+| Month-1 / week-N user retention | Share of a signup cohort active in month 1 or week N | What counts as active? |
+| CAC payback | Months of gross-margin-adjusted revenue to recover the cost of acquiring a customer | Blended or paid only? Gross margin included? |
 
-**Measurement Notes:**
-- Define your "aha moment" precisely (e.g., "created first project and invited a teammate")
-- Track TTV in hours, not just days - the faster, the better
-- Segment activation rates by signup source to identify quality differences
+Units the script expects: rates in percent, time to value with a unit ("36 hours"), payback in
+months, NRR and GRR as 12-month percentages (a ratio such as 1.12 is accepted with a warning).
 
-### 3. Retention
+## 3. Cohort rates versus period ratios
 
-**Definition:** Whether users continue to come back and use the product over time.
+"95 paid this month / 2,100 signups this month" is a period ratio, not a conversion rate: this
+month's payers signed up in earlier months. It is close to the cohort rate only when signups
+are steady and the window is short. The facts mark rates computed from `funnel_counts` this
+way and the report should too. A cohort rate (signups of March, converted within 6 months)
+needs an export with dates; the `import` command computes it and excludes cohorts younger than
+the window (`excluded_too_recent`), which a dashboard often does not.
 
-**Key Metrics:**
-- **Monthly churn rate** - Percentage of customers who cancel per month
-- **DAU/MAU ratio** - Daily active users divided by monthly active users (stickiness)
-- **Week 1 / Week 4 / Week 12 retention** - Cohort retention at key milestones
-- **Feature retention** - Which features keep users engaged long-term
+## 4. Activation and the aha moment
 
-**Measurement Notes:**
-- Churn is the silent killer of PLG businesses - even small improvements compound
-- Track retention curves by cohort to see if product improvements help newer users
-- A DAU/MAU ratio above 25% indicates strong daily engagement
-- Feature-level retention reveals what drives long-term stickiness
+- The activation event should be the earliest action that predicts retention, not the end of
+  the onboarding checklist. Find it by comparing what retained and churned users did in their
+  first days (an event-log export with `import` gives the counts; the choice is a judgment).
+- One product's activation rate is only comparable with another's when both use a similar
+  event and window. That is why the facts lower confidence when the definition is missing.
+- Time to value is a distribution. A median of one day with a long tail of users who take two
+  weeks is a different problem (a segment that cannot get set up) from a uniform two days.
+  The import reports p25, median, p75, p90 and the share activated within one hour, one day
+  and seven days.
+- Designing the steps that lead to the event is onboarding-optimizer's job; this skill sizes
+  the gap and the value of closing it.
 
-### 4. Revenue
+## 5. Retention curves and the flattening signal
 
-**Definition:** How effectively the product converts free users to paid and expands revenue from existing customers.
+- Plot the share of each signup cohort still active in week 1, 2, 3 ... A curve that levels
+  off at a non-zero share means a core group keeps getting value; a curve that keeps sliding
+  toward zero means the product has not found its retained use case yet, and more acquisition
+  mostly buys churn.
+- The `import` command averages cohorts (weighted by size), reports weeks 1, 4 and 12, and
+  runs a flattening check: the last observed week against the week four periods earlier,
+  "flattening" when the curve lost 10% or less of the users still active (a tool convention,
+  stated in the output, not an industry threshold). Few cohorts reaching the tail lowers
+  confidence; the output says so.
+- Compare newer cohorts with older ones before calling a trend: a better curve for recent
+  cohorts is the clearest sign that product changes work.
+- Revenue retention (GRR, NRR) and usage retention answer different questions: a team can
+  keep paying for a product few people use, until renewal.
 
-**Key Metrics:**
-- **Free-to-Paid conversion rate** - Percentage of free users who become paying customers
-- **Net Revenue Retention (NRR)** - Revenue retained from existing customers including expansion and contraction
-- **Average Revenue Per User (ARPU)** - Total revenue divided by total customers
-- **Payback period** - Months to recover the cost of acquiring a customer
-- **Expansion revenue percentage** - Revenue from upsells, cross-sells, and seat additions
+## 6. Trial and free-offer motions
 
-**Measurement Notes:**
-- NRR above 100% means you grow even without new customers
-- Track conversion triggers - what actions correlate with upgrade decisions
-- Monitor payback period by cohort and channel
-- Expansion revenue is the hallmark of great PLG companies
+| Motion | What the user gets | Typical trade-off |
+|---|---|---|
+| Freemium (self-serve or sales-assisted) | A free plan with limits, no time limit | Many signups, low conversion; upgrade triggers are usage limits and team features |
+| Trial without card (opt-in) | Paid features for a fixed time, no payment details | More trial starts than with a card, lower trial-to-paid |
+| Trial with card (opt-out) | Paid features for a fixed time, payment details at signup | Fewer trial starts, much higher trial-to-paid; compare paying customers per 1,000 visitors, not the conversion rate alone |
+| Reverse trial | Paid features for a time, then a free plan instead of a lockout | Elena Verna describes it as a way to keep trial-style conversion while users stay in the product on the free plan |
 
-### 5. Referral
+Because these motions convert so differently, the skill refuses to compare a rate with a
+benchmark of another motion. The card decision itself is best judged on paying customers per
+1,000 visitors from the user's own rates, before and after.
 
-**Definition:** Whether existing users bring in new users through word-of-mouth, sharing, or built-in viral mechanics.
+## 7. Sources
 
-**Key Metrics:**
-- **Viral coefficient (K-factor)** - Average number of new users each existing user brings in
-- **Referral program conversion rate** - Percentage of referred visitors who sign up
-- **Net Promoter Score (NPS)** - Likelihood of users recommending the product (-100 to 100)
-- **Organic vs. paid ratio** - Proportion of growth from organic channels
-
-**Measurement Notes:**
-- A viral coefficient above 1.0 means exponential growth (rare but powerful)
-- Track referral quality - do referred users activate and retain better?
-- NPS above 50 is considered excellent for SaaS
-- Built-in virality (collaboration, sharing) is more sustainable than referral programs
-
-## Time-to-Value (TTV) Deep Dive
-
-Time-to-Value is one of the most critical PLG metrics. It measures how quickly a new user goes from signup to experiencing the product's core benefit.
-
-### Types of TTV
-
-| Type | Definition | Example |
-|------|-----------|---------|
-| **Time to Basic Value** | First useful interaction | User creates first document |
-| **Time to Aha Moment** | User understands the product's unique advantage | User sees the collaboration feature working in real-time |
-| **Time to Habit** | Product becomes part of the user's workflow | User logs in daily for a week |
-
-### TTV Optimization Strategies
-
-1. **Reduce signup friction** - Minimize required fields, offer social login, delay email verification
-2. **Progressive onboarding** - Show value first, ask for setup details later
-3. **Pre-populated templates** - Give users something to work with immediately
-4. **Guided first-run experience** - Walk users to the aha moment step by step
-5. **Skip optional setup** - Let users explore before completing their profile
-6. **Contextual help** - Provide in-app guidance at decision points, not upfront tutorials
-
-### TTV Benchmarks
-
-- **Best in class:** Under 5 minutes to basic value
-- **Good:** Under 1 day to aha moment
-- **Average:** 1-3 days to aha moment
-- **Needs improvement:** More than 7 days to aha moment
-
-## Aha Moment Identification
-
-The aha moment is the specific action or experience that makes a user understand the product's value. Identifying it is critical for PLG optimization.
-
-### How to Find Your Aha Moment
-
-1. **Cohort analysis** - Compare actions taken by retained users vs. churned users in their first week
-2. **Correlation analysis** - Find which early actions correlate most strongly with long-term retention
-3. **User interviews** - Ask retained users "When did you realize this product was valuable?"
-4. **Event sequence analysis** - Map the most common paths of users who convert to paid
-
-### Examples of Aha Moments in SaaS
-
-| Product Type | Likely Aha Moment |
-|-------------|-------------------|
-| Project management | Created a project and moved the first task to done |
-| Communication tool | Had a real-time conversation with a teammate |
-| Analytics platform | Saw the first dashboard with their own data |
-| Design tool | Created and shared a design with a collaborator |
-| CRM | Imported contacts and logged the first deal |
-| Developer tool | Deployed code using the platform for the first time |
-
-## Activation Rate Benchmarks by Product Type
-
-| Product Type | Median Activation Rate | Top Quartile |
-|-------------|----------------------|-------------|
-| Collaboration/productivity | 30% | 45%+ |
-| Developer tools | 20% | 35%+ |
-| Marketing/analytics | 25% | 40%+ |
-| Design tools | 22% | 38%+ |
-| Communication platforms | 35% | 50%+ |
-| CRM/sales tools | 18% | 30%+ |
-
-## Free-to-Paid Conversion Benchmarks
-
-| Model | Median Conversion | Top Quartile |
-|-------|------------------|-------------|
-| Freemium (unlimited free tier) | 2-3% | 5%+ |
-| Free trial (14-day, no card) | 8-12% | 18%+ |
-| Free trial (14-day, card required) | 45-50% | 55%+ |
-| Reverse trial (start paid, downgrade to free) | 15-20% | 30%+ |
-| Usage-based free tier | 4-6% | 10%+ |
-
-Note: no-card / opt-in trial conversion is strongly bimodal - products cluster either well below the ~8-12% median or well above it (20%+), depending on trial design and buyer intent, so compare against products with a similar motion. Sources: ChartMogul SaaS Conversion Report, ProductLed, Benchmarkit 2025.
-
-## Expansion Revenue Patterns
-
-Expansion revenue comes from existing customers paying more over time. Strong PLG companies derive 30-50% of new ARR from expansion.
-
-### Expansion Levers
-
-1. **Seat-based expansion** - More team members adopt the product
-2. **Usage-based expansion** - Customers use more of a metered resource
-3. **Feature-based upsell** - Customers upgrade to access advanced features
-4. **Cross-sell** - Customers adopt additional product modules
-5. **Plan upgrade** - Customers move from a lower tier to a higher tier
-
-### Expansion Revenue Benchmarks
-
-| Stage | Expansion as % of New ARR |
-|-------|--------------------------|
-| Early stage (pre-$5M ARR) | 10-20% |
-| Growth stage ($5M-$50M ARR) | 25-35% |
-| Scale stage ($50M+ ARR) | 35-50% |
-
-Companies with NRR above 120% are now considered best-in-class (not merely top-quartile) among PLG performers and can sustain growth even with moderate new customer acquisition.
+- Lenny Rachitsky and Yuriy Timen, "What is a good activation rate?" (2022):
+  https://www.lennysnewsletter.com/p/what-is-a-good-activation-rate
+- Lenny Rachitsky and Kyle Poyar, "What is a good free-to-paid conversion rate?" (2023):
+  https://www.lennysnewsletter.com/p/what-is-a-good-free-to-paid-conversion
+- Lenny Rachitsky, "What is good retention?" (2020-06-09; denominators by business type, a
+  flat curve that supports scalable acquisition can carry a business):
+  https://www.lennysnewsletter.com/p/what-is-good-retention-issue-29
+- Elena Verna, "Trial or freemium? Get the best of both with a reverse trial", Amplitude
+  (first published 2022-09-07, updated 2025-06-03): https://amplitude.com/blog/reverse-trial
+- Benchmark definitions and windows: `references/_shared/saas-benchmarks.json`

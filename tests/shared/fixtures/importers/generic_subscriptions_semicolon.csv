@@ -1,0 +1,4 @@
+customer_id;plan;mrr;currency;start_date;end_date;status;cancel_reason
+c1;Basic;19,90;EUR;01/02/2026;;active;
+c2;Plus;49,00;EUR;15/01/2026;20/04/2026;canceled;too_expensive
+c3;Plus;49,00;EUR;03/03/2026;;active;

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>DRAFT - {{Product}}: {{page type}} prototype</title>
+<!--
+  saas-landing-builder prototype skeleton.
+  Copy this file, keep only the sections in the blueprint (in blueprint order),
+  replace every {{...}} with the blueprint copy, and keep proof the user did not
+  supply as visible [PLACEHOLDER: ...] slots. One file, no external requests,
+  works without JavaScript. Each section keeps data-section="<label>" so
+  blueprint_tools.py lint can list the section order.
+-->
+<style>
+  :root {
+    --brand: #3b5bdb;          /* {{brand color, or keep}} */
+    --brand-ink: #ffffff;
+    --ink: #1b1f24;
+    --muted: #4d5560;
+    --line: #d9dde3;
+    --bg: #ffffff;
+    --bg-alt: #f5f7fa;
+    --ph: #b42318;
+    --radius: 12px;
+    --max: 1120px;
+    --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: var(--font); color: var(--ink); background: var(--bg); line-height: 1.55; font-size: 1.0625rem; }
+  img { max-width: 100%; display: block; }
+  a { color: var(--brand); }
+  a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible {
+    outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 6px;
+  }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+  .draft-banner {
+    position: sticky; top: 0; z-index: 10; background: #fff4e5; color: #5c3b00;
+    border-bottom: 2px solid #f0a020; font-size: .875rem; padding: 8px 20px; text-align: center;
+  }
+  .ph {
+    display: inline-block; border: 2px dashed var(--ph); color: var(--ph); background: #fff5f5;
+    border-radius: 8px; padding: 2px 8px; font-size: .9em; font-weight: 600;
+  }
+  .ph-box {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    border: 2px dashed var(--ph); color: var(--ph); background: #fff5f5; border-radius: var(--radius);
+    min-height: 220px; padding: 16px; font-weight: 600;
+  }
+  header.site { border-bottom: 1px solid var(--line); }
+  header.site .wrap { display: flex; align-items: center; justify-content: space-between; min-height: 64px; gap: 16px; }
+  .logo { font-weight: 800; font-size: 1.15rem; color: var(--ink); text-decoration: none; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 48px;
+    padding: 12px 22px; border-radius: 10px; font-weight: 700; text-decoration: none; border: 2px solid var(--brand);
+  }
+  .btn-primary { background: var(--brand); color: var(--brand-ink); }
+  .btn-secondary { background: transparent; color: var(--brand); }
+  section { padding: 72px 0; }
+  section.alt { background: var(--bg-alt); }
+  h1 { font-size: clamp(2rem, 4.5vw, 3.25rem); line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; }
+  h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); line-height: 1.2; margin: 0 0 12px; letter-spacing: -0.01em; }
+  h3 { font-size: 1.15rem; margin: 0 0 8px; }
+  .lead { font-size: 1.2rem; color: var(--muted); max-width: 46rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; font-weight: 700; color: var(--brand); margin: 0 0 8px; }
+  .hero-grid { display: grid; gap: 40px; align-items: center; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0 8px; }
+  .reassure { color: var(--muted); font-size: .95rem; margin: 0; }
+  .logos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+  .logos .ph-box { min-height: 56px; font-size: .8rem; }
+  .grid { display: grid; gap: 20px; grid-template-columns: 1fr; margin-top: 28px; }
+  .card { border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--bg); }
+  ol.steps { list-style: none; counter-reset: step; padding: 0; display: grid; gap: 20px; margin-top: 28px; }
+  ol.steps li { counter-increment: step; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--bg); }
+  ol.steps li::before { content: counter(step); display: inline-flex; width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center; background: var(--brand); color: var(--brand-ink); font-weight: 800; margin-bottom: 12px; }
+  figure.quote { margin: 0; }
+  figure.quote blockquote { margin: 0 0 12px; font-size: 1.1rem; }
+  .plan { display: flex; flex-direction: column; gap: 12px; }
+  .plan.featured { border: 2px solid var(--brand); }
+  details { border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; background: var(--bg); }
+  details + details { margin-top: 12px; }
+  summary { cursor: pointer; font-weight: 700; min-height: 24px; }
+  .final { text-align: center; }
+  .final .cta-row { justify-content: center; }
+  footer.site { border-top: 1px solid var(--line); padding: 32px 0; font-size: .9rem; color: var(--muted); }
+  footer.site .wrap { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
+  form.inline { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+  form.inline label { position: absolute; left: -9999px; }
+  form.inline input { min-height: 48px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 1rem; flex: 1 1 240px; }
+  @media (min-width: 720px) {
+    .hero-grid { grid-template-columns: 1.1fr 1fr; }
+    .logos { grid-template-columns: repeat(6, 1fr); }
+    .grid { grid-template-columns: repeat(3, 1fr); }
+    ol.steps { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<div class="draft-banner" role="note"><strong>DRAFT</strong> prototype from saas-landing-builder, {{YYYY-MM-DD}}. Red dashed boxes are proof still to collect. Not for publishing as is.</div>
+
+<!-- Navigation: full site nav for homepages, logo plus one CTA for paid, demo and waitlist pages. -->
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="#top">{{Product}}</a>
+    <a class="btn btn-secondary" href="#get-started">{{Primary CTA}}</a>
+  </div>
+</header>
+
+<main id="top">
+
+<section data-section="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">{{Category or audience}}</p>
+      <h1 id="hero-title">{{Headline: outcome for the ICP}}</h1>
+      <p class="lead">{{Subheadline: what it is, for whom, how it differs from the main alternative}}</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#get-started">{{Primary CTA}}</a>
+        <a class="btn btn-secondary" href="#how-it-works">{{Secondary CTA}}</a>
+      </div>
+      <p class="reassure">{{Risk reducer that is true today, for example the real trial terms}}</p>
+    </div>
+    <div class="ph-box" role="img" aria-label="Product screenshot placeholder">[SCREENSHOT: product view that shows the headline's outcome]</div>
+  </div>
+</section>
+
+<section data-section="social_proof" class="alt" aria-label="Customers">
+  <div class="wrap">
+    <p class="reassure"><span class="ph">[METRIC: customer count or rating, with source]</span></p>
+    <div class="logos">
+      <div class="ph-box">[LOGO: customer 1, permission confirmed]</div>
+      <div class="ph-box">[LOGO: customer 2]</div>
+      <div class="ph-box">[LOGO: customer 3]</div>
+      <div class="ph-box">[LOGO: customer 4]</div>
+      <div class="ph-box">[LOGO: customer 5]</div>
+      <div class="ph-box">[LOGO: customer 6]</div>
+    </div>
+  </div>
+</section>
+
+<section data-section="problem" aria-labelledby="problem-title">
+  <div class="wrap">
+    <h2 id="problem-title">{{Problem headline in the customer's words}}</h2>
+    <p class="lead">{{Two or three sentences on the cost of the status quo, from voice-of-customer phrases}}</p>
+  </div>
+</section>
+
+<section data-section="features" class="alt" aria-labelledby="features-title">
+  <div class="wrap">
+    <h2 id="features-title">{{Section headline: the outcome the features add up to}}</h2>
+    <div class="grid">
+      <article class="card"><h3>{{Benefit 1}}</h3><p>{{How the product delivers it}}</p></article>
+      <article class="card"><h3>{{Benefit 2}}</h3><p>{{How the product delivers it}}</p></article>
+      <article class="card"><h3>{{Benefit 3}}</h3><p>{{How the product delivers it}}</p></article>
+    </div>
+  </div>
+</section>
+
+<section data-section="how_it_works" id="how-it-works" aria-labelledby="how-title">
+  <div class="wrap">
+    <h2 id="how-title">{{How it works headline}}</h2>
+    <ol class="steps">
+      <li><h3>{{Step 1: effortless start}}</h3><p>{{One sentence}}</p></li>
+      <li><h3>{{Step 2}}</h3><p>{{One sentence}}</p></li>
+      <li><h3>{{Step 3: the outcome}}</h3><p>{{One sentence}}</p></li>
+    </ol>
+  </div>
+</section>
+
+<section data-section="testimonials" class="alt" aria-labelledby="proof-title">
+  <div class="wrap">
+    <h2 id="proof-title">{{Proof headline}}</h2>
+    <div class="grid">
+      <figure class="quote card">
+        <blockquote><span class="ph">[TESTIMONIAL: real quote with a specific result]</span></blockquote>
+        <figcaption><span class="ph">[NAME, ROLE, COMPANY: with written permission]</span></figcaption>
+      </figure>
+      <figure class="quote card">
+        <blockquote><span class="ph">[TESTIMONIAL: second customer, different segment]</span></blockquote>
+        <figcaption><span class="ph">[NAME, ROLE, COMPANY]</span></figcaption>
+      </figure>
+      <figure class="quote card">
+        <blockquote><span class="ph">[CASE STUDY: before and after, measured by the customer]</span></blockquote>
+        <figcaption><span class="ph">[CASE STUDY: link]</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section data-section="pricing" aria-labelledby="pricing-title">
+  <div class="wrap">
+    <h2 id="pricing-title">{{Pricing headline}}</h2>
+    <div class="grid">
+      <article class="card plan"><h3>{{Plan 1}}</h3><p><span class="ph">[PRICE: from the price list]</span></p><p>{{Who it is for}}</p><a class="btn btn-secondary" href="#get-started">{{Plan CTA}}</a></article>
+      <article class="card plan featured"><h3>{{Plan 2}}</h3><p><span class="ph">[PRICE: from the price list]</span></p><p>{{Who it is for}}</p><a class="btn btn-primary" href="#get-started">{{Plan CTA}}</a></article>
+      <article class="card plan"><h3>{{Plan 3}}</h3><p><span class="ph">[PRICE: from the price list]</span></p><p>{{Who it is for}}</p><a class="btn btn-secondary" href="#get-started">{{Plan CTA}}</a></article>
+    </div>
+  </div>
+</section>
+
+<section data-section="faq" class="alt" aria-labelledby="faq-title">
+  <div class="wrap">
+    <h2 id="faq-title">{{FAQ headline}}</h2>
+    <details><summary>{{Objection 1 as the customer asks it}}</summary><p>{{Short, true answer}}</p></details>
+    <details><summary>{{Objection 2}}</summary><p>{{Short, true answer}}</p></details>
+    <details><summary>{{Objection 3}}</summary><p>{{Short, true answer}}</p></details>
+  </div>
+</section>
+
+<section data-section="integrations" aria-labelledby="int-title">
+  <div class="wrap">
+    <h2 id="int-title">{{Works with the tools you already use}}</h2>
+    <p class="lead">{{Integrations that exist today, named}}</p>
+  </div>
+</section>
+
+<section data-section="final_cta" class="alt final" id="get-started" aria-labelledby="final-title">
+  <div class="wrap">
+    <h2 id="final-title">{{Restate the outcome in one line}}</h2>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#top">{{Primary CTA}}</a>
+    </div>
+    <p class="reassure">{{The same true risk reducer as the hero}}</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site" data-section="footer">
+  <div class="wrap">
+    <span>{{Product}}</span>
+    <span><a href="#top">[LEGAL: privacy policy link]</a> &middot; <a href="#top">[LEGAL: terms link]</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,122 +1,126 @@
-# PLG SaaS Funnel Benchmarks
+# Funnel Benchmarks: How They Are Chosen
 
-Industry benchmark data for Product-Led Growth SaaS companies across all funnel stages.
+Last verified: 2026-10
 
-## Core PLG Metrics
+This file explains which benchmark the skill compares each funnel number with, and why. The
+numbers themselves live only in `references/_shared/saas-benchmarks.json` (synced from
+`shared/benchmarks/`); the `facts` and `benchmarks` commands print them with source, year,
+segment and confidence. Never type a benchmark number into a report from memory or from this
+file.
 
-| Metric | Bottom 25% | Median | Top 25% | Unit |
-|--------|-----------|--------|---------|------|
-| Signup-to-Active | <15% | 25% | >40% | % of signups |
-| Free-to-Paid | <2% | 5% | >10% | % of free users |
-| Monthly Churn | >8% | 5% | <3% | % of customers/mo |
-| Net Revenue Retention | <95% | 105% | >120% | % annual |
-| Time-to-Value | >7 days | 3 days | <1 day | days |
-| Payback Period | >24 mo | 16 mo | <6 mo | months |
+## Contents
 
-Payback median reflects 2025 actuals (~16 months, with 15-18 months typical; top quartile ≤6 months) per Benchmarkit 2025. NRR above 120% is now considered best-in-class rather than merely top-quartile (SaaS Capital, ChartMogul, Benchmarkit 2025).
+1. Choosing a row
+2. Motion: why free-to-paid has no single benchmark
+3. Metric by metric
+4. Known gaps (no verified benchmark)
+5. When sources disagree
+6. Sources
 
-## Acquisition Metrics
+---
 
-| Metric | Bottom 25% | Median | Top 25% | Notes |
-|--------|-----------|--------|---------|-------|
-| CAC (SMB) | >$500 | $200-300 | <$100 | PLG reduces CAC significantly |
-| CAC (Mid-market) | >$5,000 | $2,000-3,000 | <$1,000 | Hybrid PLG + sales |
-| Signup Completion Rate | <50% | 70% | >85% | From start to finish of registration |
-| Organic Traffic Share | <20% | 40% | >60% | % of signups from organic sources |
-| Website-to-Signup | <1% | 2-3% | >5% | Visitor to signup conversion |
+## 1. Choosing a row
 
-## Activation Metrics
+The script filters rows by metric and period, keeps only `verified: true` rows, and drops any
+row whose segment the user is not in. Among the rest it prefers, in this order (the order of
+the benchmark README):
 
-| Metric | Bottom 25% | Median | Top 25% | Notes |
-|--------|-----------|--------|---------|-------|
-| Signup-to-Active | <15% | 25% | >40% | Core activation metric |
-| Time-to-Value | >7 days | 3 days | <1 day | Faster is always better |
-| Onboarding Completion | <30% | 50% | >75% | % completing full setup flow |
-| Day 1 Return Rate | <20% | 35% | >50% | % returning within 24 hours |
-| Aha Moment Reach Rate | <10% | 25% | >45% | % reaching defined aha moment |
+1. ARR band or ACV band (inside the band beats partly overlapping). ARR comes from
+   `context.arr`, `context.arr_band` or MRR x 12; ACV from `context.acv` or ARPA x 12.
+2. Pricing model (seat or usage).
+3. Motion (freemium, trial with or without card, or plg / sales-led / hybrid).
+4. AI-native.
+5. Other cuts (B2B or B2C, traffic source, ARPA band, funding, contract term).
+6. Then the newer year, the higher row confidence, and rows with percentiles over single
+   values. Equal rows are taken in id order, so the choice is repeatable.
 
-### What Top Performers Do Differently (Activation)
-- Product delivers value within the first session, often within minutes
-- Onboarding is personalized based on use case or role
-- The aha moment requires 3 or fewer steps from signup
-- Users see their own data or content immediately (not demo data)
-- Help is contextual and appears when needed, not as a forced tutorial
+A row cut by something the user did not give (for example an ARPA band when ARPA is unknown)
+is not used. Panels that only set a floor (ChartMogul's "companies above $250K ARR") still
+apply when ARR is unknown. When nothing matches, the facts say why and list the nearest rows
+for context; that metric is not scored.
 
-## Retention Metrics
+The primary row sets the position and the target. Up to three alternatives follow, one per
+other source first, so a report can show both sides when sources disagree.
 
-| Metric | Bottom 25% | Median | Top 25% | Notes |
-|--------|-----------|--------|---------|-------|
-| Monthly Churn (SMB) | >8% | 5% | <3% | Logo churn rate |
-| Monthly Churn (Mid-market) | >5% | 3% | <1.5% | Logo churn rate |
-| Annual Churn | >40% | 25% | <15% | Annualized rate |
-| DAU/MAU Ratio | <10% | 20% | >30% | Stickiness indicator |
-| Week 1 Retention | <25% | 40% | >60% | Active in week 1 after signup |
-| Week 4 Retention | <10% | 20% | >35% | Active in week 4 after signup |
-| Week 12 Retention | <5% | 12% | >25% | Active in week 12 after signup |
+## 2. Motion: why free-to-paid has no single benchmark
 
-### What Top Performers Do Differently (Retention)
-- Product is integrated into daily workflows (not a "nice to have")
-- Regular engagement triggers (notifications, digests, activity feeds)
-- Continuous value delivery through new features and improvements
-- Re-engagement campaigns for users showing declining activity
-- Strong community or network effects that increase switching costs
+A card-required trial, a no-card trial and a freemium plan convert at rates several times
+apart, so comparing them with one number is the classic error (a card-required trial looks
+elite, a good freemium product looks average). The script only compares a free-to-paid or
+visitor-to-signup rate with rows for the same motion:
 
-## Revenue Metrics
+| context.motion | Free-to-paid rows used | Visitor-to-signup rows used |
+|---|---|---|
+| `freemium_self_serve` | Lenny/Poyar freemium self-serve, then First Page Sage freemium | First Page Sage and Lenny/Poyar freemium |
+| `freemium_sales_assist` | Lenny/Poyar freemium sales-assist, then First Page Sage freemium | as above |
+| `freemium` (sales assist unknown) | First Page Sage freemium, then both Lenny/Poyar freemium rows | as above |
+| `trial_no_card` | First Page Sage opt-in trial, then Lenny/Poyar free trial (card not split) | First Page Sage opt-in, Lenny/Poyar free trial |
+| `trial_card_required` | First Page Sage opt-out trial only | First Page Sage opt-out |
+| `trial` (card unknown), `reverse_trial`, `no_free_offer`, unknown | none: the rate is shown, not compared | none |
 
-| Metric | Bottom 25% | Median | Top 25% | Notes |
-|--------|-----------|--------|---------|-------|
-| Free-to-Paid | <2% | 5% | >10% | Overall conversion rate |
-| Trial-to-Paid (no card) | <8% | 8-12% | >20% | 14-day trial without card; bimodal (see note) |
-| Trial-to-Paid (card req.) | <30% | 45-50% | >55% | 14-day trial with card |
-| NRR | <95% | 105% | >120% | Net revenue retention; >120% is best-in-class |
-| Expansion Revenue | <10% | 25% | >40% | As % of new ARR |
-| ARPU Growth YoY | <5% | 15% | >30% | Annual ARPU increase |
-| Payback Period | >24 mo | 16 mo | <6 mo | CAC payback (2025 actuals ~16 mo) |
-| LTV/CAC Ratio | <2x | 3-4x | >6x | Lifetime value to CAC |
+Motion comes from `context.motion`, or from growth-context.md (`free_offer` plus
+`card_required`, and `gtm_motion` for freemium). The `pricing` command quotes the pricing page
+wording (free plan, trial length, "no credit card required", per-seat or usage pricing,
+contact sales) so the model can infer it; an inferred motion is an assumption in the report.
 
-Note: no-card / opt-in trial conversion is strongly bimodal - products cluster either well below the ~8-12% median or well above it (20%+), depending on onboarding quality, trial length, and buyer intent, so benchmark against products with a similar trial motion. Freemium conversion medians remain 2-3%. Sources: ChartMogul SaaS Conversion Report, ProductLed, Benchmarkit 2025.
+Windows matter too. Lenny/Poyar count conversions within 6 months of signup. First Page Sage
+does not state a window and counts a single paid month as a conversion, which overstates
+retained paying customers. Ask the user for their window and say which window each number
+uses.
 
-### What Top Performers Do Differently (Revenue)
-- Clear upgrade triggers tied to usage limits or team size
-- Pricing aligned with the value metric (what customers care about)
-- In-app upgrade prompts at moments of high engagement
-- Expansion revenue built into the product (seats, usage, features)
-- Annual plans incentivized but not forced
+## 3. Metric by metric
 
-## Referral Metrics
+| Metric | Row family | Notes |
+|---|---|---|
+| Visitor-to-signup | `visitor_to_signup.fps2025.*`, `visitor_to_signup.lenny2023.*` | Averages and an unnamed statistic; depends on which visitors are counted. Confidence is capped at low. |
+| Activation rate | `activation_rate.lenny2022.*`, `activation_rate.userpilot2025.b2b`, `activation_rate.userpilot2024.*` | Every product defines activation its own way; ask for the event and window. |
+| Time to value | `time_to_value.userpilot2025.b2b`, `time_to_value.userpilot2024.*` | Hours from signup to the activation event. The 2025 median label is inferred by the benchmark file (see its note). |
+| Free-to-paid | `free_to_paid.lenny2023.*` (rules of thumb: good and great bands), `trial_to_paid.fps2025.*` (averages) | Section 2. "Good" and "great" are rules of thumb, not percentiles. |
+| Monthly logo churn | `logo_churn.chartmogul2022.*` | Cut by ARPA (under $25 or over $500 a month) and ARR (under $300K, $1M-$3M); 2021-22 data, so confidence is low. No row for mid ARPA: the facts list the nearest rows. |
+| GRR | `grr.aleph2026.*`, `grr.saascap2025.*`, `grr.chartmogul2025.ai_native*` | 12-month. Aleph splits by GTM motion (PLG, hybrid, sales-led) and ACV. |
+| NRR | `nrr.aleph2026.*`, `nrr.saascap2025.*`, `nrr.chartmogul2025.*` | 12-month. Split by ARR, ACV, seat vs usage pricing, AI-native, funding and contract term. |
+| Month-1 user retention | `month_1_retention.userpilot2025.b2b` | Product usage retention, not revenue. |
+| CAC payback | `cac_payback.aleph2026.*`, `cac_payback.skok.rule` | Lower is better. Computed by subscription-metrics; here it is an input. |
 
-| Metric | Bottom 25% | Median | Top 25% | Notes |
-|--------|-----------|--------|---------|-------|
-| Viral Coefficient (K) | <0.1 | 0.3 | >0.7 | New users per existing user |
-| Referral Program Signup | <5% | 12% | >25% | Referred visitors who sign up |
-| NPS | <20 | 40 | >60 | Net Promoter Score |
-| Organic Share of Growth | <20% | 40% | >65% | Growth from non-paid channels |
-| Invite Acceptance Rate | <10% | 25% | >40% | Invited users who join |
+Monthly churn and annual retention are different periods. The facts convert monthly logo churn
+to its annual equivalent (`1 - (1 - c)^12`) and NRR or GRR to a monthly equivalent
+(`annual^(1/12)`) so they can be read side by side; the benchmark README holds the formulas.
 
-### What Top Performers Do Differently (Referral)
-- Virality is built into the core product (sharing, collaboration)
-- Referral rewards benefit both the referrer and the new user
-- The product generates shareable outputs (reports, designs, content)
-- Word-of-mouth is driven by genuine product satisfaction, not incentives
-- Community engagement creates organic advocacy
+## 4. Known gaps (no verified benchmark)
 
-## Benchmarks by Company Stage
+Say "no verified benchmark" for these, and judge them from the user's own data and trend:
 
-| Metric | Seed / Pre-PMF | Series A | Series B+ |
-|--------|---------------|----------|-----------|
-| MRR | <$50K | $50K-$500K | $500K+ |
-| MoM Growth | >15% | 10-15% | 8-12% |
-| Activation Rate | 15-25% | 25-35% | 35-45% |
-| Free-to-Paid | 2-4% | 4-7% | 7-12% |
-| Monthly Churn | 6-10% | 4-6% | 2-4% |
-| NRR | 90-100% | 100-110% | 110-130% |
-| Team Size per $1M ARR | 8-15 | 5-8 | 3-5 |
+- Week-1, week-4 and week-12 user retention. Use the flattening check of the imported curve.
+- Reverse-trial conversion.
+- Viral coefficient, invite acceptance, referral conversion, NPS.
+- DAU/MAU, onboarding completion, day-1 return, signup completion by stage.
+- Benchmarks by company stage (activation or churn "for a Series A company").
+- Monthly churn for ARPA between $25 and $500 a month.
 
-## How to Use These Benchmarks
+Older versions of this skill printed numbers for several of these. They had no verifiable
+source and were removed.
 
-1. **Identify your stage** - Benchmarks shift based on company maturity
-2. **Focus on RED metrics first** - The biggest leak has the most impact
-3. **Set targets for YELLOW-to-GREEN** - Incremental improvement compounds
-4. **Context matters** - Your specific vertical may have different norms
-5. **Track trends, not snapshots** - Monthly improvement direction matters more than absolute values
-6. **Benchmark against yourself** - Month-over-month improvement is the most relevant comparison
+## 5. When sources disagree
+
+- NRR: survey-based Aleph x Benchmarkit medians sit well above ChartMogul's billing-data panel,
+  which includes more small self-serve companies. Name both, say which one is primary for the
+  user's segment, and score on the primary.
+- Free-to-paid for freemium: Lenny/Poyar give rule-of-thumb bands with a 6-month window;
+  First Page Sage gives agency-sample averages. The impact model ranks leaks on the more
+  conservative of the two targets (the one closer to the user's current value).
+- Activation: Lenny/Timen (all SaaS, survey) and Userpilot (B2B SaaS, product data) differ;
+  activation definitions differ more than the samples do.
+
+## 6. Sources
+
+All rows, with exact URLs, sample notes and verification dates:
+`references/_shared/saas-benchmarks.json` (last verified 2026-10-24). Headline sources:
+
+- Aleph x Benchmarkit, 2026 SaaS & AI Performance Benchmarks (FY2025 data)
+- ChartMogul, "The AI churn wave" (December 2025) and "What is a good customer churn rate?"
+  (2022 data)
+- SaaS Capital retention benchmarks (2025, 2026)
+- Lenny Rachitsky and Kyle Poyar, "What is a good free-to-paid conversion rate?" (2023)
+- Lenny Rachitsky and Yuriy Timen, "What is a good activation rate?" (2022)
+- First Page Sage, SaaS free trial conversion rate benchmarks (2025)
+- Userpilot, SaaS Product Metrics Benchmark Report (2024, 2025)

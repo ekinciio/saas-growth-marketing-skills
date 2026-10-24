@@ -1,631 +1,434 @@
 #!/usr/bin/env python3
-"""
-Landing Page Structure Analyzer
+"""Ordered outline of a SaaS page's main-content blocks (saas-landing-builder).
 
-Analyzes SaaS landing pages against the 12-section anatomy framework.
-Detects which sections are present, evaluates section order, and provides
-recommendations for missing sections.
+A fact extractor for the review (rebuild plan) and pre-fill steps. It fetches
+a URL or reads a saved HTML file, drops hidden nodes and page chrome (nav,
+footer, cookie banners), and returns the main-content blocks in page order:
+heading, a 300-character excerpt, CTAs with href and intent, image counts
+(inline SVG included), list items, quote / accordion / form / table markers
+and claim candidates that need a source. It also reports the nav and footer
+facts the page-type checks need.
+
+There is no score and no order verdict: the model labels every block with
+references/section-labels.md, and blueprint_tools.py completeness counts the
+labels against the section set for the page type.
 
 Usage:
-    python page_structure_analyzer.py <landing_page_url_or_html_file>
+    python3 page_structure_analyzer.py https://example.com --json
+    python3 page_structure_analyzer.py saved.html --url https://example.com --json
+    python3 page_structure_analyzer.py example.com --json --out growth-reports/.cache/example-outline.json
 
-Example:
-    python page_structure_analyzer.py https://example.com
-    python page_structure_analyzer.py ./saved-page.html
+Exit codes (shared contract, _growthkit/cli.py):
+    0 ok   2 usage error   3 unreachable or blocked   4 partial (page cut at
+    the size limit)   5 nothing to analyze (JavaScript shell, empty page)
 """
 
 from __future__ import annotations
 
-import json
 import os
 import re
 import sys
-from dataclasses import dataclass, field, asdict
-from typing import Optional
-from urllib.parse import urlparse
+from html import escape
+from typing import Any, Dict, List, Optional, Set
 
-try:
-    import requests
-    from bs4 import BeautifulSoup
-except ImportError:
-    print("Required dependencies: requests, beautifulsoup4")
-    print("Install with: pip install requests beautifulsoup4")
-    sys.exit(1)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from _growthkit import cli  # noqa: E402
+import builder_common  # noqa: E402
 
-# The 12 landing page sections and their detection patterns
-SECTION_DEFINITIONS: dict[str, dict] = {
-    "hero": {
-        "name": "Hero Section",
-        "order": 1,
-        "description": "Primary headline, subheadline, CTA, and visual",
-        "html_patterns": ["h1", "hero", "banner", "jumbotron", "masthead"],
-        "text_patterns": [
-            r"get\s+started", r"start\s+free", r"try\s+free", r"sign\s+up",
-            r"book\s+a?\s*demo", r"request\s+demo",
-        ],
-        "recommendation": (
-            "Add a hero section with a clear headline stating your core value "
-            "proposition, a supporting subheadline, and a single primary CTA."
-        ),
-    },
-    "social_proof": {
-        "name": "Social Proof Bar",
-        "order": 2,
-        "description": "Company logos, user counts, or trust badges",
-        "html_patterns": ["logo-bar", "logos", "trusted", "clients", "customers", "partners"],
-        "text_patterns": [
-            r"trusted\s+by", r"used\s+by", r"loved\s+by", r"join\s+\d",
-            r"\d+[,.]?\d*[kKmM]?\+?\s*(companies|teams|users|customers)",
-        ],
-        "recommendation": (
-            "Add a social proof bar with customer logos or a user count "
-            "directly below the hero section to build immediate credibility."
-        ),
-    },
-    "problem": {
-        "name": "Problem Statement",
-        "order": 3,
-        "description": "Articulation of the customer's pain points",
-        "html_patterns": ["problem", "pain", "challenge", "struggle", "frustrat"],
-        "text_patterns": [
-            r"tired\s+of", r"struggle", r"frustrated", r"wast(e|ing)\s+time",
-            r"the\s+problem", r"sound\s+familiar", r"you\s+know\s+the\s+feeling",
-        ],
-        "recommendation": (
-            "Add a problem statement section that articulates your "
-            "audience's pain points in their own language."
-        ),
-    },
-    "solution": {
-        "name": "Solution Overview",
-        "order": 4,
-        "description": "How your product solves the stated problem",
-        "html_patterns": ["solution", "how-we-help", "what-we-do", "overview", "about"],
-        "text_patterns": [
-            r"the\s+solution", r"we\s+help", r"our\s+platform", r"with\s+\w+\s*,?\s*you\s+can",
-            r"introducing", r"meet\s+\w+",
-        ],
-        "recommendation": (
-            "Add a solution overview that directly connects your product "
-            "to the problems described above."
-        ),
-    },
-    "features": {
-        "name": "Feature Grid",
-        "order": 5,
-        "description": "3-4 key features with benefit descriptions",
-        "html_patterns": [
-            "feature", "benefit", "capability", "what-you-get",
-            "highlights", "advantages",
-        ],
-        "text_patterns": [
-            r"features", r"what\s+you\s+get", r"capabilities",
-            r"why\s+choose", r"highlights",
-        ],
-        "recommendation": (
-            "Add a feature grid showcasing 3-4 key features. Lead with "
-            "benefits, not technical specifications."
-        ),
-    },
-    "how_it_works": {
-        "name": "How It Works",
-        "order": 6,
-        "description": "Simple 3-step process explanation",
-        "html_patterns": ["how-it-works", "steps", "process", "getting-started"],
-        "text_patterns": [
-            r"how\s+it\s+works", r"step\s+[123]", r"getting\s+started",
-            r"in\s+3\s+steps", r"simple\s+steps", r"easy\s+as",
-        ],
-        "recommendation": (
-            "Add a 'How It Works' section with 3 simple steps. Make step 1 "
-            "feel effortless and step 3 be the desired outcome."
-        ),
-    },
-    "testimonials": {
-        "name": "Testimonials / Case Studies",
-        "order": 7,
-        "description": "Customer success stories and quotes",
-        "html_patterns": [
-            "testimonial", "review", "case-stud", "quote", "customer-stor",
-            "success-stor", "what-customers-say",
-        ],
-        "text_patterns": [
-            r"testimonial", r"what\s+(our\s+)?customers\s+say",
-            r"case\s+stud", r"success\s+stor", r"hear\s+from",
-        ],
-        "recommendation": (
-            "Add 2-3 testimonials with real names, photos, titles, and "
-            "specific outcomes. Video testimonials often outperform text."
-        ),
-    },
-    "pricing": {
-        "name": "Pricing Section",
-        "order": 8,
-        "description": "Pricing plans and comparison",
-        "html_patterns": ["pricing", "plans", "packages", "price"],
-        "text_patterns": [
-            r"pricing", r"\$\d+", r"per\s+month", r"/mo", r"/month",
-            r"free\s+plan", r"enterprise", r"starter",
-            r"professional", r"business\s+plan",
-        ],
-        "recommendation": (
-            "Consider adding a pricing section with 2-3 tiers. Transparent "
-            "pricing builds trust for SMB and mid-market buyers."
-        ),
-    },
-    "faq": {
-        "name": "FAQ Section",
-        "order": 9,
-        "description": "Frequently asked questions addressing objections",
-        "html_patterns": ["faq", "frequently-asked", "questions", "accordion"],
-        "text_patterns": [
-            r"faq", r"frequently\s+asked", r"common\s+questions",
-            r"have\s+questions", r"q\s*&\s*a",
-        ],
-        "recommendation": (
-            "Add an FAQ section with 5-8 questions that address common "
-            "objections about pricing, security, setup time, and cancellation."
-        ),
-    },
-    "integrations": {
-        "name": "Integrations / Compatibility",
-        "order": 10,
-        "description": "Supported integrations and ecosystem fit",
-        "html_patterns": [
-            "integrat", "connect", "compatible", "works-with",
-            "ecosystem", "plugins", "extensions",
-        ],
-        "text_patterns": [
-            r"integrat", r"connect\s+with", r"works\s+with",
-            r"compatible", r"plug[\s-]?ins", r"extensions",
-            r"api\s+access", r"zapier", r"webhook",
-        ],
-        "recommendation": (
-            "Add an integrations section showing logos of popular tools "
-            "your product connects with. This reduces switching cost concerns."
-        ),
-    },
-    "final_cta": {
-        "name": "Final CTA",
-        "order": 11,
-        "description": "Bottom-of-page conversion section",
-        "html_patterns": ["final-cta", "bottom-cta", "cta-section", "cta-banner", "form"],
-        "text_patterns": [
-            r"ready\s+to", r"get\s+started\s+today", r"start\s+your",
-            r"join\s+\d", r"try\s+it\s+free", r"what\s+are\s+you\s+waiting",
-        ],
-        "recommendation": (
-            "Add a final CTA section near the bottom with a restated value "
-            "proposition and a clear call-to-action button."
-        ),
-    },
-    "footer": {
-        "name": "Footer",
-        "order": 12,
-        "description": "Navigation, legal links, and trust signals",
-        "html_patterns": ["footer"],
-        "text_patterns": [
-            r"privacy\s+policy", r"terms\s+of\s+service", r"terms\s+and\s+conditions",
-            r"\u00a9\s*\d{4}", r"copyright", r"all\s+rights\s+reserved",
-        ],
-        "recommendation": (
-            "Add a proper footer with organized link columns, legal pages, "
-            "social media links, and compliance badges."
-        ),
-    },
-}
+TOOL = "page_structure_analyzer"
+
+EXCERPT_CHARS = 300
+MAX_BLOCK_CTAS = 6
+MAX_CLAIMS = 40
+MAX_QUOTES = 12
+# Blocks whose word sets overlap this much are flagged as likely responsive
+# twins (the same section rendered once for desktop and once for mobile).
+SIMILARITY_THRESHOLD = 0.6
+# Below these the static HTML probably misses content a browser would show.
+THIN_MAIN_WORDS = 150
+FEW_BLOCKS = 3
+
+_SVG_RE = re.compile(r"<svg\b([^>]*)>(.*?)</svg\s*>", re.IGNORECASE | re.DOTALL)
+_ATTR_RE = re.compile(r"""([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*("[^"]*"|'[^']*'|[^\s"'>]+)""")
+_TITLE_RE = re.compile(r"<title\b[^>]*>(.*?)</title\s*>", re.IGNORECASE | re.DOTALL)
+_KEEP_SVG_ATTRS = ("aria-hidden", "hidden", "class", "style", "role", "id")
+_HEADING_TAG_RE = re.compile(r"^h[1-6]$")
+_WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)
+LEGAL_RE = re.compile(
+    r"privacy|terms|legal|imprint|impressum|datenschutz|cookie|gdpr|kvkk|gizlilik|"
+    r"aviso[- ]legal|mentions[- ]l.gales|dpa\b|security|trust",
+    re.IGNORECASE,
+)
 
 
-@dataclass
-class SectionResult:
-    """Result for a single section detection."""
+def svg_to_img(markup: str) -> str:
+    """Replace each inline <svg> with an <img> placeholder.
 
-    key: str
-    name: str
-    order: int
-    detected: bool = False
-    confidence: str = "none"
-    signals: list = field(default_factory=list)
-    first_position: Optional[int] = None  # document-order index of first signal
-
-
-@dataclass
-class PageAnalysisResult:
-    """Complete page structure analysis result."""
-
-    url: str
-    sections_found: list = field(default_factory=list)
-    sections_missing: list = field(default_factory=list)
-    sections_possible: list = field(default_factory=list)
-    completeness_score: float = 0.0
-    section_order_optimal: bool = True
-    section_details: list = field(default_factory=list)
-    recommendations: list = field(default_factory=list)
-    warnings: list = field(default_factory=list)
-    errors: list = field(default_factory=list)
-
-
-def fetch_page(url: str, timeout: int = 15) -> Optional[BeautifulSoup]:
-    """Fetch a web page and return a BeautifulSoup object.
-
-    Args:
-        url: The URL to fetch.
-        timeout: Request timeout in seconds.
-
-    Returns:
-        BeautifulSoup object or None if fetch failed.
+    page_facts() drops <svg> as non-rendered, so SVG logo bars vanish from
+    the outline. As <img data-svg> they count as images, keep their hidden
+    attributes (aria-hidden icons are still removed) and give link text from
+    aria-label or <title> ("GitHub" instead of an empty icon link).
     """
-    # NOTE: refresh the Chrome version below periodically so the UA stays current.
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/138.0.0.0 Safari/537.36"
-        ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
+    def replace(match: "re.Match[str]") -> str:
+        attrs_text, inner = match.group(1), match.group(2)
+        if "<script" in inner.lower() or "</script" in inner.lower():
+            return match.group(0)
+        attrs = {}
+        for name, value in _ATTR_RE.findall(attrs_text):
+            attrs[name.lower()] = value.strip("\"'")
+        label = attrs.get("aria-label") or ""
+        if not label:
+            title = _TITLE_RE.search(inner)
+            if title:
+                label = re.sub(r"<[^>]+>", " ", title.group(1))
+        label = " ".join(label.split())[:80]
+        kept = "".join(
+            ' %s="%s"' % (name, escape(attrs[name], quote=True))
+            for name in _KEEP_SVG_ATTRS if name in attrs
+        )
+        return '<img data-svg="1" alt="%s"%s>' % (escape(label, quote=True), kept)
+
+    return _SVG_RE.sub(replace, markup or "")
+
+
+def _words(text: str) -> Set[str]:
+    return {w.lower() for w in _WORD_RE.findall(text or "") if len(w) > 2}
+
+
+def _similarity(a: Set[str], b: Set[str]) -> float:
+    if not a or not b:
+        return 0.0
+    return len(a & b) / float(len(a | b))
+
+
+def _block_heading(block: Dict[str, Any]) -> Optional[str]:
+    """page_facts reports no heading when the block itself is an <h2>."""
+    if block.get("heading"):
+        return block["heading"]
+    if _HEADING_TAG_RE.match(block.get("tag") or "") and block.get("text"):
+        return block["text"][:160]
+    return None
+
+
+def _hero_index(outline: List[Dict[str, Any]], ctas: List[Dict[str, Any]]) -> Optional[int]:
+    for block in outline:
+        if block.get("heading_level") == 1 or block.get("tag") == "h1":
+            return block["index"]
+    for cta in ctas:
+        if cta.get("zone") == "hero" and cta.get("block") is not None:
+            return cta["block"]
+    return outline[0]["index"] if outline else None
+
+
+def build_blocks(facts: Dict[str, Any], claims_mod: Any) -> List[Dict[str, Any]]:
+    """Turn page_facts()['outline'] into the blocks the model labels."""
+    outline = facts.get("outline") or []
+    ctas = facts.get("ctas") or []
+    hero = _hero_index(outline, ctas)
+    blocks: List[Dict[str, Any]] = []
+    seen: List[Any] = []
+    for position, raw in enumerate(outline):
+        index = raw["index"]
+        block_ctas = [
+            {"text": c.get("text"), "href": c.get("href"), "intent": c.get("intent"), "style": c.get("style")}
+            for c in ctas if c.get("block") == index
+        ][:MAX_BLOCK_CTAS]
+        excerpt = (raw.get("text") or "")[:EXCERPT_CHARS]
+        words = _words(raw.get("text") or "")
+        similar_to = None
+        for other_index, other_words in seen:
+            if _similarity(words, other_words) >= SIMILARITY_THRESHOLD and len(words) >= 8:
+                similar_to = other_index
+                break
+        seen.append((index, words))
+        headings = raw.get("headings") or []
+        blocks.append({
+            "index": index,
+            "position": position,
+            "zone": "hero" if index == hero else "body",
+            "tag": raw.get("tag"),
+            "id": raw.get("id"),
+            "class": raw.get("class"),
+            "heading": _block_heading(raw),
+            "heading_level": raw.get("heading_level"),
+            "subheadings": headings[1:6],
+            "words": raw.get("words"),
+            "excerpt": excerpt,
+            "ctas": block_ctas,
+            "images": raw.get("images"),
+            "list_items": raw.get("list_items"),
+            "has_blockquote": raw.get("has_blockquote"),
+            "has_accordion": raw.get("has_details"),
+            "has_form": raw.get("has_form"),
+            "has_table": raw.get("has_table"),
+            "claims": [
+                {"type": c["type"], "text": c["text"]}
+                for c in claims_mod.find_claims(excerpt)
+            ][:8],
+            "similar_to": similar_to,
+        })
+    return blocks
+
+
+def chrome_facts(markup: str, page_url: Optional[str], ctas: List[Dict[str, Any]], html_mod: Any) -> Dict[str, Any]:
+    """Nav and footer facts: link counts, CTAs with intent, legal links."""
+    soup = html_mod.parse(markup)
+    html_mod.strip_invisible(soup)
+    body = soup.body or soup
+
+    def outside_sections(tag: Any) -> bool:
+        return tag.find_parent(["article", "section", "aside", "main"]) is None
+
+    nav_nodes = [t for t in body.find_all(["nav", "header"]) if outside_sections(t) or t.name == "nav"]
+    nav_nodes += [t for t in body.find_all(attrs={"role": "navigation"}) if t not in nav_nodes]
+    footer_nodes = [t for t in body.find_all("footer") if outside_sections(t)]
+    footer_nodes += [t for t in body.find_all(attrs={"role": "contentinfo"}) if t not in footer_nodes]
+
+    def links(nodes: List[Any]) -> List[Dict[str, str]]:
+        out: List[Dict[str, str]] = []
+        seen: Set[str] = set()
+        for node in nodes:
+            for anchor in node.find_all("a", href=True):
+                href = str(anchor.get("href")).strip()
+                if not href or href.startswith(("#", "javascript:")):
+                    continue
+                text = html_mod.clean_text(anchor, collapse=True) or str(anchor.get("aria-label") or "")
+                key = href.rstrip("/").lower()
+                if key in seen:
+                    continue
+                seen.add(key)
+                out.append({"text": text[:80], "href": href})
+        return out
+
+    nav_links = links(nav_nodes)
+    footer_links = links(footer_nodes)
+    legal = [
+        link["text"] or link["href"] for link in footer_links
+        if LEGAL_RE.search(link["text"] or "") or LEGAL_RE.search(link["href"] or "")
+    ]
+
+    def zone_ctas(zone: str) -> List[Dict[str, Any]]:
+        return [
+            {"text": c.get("text"), "href": c.get("href"), "intent": c.get("intent")}
+            for c in ctas if c.get("zone") == zone
+        ][:12]
+
+    return {
+        "nav": {
+            "present": bool(nav_nodes),
+            "link_count": len(nav_links),
+            "ctas": zone_ctas("nav"),
+        },
+        "footer": {
+            "present": bool(footer_nodes),
+            "link_count": len(footer_links),
+            "legal_links": legal[:12],
+            "ctas": zone_ctas("footer"),
+        },
     }
-    try:
-        response = requests.get(url, headers=headers, timeout=timeout, allow_redirects=True)
-        response.raise_for_status()
-        return BeautifulSoup(response.text, "html.parser")
-    except requests.RequestException as e:
-        print(f"Error fetching {url}: {e}")
-        return None
 
 
-def load_source(source: str) -> Optional[BeautifulSoup]:
-    """Load a page from a URL or a local HTML file path."""
-    if os.path.isfile(source):
-        try:
-            with open(source, encoding="utf-8", errors="replace") as fh:
-                return BeautifulSoup(fh.read(), "html.parser")
-        except OSError as e:
-            print(f"Error reading {source}: {e}")
-            return None
-    return fetch_page(source)
+def summarize_ctas(ctas: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """CTA counts by zone and intent, plus the hero CTAs in order."""
+    by_zone: Dict[str, Dict[str, int]] = {}
+    for cta in ctas:
+        zone = cta.get("zone") or "body"
+        intent = cta.get("intent") or "none"
+        by_zone.setdefault(zone, {})
+        by_zone[zone][intent] = by_zone[zone].get(intent, 0) + int(cta.get("count") or 1)
+    hero = [
+        {"text": c.get("text"), "href": c.get("href"), "intent": c.get("intent"), "style": c.get("style")}
+        for c in ctas if c.get("zone") == "hero"
+    ][:6]
+    return {"by_zone": by_zone, "hero": hero}
 
 
-def detect_page_language(soup: BeautifulSoup) -> str:
-    """Return the declared <html lang> value (lowercased), or '' if unset."""
-    html_tag = soup.find("html")
-    if html_tag is None:
-        return ""
-    return (html_tag.get("lang") or "").strip().lower()
+def render_hint(facts: Dict[str, Any], blocks: List[Dict[str, Any]], fetch: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """Whether a browser render would probably show more of the page."""
+    reasons: List[str] = []
+    main_words = int(facts.get("main_word_count") or 0)
+    if main_words < THIN_MAIN_WORDS:
+        reasons.append("only %d words of main content in the static HTML" % main_words)
+    if len(blocks) < FEW_BLOCKS:
+        reasons.append("only %d main-content block(s) in the static HTML" % len(blocks))
+    signals = facts.get("js_shell_signals") or {}
+    if signals.get("empty_root"):
+        reasons.append("empty app root #%s" % signals["empty_root"])
+    if fetch and fetch.get("truncated"):
+        reasons.append("the page was cut at the size limit")
+    return {"render_recommended": bool(reasons), "reasons": reasons}
 
 
-def build_position_index(soup: BeautifulSoup) -> dict:
-    """Map each node's id() to its document-order index.
+def analyze(markup: str, page_url: Optional[str], fetch: Optional[Dict[str, Any]] = None,
+            max_blocks: int = 40) -> Dict[str, Any]:
+    """All facts for one page. Raises nothing for odd HTML; returns plain JSON types."""
+    from _growthkit import html as html_mod
+    import proof_patterns as claims_mod
 
-    Used to compare the actual on-page position of detected sections.
-    """
-    return {id(node): i for i, node in enumerate(soup.descendants)}
-
-
-def detect_section(
-    soup: BeautifulSoup,
-    section_key: str,
-    definition: dict,
-    positions: Optional[dict] = None,
-) -> SectionResult:
-    """Detect whether a specific section exists on the page.
-
-    Uses a combination of HTML structure analysis (class names, IDs, tag names)
-    and text content pattern matching. Requires at least 2 signals to mark a
-    section as detected; a single weak signal is reported as "possible" and
-    is not counted toward the completeness score.
-
-    Args:
-        soup: Parsed HTML page.
-        section_key: The section identifier.
-        definition: The section definition with detection patterns.
-        positions: Optional map of id(node) -> document-order index, used to
-            record where the section's first signal appears on the page.
-
-    Returns:
-        SectionResult with detection status, confidence, and first position.
-    """
-    result = SectionResult(
-        key=section_key,
-        name=definition["name"],
-        order=definition["order"],
-    )
-
-    page_text = soup.get_text().lower()
-    signals = []
-    signal_positions = []
-
-    def record_elements(elements) -> None:
-        if positions is None:
-            return
-        for el in elements:
-            pos = positions.get(id(el))
-            if pos is not None:
-                signal_positions.append(pos)
-
-    # Check HTML patterns (class names, IDs, data attributes)
-    for pattern in definition["html_patterns"]:
-        # Check element IDs
-        elements_by_id = soup.find_all(id=re.compile(pattern, re.IGNORECASE))
-        if elements_by_id:
-            signals.append(f"Found element with ID matching '{pattern}'")
-            record_elements(elements_by_id)
-
-        # Check class names
-        elements_by_class = soup.find_all(class_=re.compile(pattern, re.IGNORECASE))
-        if elements_by_class:
-            signals.append(f"Found element with class matching '{pattern}'")
-            record_elements(elements_by_class)
-
-        # Check tag-specific patterns (e.g., footer, h1, form tags)
-        if pattern in ("footer", "header", "nav", "h1", "form"):
-            tag_elements = soup.find_all(pattern)
-            if tag_elements:
-                signals.append(f"Found <{pattern}> tag")
-                record_elements(tag_elements)
-
-    # Check text patterns
-    for pattern in definition["text_patterns"]:
-        if re.search(pattern, page_text, re.IGNORECASE):
-            signals.append(f"Found text matching '{pattern}'")
-            # Locate the first text node matching this pattern for its position
-            if positions is not None:
-                text_node = soup.find(string=re.compile(pattern, re.IGNORECASE))
-                if text_node is not None:
-                    pos = positions.get(id(text_node))
-                    if pos is not None:
-                        signal_positions.append(pos)
-
-    if signal_positions:
-        result.first_position = min(signal_positions)
-
-    # Determine detection and confidence.
-    # A single weak signal is NOT enough to count the section as present.
-    result.signals = signals
-    if len(signals) >= 3:
-        result.detected = True
-        result.confidence = "high"
-    elif len(signals) >= 2:
-        result.detected = True
-        result.confidence = "medium"
-    elif len(signals) == 1:
-        result.detected = False
-        result.confidence = "possible"
-    else:
-        result.detected = False
-        result.confidence = "none"
-
-    return result
-
-
-def evaluate_section_order(detected_sections: list[SectionResult]) -> bool:
-    """Evaluate whether detected sections follow the optimal order.
-
-    Compares the actual on-page position (document-order index of each
-    section's first matched signal) against the recommended section order.
-
-    Args:
-        detected_sections: List of detected section results.
-
-    Returns:
-        True if sections appear on the page in the recommended order.
-    """
-    positioned = [
-        s for s in detected_sections
-        if s.detected and s.first_position is not None
-    ]
-    if len(positioned) <= 1:
-        return True
-
-    # Sort by where each section actually appears on the page, then check
-    # that the recommended order values are non-decreasing.
-    positioned.sort(key=lambda s: s.first_position)
-    actual_orders = [s.order for s in positioned]
-    for i in range(1, len(actual_orders)):
-        if actual_orders[i] < actual_orders[i - 1]:
-            return False
-    return True
-
-
-def analyze_page_structure(source: str) -> PageAnalysisResult:
-    """Perform a complete page structure analysis.
-
-    Fetches the landing page (or reads a local HTML file) and checks for the
-    presence of all 12 sections in the landing page anatomy framework.
-
-    Args:
-        source: The landing page URL or local HTML file path to analyze.
-
-    Returns:
-        PageAnalysisResult with findings and recommendations.
-    """
-    result = PageAnalysisResult(url=source)
-
-    # Validate URL (skip validation for local files)
-    if not os.path.isfile(source):
-        parsed = urlparse(source)
-        if not parsed.scheme or not parsed.netloc:
-            result.errors.append("Invalid URL. Please provide a full URL including https://")
-            return result
-
-    # Fetch the page (or read the local file)
-    soup = load_source(source)
-    if soup is None:
-        result.errors.append(
-            "Could not fetch the page. This may be due to JavaScript rendering "
-            "(SPA), access restrictions, or network issues."
-        )
-        return result
-
-    # Non-English pages: the text patterns are English-only and would
-    # silently miss sections. Warn prominently instead.
-    lang = detect_page_language(soup)
-    if lang and not lang.startswith("en"):
-        result.warnings.append(
-            f"Page language is '{lang}'. Text-pattern section detection is "
-            "unreliable for non-English pages - verify section presence "
-            "manually from the page content."
-        )
-
-    # Detect each section (positions enable the section-order check)
-    positions = build_position_index(soup)
-    section_results = []
-    for section_key, definition in SECTION_DEFINITIONS.items():
-        section_result = detect_section(soup, section_key, definition, positions)
-        section_results.append(section_result)
-
-    # Sort by order for display
-    section_results.sort(key=lambda s: s.order)
-
-    # Categorize found, possible (1 weak signal, not scored), and missing
-    result.sections_found = [s.name for s in section_results if s.detected]
-    result.sections_possible = [
-        s.name for s in section_results
-        if not s.detected and s.confidence == "possible"
-    ]
-    result.sections_missing = [s.name for s in section_results if not s.detected]
-
-    # Calculate completeness
-    total_sections = len(SECTION_DEFINITIONS)
-    found_count = len(result.sections_found)
-    result.completeness_score = round((found_count / total_sections) * 100, 1)
-
-    # Evaluate section order
-    result.section_order_optimal = evaluate_section_order(section_results)
-
-    # Build section details
-    result.section_details = [
+    prepared = svg_to_img(markup)
+    facts = html_mod.page_facts(prepared, page_url, text_chars=20000, max_blocks=max_blocks)
+    blocks = build_blocks(facts, claims_mod)
+    main_text = facts.get("main_text") or ""
+    page_claims: List[Dict[str, Any]] = []
+    seen_claims: Set[Any] = set()
+    for claim in claims_mod.find_claims(main_text):
+        key = (claim["type"], claim["text"].lower())
+        if key in seen_claims:
+            continue
+        seen_claims.add(key)
+        page_claims.append({"type": claim["type"], "text": claim["text"], "context": claim["context"]})
+    quotes = [
+        {"text": q["text"], "attribution": q["attribution"]}
+        for q in claims_mod.find_quotes(main_text)
+    ][:MAX_QUOTES]
+    ctas = facts.get("ctas") or []
+    meta = facts.get("meta") or {}
+    headings = facts.get("headings") or {}
+    forms = [
         {
-            "section": s.name,
-            "detected": s.detected,
-            "confidence": s.confidence,
-            "signals_count": len(s.signals),
+            "kind": f.get("kind"), "zone": f.get("zone"), "block": f.get("block"),
+            "questions": f.get("questions"), "required": f.get("required_count"),
+            "submit_text": f.get("submit_text"), "primary_candidate": f.get("primary_candidate"),
         }
-        for s in section_results
-    ]
+        for f in (facts.get("forms") or []) if not f.get("hidden")
+    ][:8]
+    return {
+        "page": {
+            "url": page_url,
+            "title": facts.get("title"),
+            "lang": facts.get("lang"),
+            "meta_description": meta.get("description"),
+            "canonical": meta.get("canonical"),
+            "robots": meta.get("robots") or {},
+            "viewport": meta.get("viewport"),
+            "h1": (headings.get("h1") or [])[:3],
+            "h2_count": len(headings.get("h2") or []),
+            "word_count": facts.get("word_count"),
+            "main_word_count": facts.get("main_word_count"),
+            "json_ld_types": (facts.get("json_ld") or {}).get("types") or [],
+        },
+        "blocks": blocks,
+        "block_count": len(blocks),
+        "ctas": summarize_ctas(ctas),
+        "chrome": chrome_facts(prepared, page_url, ctas, html_mod),
+        "forms": forms,
+        "embedded_forms": facts.get("embedded_forms") or [],
+        "media": facts.get("media") or {},
+        "claims": page_claims[:MAX_CLAIMS],
+        "claims_total": len(page_claims),
+        "quotes": quotes,
+        "render": render_hint(facts, blocks, fetch),
+        "is_js_shell": bool(facts.get("is_js_shell")),
+        "js_shell_signals": facts.get("js_shell_signals") or {},
+        "hidden_removed": facts.get("hidden_removed") or {},
+        "extractor_notes": facts.get("notes") or [],
+        "_facts_for_status": {
+            "word_count": facts.get("word_count"),
+            "headings": {"h1": headings.get("h1") or []},
+            "is_js_shell": facts.get("is_js_shell"),
+        },
+    }
 
-    # Generate recommendations
-    for section_key, definition in SECTION_DEFINITIONS.items():
-        matching = [s for s in section_results if s.key == section_key]
-        if matching and not matching[0].detected:
-            result.recommendations.append(
-                f"[Missing: {definition['name']}] {definition['recommendation']}"
-            )
 
-    if not result.section_order_optimal:
-        result.recommendations.append(
-            "[Section Order] Consider reordering your page sections to follow "
-            "the optimal flow: Hero > Social Proof > Problem > Solution > "
-            "Features > How It Works > Testimonials > Pricing > FAQ > "
-            "Integrations > Final CTA > Footer."
-        )
-
-    if result.completeness_score < 50:
-        result.recommendations.insert(
-            0,
-            f"[Low Completeness] Your page has only {found_count}/12 recommended "
-            f"sections ({result.completeness_score}%). Adding the missing sections "
-            f"could significantly improve conversion rates."
-        )
-
-    return result
-
-
-def format_report(result: PageAnalysisResult) -> str:
-    """Format the analysis result as a readable report.
-
-    Args:
-        result: The completed analysis result.
-
-    Returns:
-        Formatted report string.
-    """
-    lines = [
-        "=" * 60,
-        "LANDING PAGE STRUCTURE ANALYSIS",
-        "=" * 60,
-        f"URL: {result.url}",
-    ]
-
-    if result.warnings:
-        lines.append("")
-        lines.append("!" * 60)
-        for warning in result.warnings:
-            lines.append(f"WARNING: {warning}")
-        lines.append("!" * 60)
-
-    lines.extend([
-        "",
-        f"COMPLETENESS: {len(result.sections_found)}/12 sections "
-        f"({result.completeness_score}%)",
-        f"Section Order: {'Optimal' if result.section_order_optimal else 'Suboptimal'}",
-        "",
-        "--- Sections Found ---",
-    ])
-
-    for detail in result.section_details:
-        if detail["detected"]:
-            lines.append(
-                f"  [+] {detail['section']} "
-                f"(confidence: {detail['confidence']})"
-            )
-
-    lines.append("")
-    lines.append("--- Sections Missing ---")
-
-    for detail in result.section_details:
-        if not detail["detected"]:
-            if detail["confidence"] == "possible":
-                lines.append(
-                    f"  [?] {detail['section']} "
-                    f"(possible - 1 weak signal, not scored)"
-                )
-            else:
-                lines.append(f"  [-] {detail['section']}")
-
-    lines.append("")
-    lines.append("--- Recommendations ---")
-
-    for i, rec in enumerate(result.recommendations, 1):
-        lines.append(f"  {i}. {rec}")
-
-    if result.errors:
-        lines.extend(["", "--- Warnings ---"])
-        for error in result.errors:
-            lines.append(f"  ! {error}")
-
-    lines.append("=" * 60)
+def format_human(envelope: Dict[str, Any]) -> str:
+    """Short text view for a person at a terminal (the model uses --json)."""
+    lines = []
+    if envelope.get("status") != cli.STATUS_OK:
+        lines.append("STATUS: %s" % envelope.get("status"))
+        for error in envelope.get("errors") or []:
+            lines.append("ERROR: %s" % error)
+    page = envelope.get("page") or {}
+    if page:
+        lines.append("URL: %s" % (page.get("url") or "(file)"))
+        lines.append("Title: %s" % (page.get("title") or "-"))
+        lines.append("Main-content words: %s in %s blocks" % (page.get("main_word_count"), envelope.get("block_count")))
+    for block in envelope.get("blocks") or []:
+        lines.append("  [%s] %-5s %-60s ctas=%d img=%s" % (
+            block["index"], block["zone"], (block.get("heading") or block.get("excerpt") or "")[:60],
+            len(block.get("ctas") or []), block.get("images")))
+    render = envelope.get("render") or {}
+    if render.get("render_recommended"):
+        lines.append("Render recommended: " + "; ".join(render.get("reasons") or []))
+    for note in envelope.get("notes") or []:
+        lines.append("NOTE: %s" % note)
+    lines.append("No score: label the blocks with references/section-labels.md.")
     return "\n".join(lines)
 
 
-def main() -> None:
-    """Run the page structure analyzer from the command line."""
-    if len(sys.argv) < 2:
-        print("Usage: python page_structure_analyzer.py <landing_page_url_or_html_file>")
-        print("Example: python page_structure_analyzer.py https://example.com")
-        print("Example: python page_structure_analyzer.py ./saved-page.html")
-        sys.exit(1)
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = cli.build_parser(
+        "Ordered outline of a SaaS page's main-content blocks, as facts for the model to label.",
+        input_help="URL, saved HTML file, or '-' to read HTML from stdin",
+        prog="page_structure_analyzer.py",
+        demo=False,
+    )
+    parser.add_argument("--url", help="original URL of a saved HTML file (resolves links; shown in the output)")
+    parser.add_argument("--max-blocks", type=int, default=40, help="most blocks to return (default: 40)")
+    args = parser.parse_args(argv)
+    run = cli.Run(TOOL, args)
+    builder_common.ensure_private_reports_dir(args.out, run.log)
+    try:
+        source = cli.resolve_input(args.input)
+    except cli.UsageError as exc:
+        return run.fail(cli.STATUS_USAGE, str(exc))
+    if args.max_blocks < 1:
+        return run.fail(cli.STATUS_USAGE, "--max-blocks must be at least 1")
 
-    source = sys.argv[1]
+    from _growthkit import http
 
-    # Ensure URL has scheme (skip for local HTML files)
-    if not os.path.isfile(source) and not source.startswith("http"):
-        source = "https://" + source
+    fetch_summary = None
+    status = cli.STATUS_OK
+    source_info: Dict[str, Any] = {"kind": source["kind"], "input": source["value"]}
+    if source["kind"] == "url":
+        try:
+            page_url = http.normalize_url(source["value"])
+        except ValueError as exc:
+            return run.fail(cli.STATUS_USAGE, str(exc), data={"source": source_info})
+        run.log("fetching %s" % page_url)
+        result = http.fetch(page_url, timeout=args.timeout)
+        fetch_summary = http.summarize(result)
+        source_info["fetch"] = fetch_summary
+        outcome, message = cli.fetch_outcome(result)
+        if outcome in (cli.STATUS_BLOCKED, cli.STATUS_UNREACHABLE):
+            kind = "blocked" if outcome == cli.STATUS_BLOCKED else (
+                "http_error" if result.get("http_status") else "unreachable")
+            source_info["failure"] = kind
+            run.note("blocked: follow references/_shared/browser-fallback.md" if kind == "blocked"
+                     else "unreachable: check the URL with the user; a browser will not help")
+            return run.fail(outcome, message, data={"source": source_info})
+        if outcome == cli.STATUS_NOTHING:
+            run.note("follow references/_shared/browser-fallback.md (render the page, then pass the saved file)")
+            return run.fail(outcome, message, data={"source": source_info})
+        if outcome == cli.STATUS_PARTIAL:
+            run.error(message)
+            status = cli.STATUS_PARTIAL
+        markup = result.get("html") or ""
+        page_url = result.get("final_url") or page_url
+    else:
+        markup = source["text"] or ""
+        page_url = None
+        if args.url:
+            try:
+                page_url = http.normalize_url(args.url)
+            except ValueError as exc:
+                return run.fail(cli.STATUS_USAGE, "--url: %s" % exc)
 
-    print(f"Analyzing page structure: {source}")
-    print("Loading page...")
-    print()
-
-    result = analyze_page_structure(source)
-
-    # Print formatted report
-    print(format_report(result))
-
-    # Also output JSON for programmatic use
-    print("\n--- JSON Output ---")
-    print(json.dumps(asdict(result), indent=2))
+    facts = analyze(markup, page_url, fetch_summary, args.max_blocks)
+    gate = facts.pop("_facts_for_status")
+    verdict, message = cli.facts_outcome(gate)
+    data = dict(source=source_info, **facts)
+    if verdict == cli.STATUS_NOTHING or not facts["blocks"]:
+        run.note("follow references/_shared/browser-fallback.md (render the page, then pass the saved file)")
+        data["blocks"] = []
+        data["block_count"] = 0
+        return run.fail(cli.STATUS_NOTHING, message or "No main-content blocks found in the HTML.", data=data)
+    if message:
+        run.note(message)
+    if facts["render"]["render_recommended"]:
+        run.note("render recommended before labelling: " + "; ".join(facts["render"]["reasons"]))
+    return run.emit(data, status=status, human=format_human)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

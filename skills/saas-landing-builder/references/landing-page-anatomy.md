@@ -1,285 +1,197 @@
-# Landing Page Anatomy - 12 Sections
+# Landing Page Anatomy: Section by Section
 
-A complete reference for building high-converting SaaS landing pages, section by section.
+Last verified: 2026-10
 
-## 1. Hero Section
+Read this before you draft or rewrite any section. Each section has a job, signs that it
+works, common mistakes, the proof slot it needs, and an illustrative example. Examples use a
+fictional product ("Acme", finance close software) and bracketed placeholders for every
+number, name and quote: they show the pattern, never content to reuse. Which sections a page
+needs depends on the page type, not on this list.
 
-### Purpose
-Create an immediate, compelling first impression that communicates your core value proposition and motivates visitors to keep scrolling or take action.
+## Contents
 
-### Best Practices
-- Primary headline: 6-10 words, benefit-focused, clear
-- Subheadline: 15-25 words, expand on the headline with specifics
-- Single primary CTA button with action-oriented text
-- Supporting visual: product screenshot, illustration, demo video, or an interactive product demo/tour (embedded walkthroughs let visitors try the product before signing up)
-- Above the fold - everything visible without scrolling
-- White space around the CTA to draw attention
+1. Hero
+2. Social proof
+3. Problem
+4. Solution
+5. Features
+6. How it works
+7. Product demo
+8. Testimonials and case studies
+9. Use cases
+10. Integrations
+11. Security and compliance
+12. Comparison
+13. Pricing
+14. FAQ
+15. Lead form
+16. Final CTA
+17. Footer
+18. Every section: checks before handover
 
-### Common Mistakes
-- Feature-focused headline instead of benefit-focused
-- Multiple competing CTAs that dilute focus
-- Generic stock photos that do not relate to the product
-- Too much text crammed above the fold
-- Missing subheadline that leaves the headline ambiguous
-- CTA that says "Learn More" instead of driving action
+---
 
-### Examples
-- Headline: "Ship faster with automated code reviews"
-- Subheadline: "Reduce PR review time by 50% with AI-powered suggestions your team will actually trust."
-- CTA: "Start free trial - no credit card needed"
+## 1. Hero
 
-## 2. Social Proof Bar
+- Job: in one screen, say what it is, who it is for, why it beats the alternative, and the
+  next step.
+- Works when: the headline names an outcome or a problem in the buyer's words; the
+  subheadline names the category and the difference; one primary CTA stands out; the visual
+  shows the product doing the headline's job; a true risk reducer sits next to the CTA.
+- Mistakes: slogans with no category ("Work, reimagined"); feature names as headlines; two
+  primary CTAs; a stock illustration instead of the product; claims nobody can source.
+- Proof slot: optional in the hero itself; a short proof line under the CTA works when it is
+  real ([RATING] or [LOGO]).
+- Illustrative: Headline "Close the books without the CSV marathon". Subheadline "Acme is
+  month-end close software for finance teams on Stripe and NetSuite: it matches payouts to
+  bank lines and posts the entries for you." CTA "Start free". Reassurance "[CONFIRM: trial
+  terms]".
 
-### Purpose
-Build immediate credibility by showing that recognized companies or a large number of users trust your product.
+## 2. Social proof
 
-### Best Practices
-- Place directly below the hero section
-- Show 4-6 recognizable company logos
-- Use grayscale logos for visual consistency
-- Include a trust statement: "Trusted by 10,000+ teams"
-- If no big logos yet, use category proof: "Rated #1 on G2"
-- Keep it simple - logos only, no descriptions needed
+- Job: early evidence that teams like the visitor's use it.
+- Works when: logos are recognizable to this ICP and shown with permission; counts and
+  ratings carry a source and date; it sits near the first CTA.
+- Mistakes: logos without permission; counts without a definition ("10,000+ users" of
+  what?); ratings without platform, review count and date; awards nobody has heard of.
+- Proof slot: `[LOGO: ...]`, `[METRIC: ...]`, `[RATING: ...]`.
+- Illustrative: "Finance teams at [LOGO: 5 customer logos, permission confirmed] close
+  with Acme."
 
-### Common Mistakes
-- Using unknown company logos that do not build trust
-- Too many logos creating visual clutter
-- Color logos that distract from the page flow
-- Placing it too far below the hero section
-- Fake or misleading user counts
+## 3. Problem
 
-### Examples
-- "Trusted by teams at Stripe, Vercel, Linear, and 5,000+ companies"
-- Logo bar with 5 recognizable tech company logos in grayscale
+- Job: make the visitor feel understood before the product appears.
+- Works when: it uses phrases from voice-of-customer data; it names the cost of the status
+  quo concretely; it is short (two to four lines or three bullets).
+- Mistakes: generic pains ("productivity is hard"); exaggeration; pains this ICP does not
+  have; skipping it for cold traffic.
+- Proof slot: voice-of-customer phrases with sources (evidence table).
+- Illustrative: "Every close, someone exports payouts, pastes them next to the bank
+  statement and hunts for the [METRIC: typical number of] lines that do not match."
 
-## 3. Problem Statement
+## 4. Solution
 
-### Purpose
-Demonstrate that you understand your audience's pain points. When visitors feel understood, they trust your solution more.
+- Job: one clear statement of the product and the outcome, tied to the problem.
+- Works when: it reads as the answer to section 3; it describes the new way, not the
+  feature list.
+- Mistakes: listing features here; jargon; repeating the hero word for word.
+- Illustrative: "Acme reconciles payouts, refunds and fees against your bank feed as they
+  happen, so the close is a review, not a rebuild."
 
-### Best Practices
-- Use the customer's language, not industry jargon
-- Describe the problem in emotional terms (frustration, time wasted, money lost)
-- Be specific about the consequences of the problem
-- Use a short narrative or scenario the reader recognizes
-- 2-3 short paragraphs or a bullet list of pain points
+## 5. Features
 
-### Common Mistakes
-- Skipping this section and jumping straight to the solution
-- Being too vague or generic about the problem
-- Using technical language the audience does not use
-- Making the problem sound trivial
-- Describing a problem the audience does not actually have
+- Job: show the three to six capabilities that deliver the outcome.
+- Works when: each card leads with the benefit, then the capability; each has a visual of
+  the product; there are only as many as a visitor can scan.
+- Mistakes: twelve features in a grid; feature names without benefits; identical icons and
+  vague verbs ("streamline", "empower").
+- Illustrative card: "Catch mismatches the day they happen. Acme flags any payout that does
+  not match a bank line and shows why."
 
-### Examples
-- "You spend hours every week manually updating spreadsheets, chasing teammates for status updates, and building reports that are outdated before you finish them."
+## 6. How it works
 
-## 4. Solution Overview
+- Job: make starting feel easy and predictable.
+- Works when: three to four numbered steps; step one is effortless and true; the last step
+  is the outcome; on demo pages it says what happens after the form.
+- Mistakes: steps that hide real setup work; more than four steps; no outcome.
+- Illustrative: 1 "Connect Stripe and your bank" 2 "Review the matches Acme suggests"
+  3 "Approve the close". Setup time: [CONFIRM: typical setup time].
 
-### Purpose
-Present your product as the clear answer to the problems described above. Bridge the gap between pain and resolution.
+## 7. Product demo
 
-### Best Practices
-- Directly connect to the problems stated in section 3
-- Focus on outcomes, not features
-- Use a product screenshot or short demo GIF
-- Keep it concise - detailed features come in section 5
-- One clear statement of what your product does
+- Job: let the visitor see or try the product without signing up.
+- Works when: an interactive demo, a short walkthrough or a click-through tour of the core
+  job; captions say what the viewer is seeing.
+- Mistakes: a long brand video; a demo of features the ICP does not need; autoplay with
+  sound.
+- Proof slot: `[VIDEO: ...]` or `[DEMO: interactive tour of ...]` until it exists.
 
-### Common Mistakes
-- Listing features instead of describing the solution
-- No visual representation of the product
-- Disconnected from the problem statement
-- Too technical for the target audience
-- Trying to cover every capability at once
+## 8. Testimonials and case studies
 
-### Examples
-- "Acme automatically syncs your project data, sends reminders to your team, and generates real-time reports - so you can focus on the work that matters."
+- Job: let real customers say what changed for them.
+- Works when: real names, roles, companies and photos (with permission); a specific result
+  in the customer's words; the customers match the ICP; material connections are disclosed.
+- Mistakes: anonymous or initials-only quotes; generic praise ("Great tool!"); quotes edited
+  beyond recognition; any quote you or a model wrote.
+- Proof slot: `[TESTIMONIAL: real quote with a specific result; name, role, company]`,
+  `[CASE STUDY: customer, before and after, link]`.
 
-## 5. Feature Grid
+## 9. Use cases
 
-### Purpose
-Showcase 3-4 key features that deliver the most value. Help visitors understand what they will specifically get.
+- Job: let each role, team or industry find itself.
+- Works when: tabs or cards per role or job with one outcome each and a link to a deeper
+  page.
+- Mistakes: listing every industry; the same copy with the role name swapped.
 
-### Best Practices
-- Limit to 3-4 features (not your entire feature list)
-- Each feature: icon + headline + 1-2 sentence description
-- Lead each description with the benefit, then the feature
-- Use a grid layout (2x2 or 1x3) for scannability
-- Include micro-visuals: icons, small screenshots, or illustrations
-- Link to detailed feature pages for those who want more
+## 10. Integrations
 
-### Common Mistakes
-- Listing 8-12 features that overwhelm the visitor
-- Feature names without benefit explanation
-- Technical jargon in feature descriptions
-- No visual differentiation between features
-- Features that all sound the same
+- Job: show the product fits the current stack and lowers switching cost.
+- Works when: the integrations the ICP cares about come first; only live integrations are
+  shown; API or webhooks are mentioned for technical buyers.
+- Mistakes: logos of planned integrations; a wall of logos with no grouping.
 
-### Examples
-- Feature card: "Instant Reports - Generate board-ready reports in one click. No more copy-pasting from five different tools."
+## 11. Security and compliance
 
-## 6. How It Works
+- Job: answer the security reviewer before they ask.
+- Works when: it names current reports and certifications with dates, data residency,
+  SSO and access controls, and links to a trust page.
+- Mistakes: badges for audits not completed; "bank-grade security" with no detail.
+- Proof slot: `[COMPLIANCE: report name and date]`.
 
-### Purpose
-Reduce perceived complexity by showing a simple 3-step process to get started and achieve results.
+## 12. Comparison
 
-### Best Practices
-- Exactly 3 steps (the brain processes three items easily)
-- Number each step clearly (1, 2, 3)
-- Each step: number + headline + 1 sentence description
-- Make step 1 feel effortless ("Sign up in 30 seconds")
-- Make step 3 the outcome ("See results in real-time")
-- Visual connection between steps (arrows, timeline)
+- Job: show the difference from the main alternative or the old way.
+- Works when: the comparison is fair and sourced, dated, and focused on the few points that
+  matter to this ICP. Comparing with "spreadsheets" or "the old way" avoids naming a
+  competitor.
+- Mistakes: unsourced claims about named competitors; tables where you win every row.
+  Full "X vs us" and "X alternatives" pages belong to competitor-intel.
 
-### Common Mistakes
-- More than 4 steps (loses the simplicity benefit)
-- Steps that are too technical or detailed
-- First step that sounds hard or time-consuming
-- No visual hierarchy between steps
-- Missing the outcome in the final step
+## 13. Pricing
 
-### Examples
-1. "Connect your tools" - Integrate with GitHub, Slack, and Jira in one click
-2. "Set your rules" - Define what matters to your team with simple templates
-3. "Ship faster" - Watch your deployment frequency double in the first month
+- Job: let visitors self-qualify and pick a plan.
+- Works when: two to four plans; the recommended plan is marked; each plan says who it is
+  for; usage or credit pricing comes with worked examples or a calculator; annual and monthly
+  prices are clear; trial and cancellation terms are stated.
+- Mistakes: hidden prices on a self-serve product; feature tables nobody can parse; prices
+  you made up. Price levels come from the user or pricing-analyzer.
+- Proof slot: `[PRICE: from the current price list]`.
 
-## 7. Testimonials / Case Studies
+## 14. FAQ
 
-### Purpose
-Provide social proof through real customer stories. Let your customers sell your product for you.
+- Job: remove the last doubts before the ask.
+- Works when: five to eight questions written the way buyers ask them, drawn from the top
+  objections, sales calls and support tickets; short answers; links for depth.
+- Mistakes: questions nobody asks; answers that dodge; facts you could not confirm (mark
+  them `[CONFIRM: ...]`).
 
-### Best Practices
-- Use real names, photos, titles, and companies
-- Include specific numbers and outcomes when possible
-- Match testimonials to your target persona
-- 2-3 testimonials is ideal (more is not always better)
-- Video testimonials often outperform text testimonials (exact lift varies by audience)
-- Include the customer's problem and the result they achieved
+## 15. Lead form
 
-### Common Mistakes
-- Anonymous or vague testimonials ("Great product!" - J.S.)
-- No photos or company names
-- All testimonials saying the same thing
-- Testimonials from non-target personas
-- Too many testimonials creating a wall of text
+- Job: collect what sales needs, nothing more.
+- Works when: few fields; clear labels; a line on what happens next and when; a privacy
+  note; no fields the team does not use.
+- Mistakes: asking for phone and company size when sales does not use them; no
+  confirmation of next steps. Signup forms and the steps up to account creation belong to
+  web-app-growth-engine.
 
-### Examples
-- "We cut our onboarding time from 2 weeks to 3 days. The team actually enjoys using it." - Sarah Chen, VP Engineering at Acme Corp [photo]
+## 16. Final CTA
 
-## 8. Pricing Section
+- Job: one last, clear ask for visitors who read to the end.
+- Works when: it restates the outcome in one line, repeats the primary CTA, and repeats the
+  true risk reducer; it looks distinct from the section before.
+- Mistakes: a new CTA text that competes with the hero; fake urgency.
 
-### Purpose
-Present pricing clearly so visitors can self-qualify and make a purchase decision without contacting sales.
+## 17. Footer
 
-### Best Practices
-- Show 2-3 pricing tiers (avoid paradox of choice)
-- Highlight the recommended plan visually
-- List the most important features per tier (5-7 max)
-- Include a free tier or trial option
-- Show annual vs monthly pricing toggle
-- For usage-based or credit-based pricing, show a simple calculator or worked examples ("1,000 API calls ≈ $X") so buyers can estimate their bill
-- Add "No credit card required" near the CTA
-- Place pricing above the FAQ section
+- Job: navigation, legal and trust for visitors who look for it.
+- Works when: privacy policy, terms, imprint where required (for example in Germany),
+  security or trust page, contact; minimal on paid and demo landing pages.
+- Mistakes: missing legal links; a full sitemap on a paid landing page.
 
-### Common Mistakes
-- Hiding pricing entirely (creates distrust for SMB buyers)
-- Too many tiers or too many features listed
-- No highlighted/recommended plan
-- Enterprise-only pricing on a product-led page
-- Confusing pricing metrics (per seat vs per unit vs per usage)
+## 18. Every section: checks before handover
 
-### Examples
-- Three tiers: Free (for individuals), Pro ($29/month for teams), Enterprise (custom pricing)
-
-## 9. FAQ Section
-
-### Purpose
-Address common objections and questions that might prevent a visitor from converting. Reduce the need for sales calls.
-
-### Best Practices
-- 5-8 questions maximum
-- Lead with the most common objections first
-- Use collapsible/accordion format to save space
-- Include questions about pricing, security, setup time, and cancellation
-- Write in the customer's voice for the questions
-- Keep answers concise (2-3 sentences)
-- Consider pairing the FAQ with an AI chat widget/assistant that answers long-tail questions the FAQ does not cover
-
-### Common Mistakes
-- Too many questions that overwhelm the page
-- Questions nobody actually asks
-- Answers that are too long or too technical
-- Missing the key objection questions
-- No link to full help center for more questions
-
-### Examples
-- "How long does setup take?" - "Most teams are up and running in under 15 minutes. Connect your tools, invite your team, and start seeing results the same day."
-
-## 10. Integrations / Compatibility
-
-### Purpose
-Show that your product fits into the visitor's existing workflow and tool stack. Reduce switching cost concerns.
-
-### Best Practices
-- Display logos of popular integrations in a grid
-- Organize by category (communication, development, analytics, etc.)
-- Highlight the most popular integrations
-- Link to an integrations directory for the full list
-- Mention API availability for custom integrations
-
-### Common Mistakes
-- Listing integrations nobody uses
-- No visual organization or categories
-- Missing key integrations for your target audience
-- No mention of API or custom integration options
-- Outdated integration logos or broken links
-
-### Examples
-- Integration grid showing: Slack, GitHub, Jira, Linear, Notion, Google Workspace, Microsoft Teams, Zapier
-
-## 11. Final CTA Section
-
-### Purpose
-Provide one last conversion opportunity for visitors who have scrolled through the entire page and are ready to act.
-
-### Best Practices
-- Restate the core value proposition in one sentence
-- Use a visually distinct section (different background color)
-- Single, prominent CTA button
-- Add a secondary micro-CTA (e.g., "or book a demo")
-- Include a risk reducer ("Free 14-day trial, cancel anytime")
-- Create urgency if appropriate ("Join 500 teams who started this month")
-
-### Common Mistakes
-- Same CTA text as the hero (missed opportunity to evolve the message)
-- Too subtle - does not stand out from the rest of the page
-- Missing risk reducers at this decision point
-- Multiple CTAs that compete for attention
-- No value restatement to remind them why they scrolled this far
-
-### Examples
-- "Ready to ship faster? Start your free trial today." [CTA: Get Started Free] "No credit card required. Set up in 5 minutes."
-
-## 12. Footer
-
-### Purpose
-Provide navigation to important pages, build trust through legal compliance, and offer alternative conversion paths.
-
-### Best Practices
-- Organized link columns: Product, Company, Resources, Legal
-- Include social media links
-- Show compliance badges (SOC2, GDPR, etc.)
-- Add a newsletter signup or secondary CTA
-- Keep it clean and well-organized
-- Include contact information or support link
-
-### Common Mistakes
-- Cluttered footer with too many links
-- Missing legal pages (Privacy Policy, Terms of Service)
-- No way to contact support
-- Broken or outdated links
-- Missing social media presence
-
-### Examples
-- Four columns: Product (Features, Pricing, Integrations, Changelog), Company (About, Blog, Careers, Contact), Resources (Documentation, API Reference, Community, Status), Legal (Privacy, Terms, Security, GDPR)
+- Does this section do a job the page type needs? If not, cut it.
+- Is every number, name, quote, logo, rating and term sourced or a placeholder?
+- Is the copy in the buyer's words (voice-of-customer evidence) rather than the team's?
+- Is there exactly one primary CTA text on the page?
+- Would the section still make sense if a visitor read only its heading?

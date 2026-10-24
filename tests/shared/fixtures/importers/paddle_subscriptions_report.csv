@@ -1,0 +1,10 @@
+subscription_id,customer_id,customer_email,customer_country_code,subscription_status,subscription_created_at,subscription_started_at,subscription_trial_started_at,subscription_trial_ended_at,subscription_canceled_at,subscription_past_due_at,subscription_ends_at,subscription_billing_interval,subscription_billing_frequency,subscription_currency_code,subscription_last_billed_currency_code,subscription_last_billed_cycle_amount,subscription_cancellation_reason,subscription_has_converted_from_trial,active_recurring_product_name_list,subscription_total_units
+sub_01h001,ctm_01h001,ana@example.com,US,active,2025-09-01T10:00:00Z,2025-09-01T10:00:00Z,,,,,,month,1,USD,USD,29.00,,false,"[""Starter""]",1
+sub_01h002,ctm_01h002,ben@example.com,GB,active,2025-12-01T09:00:00Z,2025-12-01T09:00:00Z,,,,,,year,1,USD,USD,300.00,,false,"[""Starter""]",1
+sub_01h003,ctm_01h003,cem@example.com,DE,active,2026-02-01T08:00:00Z,2026-02-01T08:00:00Z,,,,,,month,3,USD,USD,90.00,,false,"[""Team""]",3
+sub_01h004,ctm_01h004,dee@example.com,US,canceled,2025-10-01T12:00:00Z,2025-10-01T12:00:00Z,,,2026-06-10T15:00:00Z,,2026-06-30T00:00:00Z,month,1,USD,USD,29.00,customer_request,false,"[""Starter""]",1
+sub_01h005,ctm_01h005,eli@example.com,FR,canceled,2025-11-01T12:00:00Z,2025-11-01T12:00:00Z,,,2026-07-15T09:00:00Z,,2026-07-15T09:00:00Z,month,1,USD,USD,29.00,chargeback,false,"[""Starter""]",1
+sub_01h006,ctm_01h006,fay@example.com,US,trialing,2026-09-10T11:00:00Z,2026-09-10T11:00:00Z,2026-09-10T11:00:00Z,2026-09-24T11:00:00Z,,,,month,1,USD,USD,,,false,"[""Starter""]",1
+sub_01h007,ctm_01h007,gus@example.com,NL,past_due,2026-03-01T07:00:00Z,2026-03-01T07:00:00Z,,,,2026-09-01T07:00:00Z,,month,1,EUR,EUR,25.00,,false,"[""Starter""]",1
+sub_01h008,ctm_01h008,hal@example.com,US,active,2026-05-01T10:00:00Z,2026-05-01T10:00:00Z,2026-05-01T10:00:00Z,2026-05-15T10:00:00Z,,,,month,1,USD,USD,29.00,,true,"[""Starter""]",1
+sub_01h009,ctm_01h009,ida@example.com,US,paused,2026-01-01T10:00:00Z,2026-01-01T10:00:00Z,,,,,,month,1,USD,USD,29.00,,false,"[""Starter""]",1

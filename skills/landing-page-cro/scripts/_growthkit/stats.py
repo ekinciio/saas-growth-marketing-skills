@@ -36,8 +36,10 @@ _STD_NORMAL = NormalDist()
 DEFAULT_ALPHA = 0.05
 DEFAULT_POWER = 0.8
 # Tests longer than this are usually not worth running: cookie churn, seasonality
-# and opportunity cost start to dominate. Callers can pass their own limit.
-DEFAULT_MAX_WEEKS = 6.0
+# and opportunity cost start to dominate. 4 weeks is the limit the report
+# contract sets (shared/standards/report-contract.md section 6); callers can
+# pass their own limit.
+DEFAULT_MAX_WEEKS = 4.0
 
 
 # --------------------------------------------------------------------------

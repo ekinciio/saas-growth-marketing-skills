@@ -5,7 +5,7 @@ sells and what the team is trying to achieve. It lives in the user's project roo
 on the first run, and is read first by every skill and agent in this toolkit.
 
 Do not confuse the two files: this standard (`shared/standards/growth-context.md`, synced into
-skills as `_shared/growth-context.md`) describes the format; the user's file
+skills as `references/_shared/growth-context.md`) describes the format; the user's file
 (`<project root>/growth-context.md`) holds their answers.
 
 ## Contents

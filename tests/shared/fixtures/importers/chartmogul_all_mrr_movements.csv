@@ -1,0 +1,11 @@
+customer_name,customer_uuid,customer_external_id,subscription_external_id,description,movement_type,date,account_currency,mrr_movement_in_account_currency,invoice_currency,mrr_movement_in_invoice_currency
+Example One,cus_0001,ext-1,sub-1,Started Growth plan,new_biz,2025-10-03 10:00:00,USD,100.00,USD,100.00
+Example Three,cus_0003,ext-3,sub-3,Started Scale plan,new_biz,2025-10-20 08:00:00,USD,300.00,USD,300.00
+Example Five,cus_0005,ext-5,sub-5,Started Starter plan,new_biz,2025-10-05 12:00:00,USD,80.00,USD,80.00
+Example Two,cus_0002,ext-2,sub-2,Started Scale plan,new_biz,2025-11-12 09:30:00,USD,200.00,USD,200.00
+Example Five,cus_0005,ext-5,sub-5,Cancelled Starter plan,churn,2025-12-15 00:00:00,USD,-80.00,USD,-80.00
+Example Four,cus_0004,ext-4,sub-4,Started Growth plan,new_biz,2026-01-15 14:00:00,USD,150.00,EUR,138.00
+Example One,cus_0001,ext-1,sub-1,Upgraded to Scale,expansion,2026-02-10 10:00:00,USD,50.00,USD,50.00
+Example Two,cus_0002,ext-2,sub-2,Removed seats,contraction,2026-03-01 09:30:00,USD,-80.00,USD,-80.00
+Example Three,cus_0003,ext-3,sub-3,Cancelled Scale plan,churn,2026-04-30 08:00:00,USD,-300.00,USD,-300.00
+Example Five,cus_0005,ext-5,sub-6,Restarted Starter plan,reactivation,2026-05-02 12:00:00,USD,80.00,USD,80.00

@@ -21,7 +21,7 @@ sidecars), and ends the file with the standard footer.
 The model usually writes the report text itself, so the same steps are
 available from the command line (run from the user's project folder):
 
-    PYTHONPATH="${CLAUDE_SKILL_DIR}/scripts" python3 -m _growthkit.report save \\
+    python3 "${CLAUDE_SKILL_DIR}/scripts/_growthkit/report.py" save \\
         --skill landing-page-cro --subject https://www.notion.com \\
         --markdown draft.md --data facts.json
 

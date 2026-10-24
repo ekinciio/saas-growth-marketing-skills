@@ -1,0 +1,26 @@
+{
+  "period_label": "2026-09",
+  "currency": "USD",
+  "beginning_mrr": 100000,
+  "new_mrr": 15000,
+  "expansion_mrr": 3000,
+  "contraction_mrr": 1000,
+  "churned_mrr": 2000,
+  "customers_start": 200,
+  "customers_new": 25,
+  "customers_churned": 8,
+  "sales_marketing_spend": 30000,
+  "gross_margin_pct": 78,
+  "net_burn": 40000,
+  "cash_balance": 900000,
+  "yoy_revenue_growth_pct": 80,
+  "profit_margin_pct": -20,
+  "margin_basis": "fcf",
+  "segment": {
+    "gtm_motion": "plg",
+    "pricing_model": "per-seat",
+    "ai_native": false,
+    "funding": "equity_backed",
+    "business_model": "b2b"
+  }
+}

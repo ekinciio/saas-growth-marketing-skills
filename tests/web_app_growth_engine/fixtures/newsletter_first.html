@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><title>Acme - Sign up</title></head><body>
+<header><form class="newsletter" action="/subscribe"><input type="email" name="email" placeholder="Get our newsletter"><button>Subscribe</button></form></header>
+<main>
+<a href="/auth/google/start" class="btn-google"><img src="g.svg" alt=""> Google</a>
+<button aria-label="Sign up with GitHub"><svg></svg></button>
+<form action="/accounts/create" class="signup">
+<input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off">
+<input type="email" name="email" required>
+<input type="password" name="password" required>
+<label><input type="radio" name="role" value="dev">Dev</label>
+<label><input type="radio" name="role" value="pm">PM</label>
+<label><input type="radio" name="role" value="design">Design</label>
+<label><input type="radio" name="role" value="other">Other</label>
+<label><input type="checkbox" name="tos" required> I agree to the Terms</label>
+<button type="submit">Create account</button>
+</form>
+</main>
+<footer><a href="https://twitter.com/acme">Twitter</a> <a href="https://linkedin.com/company/acme">LinkedIn</a> <script src="https://www.googletagmanager.com/gtm.js"></script></footer>
+</body></html>

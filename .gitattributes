@@ -1,0 +1,6 @@
+# Generated copies written by tools/sync_shared.py from shared/. Never edit
+# them by hand: edit shared/growthkit/, shared/standards/ or
+# shared/benchmarks/ and run python3 tools/sync_shared.py.
+# linguist-generated hides them from GitHub diffs and language stats.
+skills/*/scripts/_growthkit/** linguist-generated=true
+skills/*/references/_shared/** linguist-generated=true

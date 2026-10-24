@@ -1,0 +1,7 @@
+subscription[id],subscription[customer_id],customer[email],customer[first_name],subscription[plan_id],subscription[plan_quantity],subscription[plan_unit_price],subscription[currency_code],subscription[billing_period],subscription[billing_period_unit],subscription[status],subscription[started_at],subscription[trial_end],subscription[cancelled_at],subscription[cancel_reason]
+cb_sub_1,cust_1,ana@example.com,Ana,basic-USD-monthly,1,2900,USD,1,month,active,2025-11-01 10:00:00,,,
+cb_sub_2,cust_2,ben@example.com,Ben,pro-USD-yearly,2,60000,USD,1,year,active,2026-01-10 10:00:00,,,
+cb_sub_3,cust_3,cem@example.com,Cem,basic-USD-monthly,1,2900,USD,1,month,cancelled,2025-12-01 10:00:00,,2026-05-03 10:00:00,not_paid
+cb_sub_4,cust_4,dee@example.com,Dee,basic-USD-monthly,1,2900,USD,1,month,in_trial,2026-09-01 10:00:00,2026-09-15 10:00:00,,
+cb_sub_5,cust_5,eli@example.com,Eli,pro-JPY-monthly,1,3000,JPY,1,month,active,2026-02-01 10:00:00,,,
+cb_sub_6,cust_6,fay@example.com,Fay,basic-USD-monthly,1,2900,USD,1,month,non_renewing,2026-03-01 10:00:00,,2026-10-01 10:00:00,

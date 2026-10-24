@@ -1,0 +1,10 @@
+id,Number,Customer,Customer Email,Customer Name,Amount Due,Amount Paid,Amount Remaining,Attempt Count,Attempted,Billing Reason,Currency,Date (UTC),Paid,Status,Subscription,Subtotal,Tax,Total
+in_1001,EX-0001,cus_A001,ana@example.com,Ana Example,49.00,49.00,0.00,1,true,subscription_cycle,usd,2026-07-10 09:12,true,paid,sub_1A001,49.00,0.00,49.00
+in_1002,EX-0002,cus_B001,ben@example.com,Ben Example,60.00,60.00,0.00,1,true,subscription_cycle,usd,2026-08-01 14:00,true,paid,sub_1B001,60.00,0.00,60.00
+in_1003,EX-0003,cus_G001,gus@example.com,Gus Example,49.00,0.00,49.00,4,true,subscription_cycle,usd,2026-09-05 07:45,false,open,sub_1G001,49.00,0.00,49.00
+in_1004,EX-0004,cus_E001,eli@example.com,Eli Example,49.00,0.00,49.00,3,true,subscription_cycle,usd,2026-05-01 12:00,false,uncollectible,sub_1E001,49.00,0.00,49.00
+in_1005,EX-0005,cus_J001,jon@example.com,Jon Example,49.00,49.00,0.00,2,true,subscription_cycle,usd,2026-08-15 10:00,true,paid,sub_1J001,49.00,0.00,49.00
+in_1006,EX-0006,cus_C001,cem@example.com,Cem Example,468.00,468.00,0.00,1,true,subscription_cycle,usd,2026-09-15 08:30,true,paid,sub_1C001,468.00,0.00,468.00
+in_1007,,cus_A001,ana@example.com,Ana Example,10.00,0.00,10.00,0,false,manual,usd,2026-09-20 10:00,false,draft,,10.00,0.00,10.00
+in_1008,EX-0008,cus_D001,dee@example.com,Dee Example,49.00,0.00,0.00,1,true,subscription_cycle,usd,2026-03-01 10:00,false,void,sub_1D001,49.00,0.00,49.00
+in_1009,EX-0009,cus_I001,ida@example.com,Ida Example,45.00,45.00,0.00,1,true,subscription_cycle,eur,2026-09-01 09:00,true,paid,sub_1I001,45.00,0.00,45.00

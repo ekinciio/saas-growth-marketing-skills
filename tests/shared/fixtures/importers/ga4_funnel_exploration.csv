@@ -1,0 +1,17 @@
+# ----------------------------------------
+# Funnel exploration
+# Account: Example Account
+# Property: Example Property
+# ----------------------------------------
+#
+# Start date: 20260801
+# End date: 20260831
+Step,Device category,Active users,Completion rate,Abandonments,Abandonment rate
+1. Visit pricing,desktop,4000,45%,2200,55%
+2. Start signup,desktop,1800,50%,900,50%
+3. Complete signup,desktop,900,40%,540,60%
+4. Create project,desktop,360,,,
+1. Visit pricing,mobile,3000,30%,2100,70%
+2. Start signup,mobile,900,40%,540,60%
+3. Complete signup,mobile,360,50%,180,50%
+4. Create project,mobile,180,,,

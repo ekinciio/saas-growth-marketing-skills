@@ -39,8 +39,8 @@ This one line decides how every skill presents scores. Allowed values:
 Status: the default mode is an open maintainer decision. The value above follows the
 recommendation of the 1.2 review (`rubric`) until that decision is made. To change it, edit
 only this line in `shared/standards/report-contract.md` and run `python3 tools/sync_shared.py`
-so every skill's `_shared/` copy picks it up. Scripts and report helpers read the value with
-the multiline regex `^scoring_mode: *(deterministic|rubric|none) *$`.
+so every skill's `references/_shared/` copy picks it up. Scripts and report helpers read the
+value with the multiline regex `^scoring_mode: *(deterministic|rubric|none) *$`.
 
 What the switch covers: composite quality scores and grades, such as the CRO score, AI-search
 readiness score, citability score, ASO listing score, signup friction score, onboarding score,
@@ -195,8 +195,8 @@ Exactly three bets, ranked by ICE score. Each bet has:
      assumption).
   2. Run the shared stats helper (`stats.py` in the growthkit library) through the command
      the skill's SKILL.md gives (two proportions, alpha 0.05 two-sided, power 0.8, two
-     variants) with a 4-week limit (`max_weeks=4`; the helper's own default is 6, which is
-     too long for this contract). Never estimate sample sizes yourself.
+     variants) with a 4-week limit (`max_weeks=4`, which is also the helper's default).
+     Never estimate sample sizes yourself.
   3. Required time 4 weeks or less: plan an A/B test with the sample per variant, the duration
      in whole weeks (`weeks_rounded`, but at least 2), and a fixed stopping point (no early
      stopping on a peek).

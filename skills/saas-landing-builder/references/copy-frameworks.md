@@ -1,221 +1,180 @@
-# Landing Page Copy Frameworks
+# Copy Frameworks and Voice-of-Customer Copy
 
-Five proven copy frameworks for SaaS landing pages, each with structure, best use cases, and practical examples.
+Last verified: 2026-10
 
-## 1. PAS - Problem, Agitate, Solution
+Read this before you choose a framework or write any section copy. All examples are
+illustrative: "Acme" is fictional, and every number, name or quote in an example is a
+bracketed placeholder on purpose. Never copy an example's claims into a user's page.
 
-### Structure
-1. **Problem** - State the problem clearly
-2. **Agitate** - Make the problem feel more painful and urgent
-3. **Solution** - Present your product as the answer
+## Contents
 
-### When to Use
-- When the audience is problem-aware but not solution-aware
-- For products that solve a clear, specific pain point
-- When the problem has emotional weight (frustration, wasted time, lost money)
-- Best for: Landing pages, email sequences, ad copy
+1. Choose the framework from awareness and proof
+2. PAS: Problem, Agitate, Solution
+3. AIDA: Attention, Interest, Desire, Action
+4. BAB: Before, After, Bridge
+5. 4Ps: Promise, Picture, Proof, Push
+6. StoryBrand
+7. Voice of customer: write in the buyer's words
+8. Headlines, subheadlines and CTAs
+9. Plain-language rules
+10. Notes for 2026
 
-### SaaS Landing Page Example
+---
 
-**Problem:**
-"Your team spends 10+ hours every week building reports manually."
+## 1. Choose the framework from awareness and proof
 
-**Agitate:**
-"That is 500+ hours a year - the equivalent of three full-time months - spent copying data between spreadsheets, formatting charts, and chasing teammates for updates. Meanwhile, the numbers are already outdated by the time you hit send."
+Pick from the awareness stage of the main traffic source and the proof inventory, then say
+why in the report's Details section. A framework is a sequence of jobs, not a template to
+fill line by line.
 
-**Solution:**
-"Acme connects to your existing tools and generates real-time reports automatically. Your team gets those hours back, and your stakeholders get accurate data every time."
+| Awareness (main traffic) | Proof inventory | Framework | Why |
+|---|---|---|---|
+| Unaware or problem-aware | Any | PAS | Visitors must recognize the problem before a product matters |
+| Problem-aware, the change is easy to picture | Any | BAB | A clear before and after carries the page |
+| Solution-aware (comparing options) | Any | AIDA, with a "why us over [main alternative]" Interest step | They know the category; difference and desire do the work |
+| Product-aware | Real, sourced results | 4Ps | The Proof step needs real evidence; without it this framework produces invented claims |
+| Product-aware | Thin or none | AIDA with an offer-led hero and a risk reducer that is true | Lean on the offer and the product itself, not on proof you do not have |
+| Brand homepage for several audiences, sales-led | Any | StoryBrand for the narrative, PAS or AIDA inside sections | The customer is the hero; the brand is the guide |
 
-### Section Mapping
-- Hero headline: Problem statement
-- Section below hero: Agitation
-- Solution overview section: Solution
-- Feature grid: Solution details
+Never pick 4Ps when the proof inventory is empty: its Proof step would be all placeholders,
+and the page would make a promise it cannot back.
 
-## 2. AIDA - Attention, Interest, Desire, Action
+## 2. PAS: Problem, Agitate, Solution
 
-### Structure
-1. **Attention** - Grab the visitor's attention immediately
-2. **Interest** - Build interest with relevant information
-3. **Desire** - Create desire by showing outcomes and benefits
-4. **Action** - Drive a specific action with a clear CTA
+- **Problem**: the situation in the buyer's words (from voice-of-customer phrases).
+- **Agitate**: the cost of leaving it as is (time, money, risk, stress), stated concretely
+  and honestly; no scare tactics.
+- **Solution**: the product as the way out, tied point by point to the problem.
 
-### When to Use
-- When competing for attention in a crowded market
-- For products with strong visual appeal or impressive results
-- When you need to educate the audience about a new category
-- Best for: Landing pages, product launches, competitive positioning
+Section mapping: hero states the problem or the outcome; the block after the hero agitates;
+solution and features answer it.
 
-### SaaS Landing Page Example
+Illustrative example:
 
-**Attention:**
-"What if your code reviews took 5 minutes instead of 5 hours?"
+- Problem: "Month-end close still means copying CSVs between [number of tools] tools."
+- Agitate: "Every manual match is a chance to miss a payout, and the close slips into the
+  next month."
+- Solution: "Acme matches every payout to every bank line and posts the journal entry for
+  you."
 
-**Interest:**
-"Our AI reviews every pull request the moment it is opened - checking for bugs, security issues, and style consistency. It learns your team's patterns and gets smarter with every review."
+## 3. AIDA: Attention, Interest, Desire, Action
 
-**Desire:**
-"Teams using our tool merge PRs 3x faster, catch 40% more bugs before production, and spend their time building features instead of reviewing code. Imagine deploying with confidence every single day."
+- **Attention**: a headline that names the outcome or the difference.
+- **Interest**: how it works and why it is different from [main alternative].
+- **Desire**: what changes for the buyer, shown with real proof or the product itself.
+- **Action**: one clear next step with a true risk reducer.
 
-**Action:**
-"Start your free 14-day trial. No credit card needed. Your first AI code review is 60 seconds away."
+Section mapping: hero (Attention), solution, features and how it works (Interest),
+testimonials and demo (Desire), final CTA (Action).
 
-### Section Mapping
-- Hero: Attention (bold headline)
-- Problem + Solution sections: Interest
-- Testimonials + Case studies: Desire
-- Final CTA: Action
+## 4. BAB: Before, After, Bridge
 
-## 3. BAB - Before, After, Bridge
+- **Before**: today, in the buyer's words.
+- **After**: the same day once the problem is gone, concrete and believable.
+- **Bridge**: the product and the few steps that get them there.
 
-### Structure
-1. **Before** - Describe the current painful situation
-2. **After** - Paint a picture of the ideal future state
-3. **Bridge** - Show how your product gets them from Before to After
+Section mapping: problem (Before), solution (After), how it works and features (Bridge),
+testimonials (real before-and-after stories, when the user has them).
 
-### When to Use
-- When the transformation story is compelling
-- For products that enable a clear before/after comparison
-- When visual storytelling works well
-- Best for: Landing pages, case studies, upgrade pages
+## 5. 4Ps: Promise, Picture, Proof, Push
 
-### SaaS Landing Page Example
+- **Promise**: a specific outcome the user can substantiate.
+- **Picture**: what life looks like with the promise kept.
+- **Proof**: sourced results, named testimonials, case studies (only real ones).
+- **Push**: the offer and a true risk reducer.
 
-**Before:**
-"Right now, your customer support team is drowning. Tickets pile up, response times stretch to hours, and frustrated customers leave 1-star reviews. Your agents are burned out, and your CSAT scores are dropping every quarter."
+Illustrative example: "Promise: [METRIC: close time reduced, from customer data]. Proof:
+[CASE STUDY: named customer, before and after]." If those placeholders cannot be filled
+before launch, switch frameworks.
 
-**After:**
-"Picture this: tickets are auto-categorized and routed to the right agent. Common questions are answered instantly by AI. Your response time is under 2 minutes. Your agents handle complex issues that matter, and your CSAT score is above 90%."
+## 6. StoryBrand
 
-**Bridge:**
-"Acme is the AI-powered support platform that makes this transformation happen. Connect your existing help desk, train the AI on your knowledge base in one click, and start resolving tickets faster - starting today."
+From Donald Miller, *Building a StoryBrand* (2017). The customer is the hero, the brand is
+the guide.
 
-### Section Mapping
-- Problem statement: Before
-- Solution overview: After
-- How it works + Features: Bridge
-- Testimonials: Before/After proof from real customers
+- Character: who the buyer is and what they want.
+- Problem: external (the task), internal (how it feels), philosophical (why it is wrong).
+- Guide: empathy plus authority (authority = real proof only).
+- Plan: three simple steps.
+- Call to action: direct ("Book a demo") plus transitional ("Watch the product tour" only if
+  it exists).
+- Success and failure: what changes, and what it costs to do nothing (honest, no fear
+  tactics).
 
-## 4. 4Ps - Promise, Picture, Proof, Push
+Use it for brand homepages and sales-led homepages; it is too long for most paid LPs.
 
-### Structure
-1. **Promise** - Make a bold, specific promise
-2. **Picture** - Paint a vivid picture of life with the promise fulfilled
-3. **Proof** - Back up the promise with evidence
-4. **Push** - Push the reader to take action now
+## 7. Voice of customer: write in the buyer's words
 
-### When to Use
-- When you have strong data or case studies to back claims
-- For products with measurable outcomes
-- When the audience is skeptical and needs proof
-- Best for: Landing pages, product pages, pricing pages
+Copy built from customer language beats copy built from the team's vocabulary. This is the
+step that separates a consultant's draft from generic AI copy.
 
-### SaaS Landing Page Example
+Sources, best first:
 
-**Promise:**
-"Double your email open rates in 30 days."
+1. What the user pastes or points to: interview notes, sales-call notes, support tickets,
+   survey answers, churn reasons, their own review exports. Remove names, emails and company
+   names before quoting.
+2. Reports already in `growth-reports/` from review-sentiment (themes and quotes from
+   reviews) or reddit-opportunity-finder (threads where people describe the problem).
+3. Public sources found with web search: reviews of the main alternative on G2, Capterra or
+   app stores, and community threads about the problem. At most 5 sources per run. Quote
+   short phrases (under 15 words), never usernames, always with the URL and date.
 
-**Picture:**
-"Imagine opening your analytics dashboard and seeing 45% open rates instead of 22%. Your campaigns are driving real revenue. Your boss is impressed. Your competitors are wondering what changed."
+Build a phrase bank before writing:
 
-**Proof:**
-"Over 2,000 marketing teams have used our AI subject line optimizer to increase their open rates. The average improvement is 2.1x within the first month. Here is what they say:" [testimonials with specific metrics]
+| Bucket | What to collect | Used in |
+|---|---|---|
+| Pains | How they describe the problem and its cost | Problem, hero, agitate |
+| Desired outcomes | What "done" looks like to them | Hero, solution, after |
+| Triggers | What made them look for a tool now | Hero variants, message match |
+| Objections | Why they hesitated or chose something else | FAQ, security, comparison |
+| Category words | What they call the product type | Eyebrow, subheadline, SEO title |
 
-**Push:**
-"Start your free trial today. Paste in your next campaign and see the AI-optimized subject lines in seconds. If your open rates do not improve in 30 days, we will extend your trial - no questions asked."
+Every phrase used in copy gets an evidence ID with its source. If no voice-of-customer data
+exists, say so under "Not measured" and recommend 5 customer conversations to validate the
+wording before launch.
 
-### Section Mapping
-- Hero: Promise (bold headline with specific claim)
-- Solution overview: Picture
-- Testimonials + Social proof: Proof
-- Final CTA: Push (with risk reversal)
+## 8. Headlines, subheadlines and CTAs
 
-## 5. StoryBrand - Character, Problem, Guide, Plan, Action, Success, Failure
+Headlines:
 
-### Structure
-1. **Character** - The customer is the hero, not your product
-2. **Problem** - Define the external, internal, and philosophical problem
-3. **Guide** - Position your brand as the trusted guide
-4. **Plan** - Give them a simple plan to follow
-5. **Action** - Call them to action clearly
-6. **Success** - Show what success looks like
-7. **Failure** - Show what failure looks like (what they risk by not acting)
+- Say the outcome for the ICP, or the problem in their words. The subheadline says what the
+  product is, for whom, and how it differs from the main alternative.
+- The hero should pass a five-second test: a stranger can say what it is, who it is for and
+  what to do next.
+- Write 3 to 5 variants with different angles (outcome, problem, difference, audience,
+  proof-led only with real proof) and say which awareness stage each fits.
+- Clever is fine only when it is also clear.
 
-### When to Use
-- When building a brand narrative, not just selling a feature
-- For products that require trust and relationship building
-- When the buying decision is emotional and high-stakes
-- Best for: Homepage, about page, brand-level landing pages
+CTAs:
 
-### SaaS Landing Page Example
+- Start with a verb and name what they get ("Start free", "Get a demo", "Join the
+  waitlist"); avoid "Submit" and "Learn more" as the primary CTA.
+- One primary CTA text across the page. A secondary CTA serves a less ready visitor
+  ("See how it works"), not a different goal.
+- Risk reducers next to the CTA must be true today (real trial length, card requirement,
+  cancellation terms).
 
-**Character (the customer):**
-"You are a startup founder trying to grow your business."
+Microcopy that often matters: what happens after the click, form field hints, privacy note
+next to email fields, and the plan or trial terms.
 
-**Problem:**
-- External: "You need more customers but do not have a marketing team."
-- Internal: "You feel overwhelmed by all the marketing channels and tactics."
-- Philosophical: "Growing a great product should not require a marketing degree."
+## 9. Plain-language rules
 
-**Guide (your brand):**
-"We have helped 1,000+ founders grow from zero to their first 10,000 customers. We know the path because we have walked it ourselves."
+- Short sentences, concrete nouns, active verbs. Prefer the buyer's words to the team's.
+- Replace adjectives with specifics the user can source; otherwise drop the adjective.
+- "You" and "your" more than "we" and "our".
+- Reading level matters on SaaS pages: run `blueprint_tools.py benchmarks` and cite the
+  `value_note` of the Unbounce SaaS row when you mention it, with source and year.
+- Write in the page's language from the start; do not translate English copy line by line.
+  Keep product and category terms the market actually uses.
 
-**Plan:**
-1. "Connect your product" - 5-minute setup
-2. "Choose your growth playbook" - Proven templates for your stage
-3. "Launch and learn" - Automated experiments with clear results
+## 10. Notes for 2026
 
-**Action:**
-"Start growing today - free for your first 1,000 users."
-
-**Success:**
-"Join founders who went from struggling to find customers to having a predictable growth engine that runs while they sleep."
-
-**Failure:**
-"Without a systematic approach, you will keep guessing which channels work, burning budget on tactics that do not convert, and watching competitors pass you by."
-
-### Section Mapping
-- Hero: Character + Problem (external)
-- Problem section: Problem (internal + philosophical)
-- Social proof: Guide credibility
-- How it works: Plan
-- CTA sections: Action
-- Testimonials: Success stories
-- Above final CTA: Failure (subtle urgency)
-
-## Framework Selection Guide
-
-| Framework | Best When | Tone | Complexity |
-|-----------|-----------|------|------------|
-| PAS | Clear pain point exists | Empathetic | Simple |
-| AIDA | Competitive market | Exciting | Medium |
-| BAB | Strong transformation story | Aspirational | Simple |
-| 4Ps | Data-backed claims available | Confident | Medium |
-| StoryBrand | Brand building needed | Narrative | Complex |
-
-## Copy Writing Tips for All Frameworks
-
-### Headlines
-- Use numbers when possible ("3x faster", "50% less time")
-- Front-load the benefit in the first 3 words
-- Keep primary headlines under 10 words
-- Test headlines against each other - they have the highest impact
-
-### Body Copy
-- Write at an 8th-grade reading level
-- Use short paragraphs (2-3 sentences maximum)
-- Bold key phrases for scanners
-- Use "you" and "your" more than "we" and "our"
-- Replace adjectives with specific numbers
-
-### CTAs
-- Start with a verb: "Get", "Start", "Try", "Create", "Build"
-- Add value context: "Start your free trial" not "Submit"
-- Include risk reducer nearby: "No credit card required"
-- Test CTA colors - contrast with page background matters
-
-### Social Proof Copy
-- Use specific numbers: "12,847 teams" not "thousands of teams"
-- Include outcomes: "saved an average of 15 hours/week"
-- Name real companies when possible
-- Match proof to target audience persona
+- AI features: "AI-powered" is not a value proposition. Say what the AI does for the user and
+  what they no longer have to do.
+- Answer-ready copy: a plain one-sentence definition ("Acme is [category] for [ICP] that
+  [outcome]") near the top helps people and AI assistants describe the product correctly.
+  For AI-search readiness of the whole site, use geo-seo-auditor.
+- Interactive demos and short product clips can replace long feature sections; only
+  reference ones that exist.
+- Accessibility is part of copy: descriptive link text, real button labels and alt text for
+  product images.
